@@ -1,0 +1,884 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Priyansh's Rise // BEAST MODE</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;800;900&display=swap" rel="stylesheet">
+    
+    <!-- Canvas Confetti -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Poppins', 'sans-serif'] },
+                    colors: {
+                        darkBg: '#090e17',
+                        cardBg: '#1e293b',
+                        accent: '#10b981',
+                        danger: '#ef4444',
+                        warning: '#f59e0b',
+                        iit: '#3b82f6',
+                        iitDark: '#1e3a8a',
+                        subjectP: '#3b82f6', /* Blue */
+                        subjectC: '#10b981', /* Green */
+                        subjectM: '#ef4444'  /* Red */
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { background-color: #090e17; color: white; overflow-x: hidden; transition: filter 1s ease; }
+        
+        /* Glassmorphism & Glowing Effects */
+        .glass-card { background: rgba(30, 41, 59, 0.4); backdrop-filter: blur(16px); border: 1px solid rgba(255,255,255,0.08); box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1); }
+        .glass-input { background: rgba(15, 23, 42, 0.8); border: 1px solid rgba(255,255,255,0.1); color: white; transition: all 0.3s ease; }
+        .glass-input:focus { border-color: #10b981; box-shadow: 0 0 12px rgba(16, 185, 129, 0.3); outline: none; }
+        
+        .flame-glow { text-shadow: 0 0 15px rgba(239, 68, 68, 0.9); animation: pulse 2s infinite; }
+        .iit-glow { text-shadow: 0 0 15px rgba(59, 130, 246, 0.9); animation: pulse 2.5s infinite; }
+        .heat-glow { box-shadow: 0 0 10px rgba(52, 211, 153, 0.8); }
+        
+        /* Relapse Tax - Recovery Mode */
+        .recovery-mode { filter: grayscale(85%) brightness(0.8); }
+        
+        @keyframes pulse { 0% { opacity: 0.8; transform: scale(1); } 50% { opacity: 1; transform: scale(1.05); } 100% { opacity: 0.8; transform: scale(1); } }
+        
+        /* Custom Checkbox */
+        .cyber-checkbox input { display: none; }
+        .cyber-checkbox .box { width: 20px; height: 20px; border: 2px solid #475569; border-radius: 6px; display: inline-flex; align-items: center; justify-content: center; transition: all 0.2s; cursor: pointer; }
+        .cyber-checkbox input:checked + .box { background-color: #10b981; border-color: #10b981; box-shadow: 0 0 10px rgba(16,185,129,0.4); }
+        .cyber-checkbox input:checked + .box::after { content: '✔'; color: #090e17; font-size: 12px; font-weight: 900; }
+        .cyber-checkbox input:checked ~ span.chapter-text { text-decoration: line-through; color: #64748b; }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #090e17; }
+        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #475569; }
+
+        /* Smooth Tab Transitions */
+        .tab-content { display: none; opacity: 0; transition: opacity 0.4s ease; }
+        .tab-content.active { display: block; opacity: 1; animation: fadeIn 0.4s ease forwards; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body id="app-body" class="min-h-screen p-4 md:p-6 lg:p-8 flex flex-col">
+
+    <!-- Header & Stats -->
+    <div class="max-w-7xl mx-auto w-full mb-6 flex flex-col md:flex-row justify-between items-center gap-6">
+        <div>
+            <h1 class="text-4xl md:text-5xl font-black tracking-tight mb-1 flex items-center gap-3">
+                PRIYANSH'S <span class="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-blue-500">RISE</span>
+                <i data-lucide="rocket" class="text-blue-400" width="32" height="32"></i>
+            </h1>
+            <p id="system-status" class="text-gray-400 text-xs tracking-widest uppercase font-bold text-accent">System Online // Target: IIT 2027</p>
+        </div>
+        
+        <div class="flex gap-4">
+            <div class="glass-card px-5 py-2.5 rounded-2xl flex items-center gap-3 border-b-2 border-b-yellow-500">
+                <i data-lucide="star" class="text-yellow-400 fill-yellow-400"></i>
+                <div>
+                    <div class="text-[10px] text-gray-400 uppercase font-bold">Rank XP</div>
+                    <div class="font-black text-xl leading-none" id="xp-display">0</div>
+                </div>
+            </div>
+            <div class="glass-card px-5 py-2.5 rounded-2xl flex items-center gap-3 border-b-2 border-b-iit">
+                <i data-lucide="shield" class="text-iit fill-iit/20"></i>
+                <div>
+                    <div class="text-[10px] text-gray-400 uppercase font-bold">Shields</div>
+                    <div class="font-black text-xl leading-none" id="shield-display">1</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Triple View Navigation -->
+    <div class="max-w-7xl mx-auto w-full mb-8 flex justify-center md:justify-start gap-2 border-b border-slate-800 pb-1 overflow-x-auto scrollbar-hide">
+        <button onclick="window.switchTab('dashboard')" id="nav-dashboard" class="px-6 py-2.5 rounded-t-lg font-bold text-sm transition-all duration-300 bg-slate-800 text-white border-b-2 border-accent flex items-center gap-2 whitespace-nowrap">
+            <i data-lucide="layout-dashboard" width="16" height="16"></i> Command Center
+        </button>
+        <button onclick="window.switchTab('boards')" id="nav-boards" class="px-6 py-2.5 rounded-t-lg font-bold text-sm transition-all duration-300 text-gray-500 hover:text-gray-300 flex items-center gap-2 whitespace-nowrap">
+            <i data-lucide="book-open-check" width="16" height="16"></i> Board Exams
+        </button>
+        <button onclick="window.switchTab('logs')" id="nav-logs" class="px-6 py-2.5 rounded-t-lg font-bold text-sm transition-all duration-300 text-gray-500 hover:text-gray-300 flex items-center gap-2 whitespace-nowrap">
+            <i data-lucide="database" width="16" height="16"></i> Data Vault
+        </button>
+    </div>
+
+    <!-- MAIN WRAPPER -->
+    <div class="max-w-7xl mx-auto w-full flex-1">
+
+        <!-- ============================================== -->
+        <!-- TAB 1: COMMAND CENTER (DASHBOARD)              -->
+        <!-- ============================================== -->
+        <div id="tab-dashboard" class="tab-content active">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 mb-10">
+                
+                <!-- Left Column (Span 4): Intel & Analytics -->
+                <div class="lg:col-span-4 flex flex-col gap-6">
+                    
+                    <!-- Daily War Cry -->
+                    <div class="glass-card rounded-2xl p-5 border-l-4 border-l-danger">
+                        <h2 class="text-[11px] text-gray-400 uppercase tracking-widest font-bold mb-3 flex items-center gap-2">
+                            <i data-lucide="swords" width="14" height="14" class="text-danger"></i> Daily War Cry
+                        </h2>
+                        <textarea id="warcry-input" onchange="window.saveWarCry()" placeholder="e.g., I will finish Rotation Mechanics today no matter what." class="w-full glass-input rounded-lg p-3 text-sm resize-none" rows="3"></textarea>
+                    </div>
+
+                    <!-- Focus Heatmap & Logging -->
+                    <div class="glass-card rounded-2xl p-5 relative overflow-hidden">
+                        <div class="absolute -right-4 -top-4 opacity-5"><i data-lucide="brain" width="100" height="100"></i></div>
+                        <div class="flex justify-between items-center mb-4">
+                            <h2 class="text-[11px] text-gray-400 uppercase tracking-widest font-bold flex items-center gap-2">
+                                <i data-lucide="activity" width="14" height="14" class="text-accent"></i> Focus Heatmap
+                            </h2>
+                            <button onclick="window.openLogModal()" class="bg-accent/10 text-accent hover:bg-accent hover:text-slate-900 px-3 py-1.5 rounded text-[10px] font-black uppercase tracking-wider transition flex items-center gap-1 shadow-[0_0_10px_rgba(16,185,129,0.1)]">
+                                <i data-lucide="pencil" width="12" height="12"></i> Log Hours
+                            </button>
+                        </div>
+                        
+                        <div class="bg-slate-900/80 p-3 rounded-lg border border-slate-800">
+                            <div id="heatmap-container" class="flex flex-wrap gap-1.5 justify-end"></div>
+                        </div>
+                    </div>
+
+                    <!-- The Trinity Balance & Diagnostics -->
+                    <div class="glass-card rounded-2xl p-5">
+                        <h2 class="text-[11px] text-gray-400 uppercase tracking-widest font-bold mb-4 flex items-center gap-2">
+                            <i data-lucide="scale" width="14" height="14" class="text-iit"></i> The Trinity Balance (7 Days)
+                        </h2>
+                        
+                        <div id="diagnostics-container" class="mb-4 flex flex-col gap-2">
+                            <!-- Warnings injected here -->
+                        </div>
+
+                        <div id="trinity-graphs-container" class="space-y-4">
+                            <!-- Graphs injected here -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Column (Span 8): Streaks Engine -->
+                <div class="lg:col-span-8 flex flex-col gap-6">
+                    
+                    <div class="glass-card rounded-2xl p-5 flex flex-col sm:flex-row gap-4 items-end bg-gradient-to-br from-slate-800/40 to-slate-900/60">
+                        <div class="flex-1 w-full">
+                            <label class="block text-[10px] text-gray-400 uppercase font-bold mb-2 tracking-wider">Deploy Mission Protocol</label>
+                            <input type="text" id="habit-name" placeholder="e.g., NoFap, Wake up 5AM, Exercise..." class="w-full glass-input rounded-lg px-4 py-3">
+                        </div>
+                        <div class="w-full sm:w-28">
+                            <label class="block text-[10px] text-gray-400 uppercase font-bold mb-2 tracking-wider">Start Count</label>
+                            <input type="number" id="habit-start-count" placeholder="0" min="0" class="w-full glass-input rounded-lg px-4 py-3">
+                        </div>
+                        <button onclick="window.addHabit()" class="w-full sm:w-auto bg-white text-slate-900 hover:bg-gray-200 font-black py-3 px-6 rounded-lg transition shadow-[0_0_15px_rgba(255,255,255,0.2)] flex items-center justify-center gap-2">
+                            <i data-lucide="plus" width="18" height="18"></i> Deploy
+                        </button>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4" id="habits-container">
+                        <!-- Habit Cards generated here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ============================================== -->
+        <!-- TAB 2: DATA VAULT (DETAILED LOGS)              -->
+        <!-- ============================================== -->
+        <div id="tab-logs" class="tab-content">
+            <div class="glass-card rounded-2xl p-6 md:p-8">
+                <h2 class="text-2xl font-black mb-6 flex items-center gap-3 border-b border-slate-700 pb-4">
+                    <i data-lucide="server" class="text-accent"></i> Execution History
+                </h2>
+                <div id="logs-vault-container" class="flex flex-col gap-4">
+                    <!-- Logs injected here -->
+                </div>
+            </div>
+        </div>
+
+        <!-- ============================================== -->
+        <!-- TAB 3: BOARD EXAM TRACKER                      -->
+        <!-- ============================================== -->
+        <div id="tab-boards" class="tab-content">
+            <div class="flex flex-col md:flex-row justify-between items-center gap-4 mb-6">
+                <h2 class="text-2xl font-black flex items-center gap-3">
+                    <i data-lucide="book-open-check" class="text-yellow-500"></i> Board Prep Directives
+                </h2>
+                <div class="flex gap-2 w-full md:w-auto">
+                    <input type="text" id="new-board-subject" placeholder="New Subject (e.g., English)" class="glass-input rounded-lg px-4 py-2 text-sm w-full md:w-64">
+                    <button onclick="window.addBoardSubject()" class="bg-slate-700 hover:bg-slate-600 text-white font-bold py-2 px-4 rounded-lg transition"><i data-lucide="plus" width="18" height="18"></i></button>
+                </div>
+            </div>
+
+            <div id="boards-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Board Cards injected here -->
+            </div>
+        </div>
+
+    </div> <!-- End Main Wrapper -->
+
+    <!-- Footer Status -->
+    <div class="max-w-7xl mx-auto w-full mt-auto py-4 flex justify-between items-center text-[10px] uppercase font-bold tracking-widest text-gray-600 border-t border-slate-800">
+        <span id="db-status" class="flex items-center gap-2">
+            <i data-lucide="loader-2" class="animate-spin" width="14" height="14"></i> Establishing Uplink...
+        </span>
+        <button onclick="window.clearData()" class="hover:text-danger transition flex items-center gap-1">
+            <i data-lucide="triangle-alert" width="12" height="12"></i> Factory Reset
+        </button>
+    </div>
+
+    <!-- ============================================== -->
+    <!-- MODALS                                         -->
+    <!-- ============================================== -->
+
+    <!-- Study Hours Logging Modal -->
+    <div id="study-modal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center hidden opacity-0 transition-opacity duration-300">
+        <div class="bg-[#0f172a] p-8 rounded-3xl border border-slate-700 shadow-2xl max-w-lg w-full mx-4 transform scale-95 transition-transform duration-300 flex flex-col" id="study-modal-content">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-xl font-black text-white flex items-center gap-2"><i data-lucide="target" class="text-accent"></i> Log Exact Hours</h2>
+                <button onclick="window.closeLogModal()" class="text-gray-500 hover:text-white transition"><i data-lucide="x"></i></button>
+            </div>
+            
+            <p class="text-xs text-gray-400 mb-6 uppercase tracking-widest font-bold">Log absolute numbers (e.g., 1.5, 2, 0.5)</p>
+
+            <div class="grid grid-cols-2 gap-8 mb-8">
+                <!-- Class 12 -->
+                <div class="space-y-4">
+                    <h3 class="text-xs text-iit font-bold border-b border-slate-800 pb-1">CLASS 12 (CURRENT)</h3>
+                    <div><label class="text-[10px] uppercase text-gray-400">Physics (Hrs)</label><input type="number" id="h-p12" step="0.1" min="0" class="w-full glass-input rounded p-2 text-sm mt-1"></div>
+                    <div><label class="text-[10px] uppercase text-gray-400">Chemistry (Hrs)</label><input type="number" id="h-c12" step="0.1" min="0" class="w-full glass-input rounded p-2 text-sm mt-1"></div>
+                    <div><label class="text-[10px] uppercase text-gray-400">Math (Hrs)</label><input type="number" id="h-m12" step="0.1" min="0" class="w-full glass-input rounded p-2 text-sm mt-1"></div>
+                </div>
+                <!-- Class 11 -->
+                <div class="space-y-4">
+                    <h3 class="text-xs text-warning font-bold border-b border-slate-800 pb-1">CLASS 11 (REVISION)</h3>
+                    <div><label class="text-[10px] uppercase text-gray-400">Physics (Hrs)</label><input type="number" id="h-p11" step="0.1" min="0" class="w-full glass-input rounded p-2 text-sm mt-1"></div>
+                    <div><label class="text-[10px] uppercase text-gray-400">Chemistry (Hrs)</label><input type="number" id="h-c11" step="0.1" min="0" class="w-full glass-input rounded p-2 text-sm mt-1"></div>
+                    <div><label class="text-[10px] uppercase text-gray-400">Math (Hrs)</label><input type="number" id="h-m11" step="0.1" min="0" class="w-full glass-input rounded p-2 text-sm mt-1"></div>
+                </div>
+            </div>
+
+            <button onclick="window.saveStudyLog()" class="w-full bg-accent hover:bg-emerald-400 text-slate-900 font-black py-3 rounded-xl transition shadow-[0_0_15px_rgba(16,185,129,0.3)]">
+                Secure Data to Vault
+            </button>
+        </div>
+    </div>
+
+    <!-- Milestone Modal -->
+    <div id="milestone-modal" class="fixed inset-0 bg-black/90 backdrop-blur-sm z-50 flex items-center justify-center hidden opacity-0 transition-opacity duration-300">
+        <div class="bg-gradient-to-b from-slate-800 to-slate-900 p-10 rounded-3xl border border-accent shadow-[0_0_50px_rgba(16,185,129,0.3)] text-center max-w-md mx-4 transform scale-95 transition-transform duration-300" id="modal-content">
+            <div class="w-20 h-20 bg-emerald-500/20 rounded-full flex items-center justify-center mx-auto mb-6">
+                <i data-lucide="trophy" class="text-accent" width="40" height="40"></i>
+            </div>
+            <h2 id="modal-title" class="text-3xl font-black mb-2 text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-blue-400">LEVEL UP</h2>
+            <p id="modal-msg" class="text-gray-300 mb-8">You reached a new milestone.</p>
+            <button onclick="window.closeModal()" class="bg-accent hover:bg-emerald-400 text-slate-900 font-bold py-3 px-8 rounded-xl transition w-full">
+                Acknowledge
+            </button>
+        </div>
+    </div>
+
+    <!-- FIREBASE & LOGIC SCRIPT -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+
+        // User specific Firebase Config
+        const firebaseConfig = {
+            apiKey: "AIzaSyAKR7lZDRiGjmx7g_bRLkVyYiH8lf4v7gE",
+            authDomain: "jee-interactive-web.firebaseapp.com",
+            projectId: "jee-interactive-web",
+            storageBucket: "jee-interactive-web.firebasestorage.app",
+            messagingSenderId: "287271345110",
+            appId: "1:287271345110:web:e18892c99019321c872277",
+            measurementId: "G-5QL89VWD1V"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+        const dbRef = ref(db, 'userData/priyansh_rise');
+
+        // Master State Object
+        let state = {
+            xp: 0,
+            shields: 1,
+            habits: [],
+            studyLogs: {}, // 'YYYY-MM-DD': {p12: 0, c12: 0, m12: 0, p11: 0, c11: 0, m11: 0}
+            boardData: [], // [{id, name, chapters: [{id, name, done}]}]
+            warCry: "",
+            recoveryUntil: null
+        };
+
+        // --- TIMEZONE & UTILS (Strictly IST) ---
+        function getISTDateObj() {
+            const now = new Date();
+            const istString = now.toLocaleString("en-US", { timeZone: "Asia/Kolkata" });
+            return new Date(istString);
+        }
+
+        function getTodayStr() {
+            const istDate = getISTDateObj();
+            const y = istDate.getFullYear();
+            const m = String(istDate.getMonth() + 1).padStart(2, '0');
+            const d = String(istDate.getDate()).padStart(2, '0');
+            return `${y}-${m}-${d}`;
+        }
+
+        // Lock between 23:00 and 23:59 IST
+        function isTimeWindowValid() {
+            const istDate = getISTDateObj();
+            return istDate.getHours() === 23; 
+        }
+
+        function formatDisplayDate(dateStr) {
+            const date = new Date(dateStr);
+            return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+        }
+
+        // --- FIREBASE SYNC ---
+        onValue(dbRef, (snapshot) => {
+            const data = snapshot.val();
+            if (data) {
+                state = { ...state, ...data };
+                if (!state.habits) state.habits = [];
+                if (!state.studyLogs) state.studyLogs = {};
+                if (!state.boardData) state.boardData = [];
+            } else {
+                set(dbRef, state);
+            }
+            
+            document.getElementById('db-status').innerHTML = '<i data-lucide="wifi" width="14" height="14" class="text-accent"></i> <span class="text-accent">Live Uplink Secured</span>';
+            
+            // Only update WarCry if it's not currently focused by user
+            if (document.activeElement.id !== 'warcry-input') {
+                document.getElementById('warcry-input').value = state.warCry || "";
+            }
+            
+            updateGlobalUI();
+        }, (error) => {
+            document.getElementById('db-status').innerHTML = '<i data-lucide="wifi-off" width="14" height="14" class="text-danger"></i> <span class="text-danger">Connection Lost</span>';
+            lucide.createIcons();
+        });
+
+        function saveData() {
+            set(dbRef, state);
+        }
+
+        // --- TAB NAVIGATION ---
+        window.switchTab = function(tabName) {
+            // Update Buttons
+            ['dashboard', 'boards', 'logs'].forEach(t => {
+                const btn = document.getElementById(`nav-${t}`);
+                if (t === tabName) {
+                    btn.className = "px-6 py-2.5 rounded-t-lg font-bold text-sm transition-all duration-300 bg-slate-800 text-white border-b-2 border-accent flex items-center gap-2 whitespace-nowrap";
+                } else {
+                    btn.className = "px-6 py-2.5 rounded-t-lg font-bold text-sm transition-all duration-300 text-gray-500 hover:text-gray-300 flex items-center gap-2 whitespace-nowrap";
+                }
+            });
+
+            // Update Views with smooth transition
+            ['dashboard', 'boards', 'logs'].forEach(t => {
+                const el = document.getElementById(`tab-${t}`);
+                if (t === tabName) {
+                    setTimeout(() => {
+                        el.style.display = 'block';
+                        // Force reflow
+                        void el.offsetWidth;
+                        el.classList.add('active');
+                    }, 50); // slight delay allows hiding element to process
+                } else {
+                    el.classList.remove('active');
+                    el.style.display = 'none';
+                }
+            });
+        };
+
+        // --- CORE FUNCTIONS ---
+        window.saveWarCry = function() {
+            state.warCry = document.getElementById('warcry-input').value;
+            saveData();
+        };
+
+        // Modal Controls
+        window.openLogModal = function() {
+            const modal = document.getElementById('study-modal');
+            const content = document.getElementById('study-modal-content');
+            
+            // Pre-fill if data exists for today
+            const today = getTodayStr();
+            const log = state.studyLogs[today] || {p12:0, c12:0, m12:0, p11:0, c11:0, m11:0};
+            
+            ['p12','c12','m12','p11','c11','m11'].forEach(k => {
+                document.getElementById(`h-${k}`).value = log[k] || '';
+            });
+
+            modal.classList.remove('hidden');
+            setTimeout(() => {
+                modal.classList.remove('opacity-0');
+                content.classList.remove('scale-95');
+            }, 10);
+            lucide.createIcons();
+        };
+
+        window.closeLogModal = function() {
+            const modal = document.getElementById('study-modal');
+            const content = document.getElementById('study-modal-content');
+            modal.classList.add('opacity-0');
+            content.classList.add('scale-95');
+            setTimeout(() => modal.classList.add('hidden'), 300);
+        };
+
+        window.saveStudyLog = function() {
+            const today = getTodayStr();
+            const log = {};
+            let totalHoursAdded = 0;
+
+            ['p12','c12','m12','p11','c11','m11'].forEach(k => {
+                const val = parseFloat(document.getElementById(`h-${k}`).value) || 0;
+                log[k] = val;
+                totalHoursAdded += val;
+            });
+
+            // Calculate XP diff (5 XP per hour)
+            const oldTotal = calculateDailyTotal(state.studyLogs[today]);
+            const diff = totalHoursAdded - oldTotal;
+            if (diff > 0) state.xp += Math.round(diff * 5);
+
+            state.studyLogs[today] = log;
+            saveData();
+            window.closeLogModal();
+        };
+
+        function calculateDailyTotal(logObj) {
+            if (!logObj) return 0;
+            return (logObj.p12||0) + (logObj.c12||0) + (logObj.m12||0) + (logObj.p11||0) + (logObj.c11||0) + (logObj.m11||0);
+        }
+
+        // Habits Logic
+        window.addHabit = function() {
+            const nameInput = document.getElementById('habit-name');
+            const countInput = document.getElementById('habit-start-count');
+            const name = nameInput.value.trim();
+            const startCount = parseInt(countInput.value) || 0;
+
+            if (!name) return;
+
+            state.habits.push({
+                id: Date.now().toString(),
+                name: name,
+                currentStreak: startCount,
+                maxStreak: startCount,
+                lastCompleted: null
+            });
+
+            nameInput.value = ''; countInput.value = '';
+            saveData();
+        };
+
+        window.markDone = function(id) {
+            // STRICT TIME CHECK
+            if (!isTimeWindowValid()) {
+                alert("STRICT DISCIPLINE PROTOCOL:\nYou can only secure streaks between 11:00 PM and 12:00 Midnight (IST). Get back to work and earn it.");
+                return;
+            }
+
+            const habit = state.habits.find(h => h.id === id);
+            const today = getTodayStr();
+
+            if (habit.lastCompleted === today) return;
+
+            habit.currentStreak++;
+            habit.lastCompleted = today;
+            if (habit.currentStreak > habit.maxStreak) habit.maxStreak = habit.currentStreak;
+
+            state.xp += 25;
+
+            // Milestones
+            if (habit.currentStreak === 14) showMilestone("Concept Master", `14 Days of ${habit.name}. Basics locked in.`);
+            else if (habit.currentStreak === 45) showMilestone("Mains Ready", `45 Days of ${habit.name}. Formidable.`);
+            else if (habit.currentStreak === 90) showMilestone("Advance Warrior", `90 Days of ${habit.name}. Welcome to the 1%.`);
+            else if ([7, 21, 30, 60].includes(habit.currentStreak)) confetti({ particleCount: 50 });
+
+            saveData();
+        };
+
+        window.resetHabit = function(id) {
+            const habit = state.habits.find(h => h.id === id);
+            if (state.shields > 0) {
+                if (confirm("Streak endangered! Use 1 Shield to freeze this and prevent reset?")) {
+                    state.shields--;
+                    habit.lastCompleted = getTodayStr(); 
+                    saveData();
+                    return;
+                }
+            }
+            if (confirm(`Reset ${habit.name} to 0? Relapse Tax applies.`)) {
+                habit.currentStreak = 0; habit.lastCompleted = null;
+                state.recoveryUntil = Date.now() + (24 * 60 * 60 * 1000); // 24h
+                saveData();
+            }
+        };
+
+        window.deleteHabit = function(id) {
+            if(confirm("Delete mission?")) { state.habits = state.habits.filter(h => h.id !== id); saveData(); }
+        };
+
+        // Board Logic
+        window.addBoardSubject = function() {
+            const input = document.getElementById('new-board-subject');
+            const val = input.value.trim();
+            if(!val) return;
+            state.boardData.push({ id: 'b'+Date.now(), name: val, chapters: [] });
+            input.value = ''; saveData();
+        };
+        window.deleteBoardSubject = function(id) {
+            if(confirm("Delete subject entirely?")) { state.boardData = state.boardData.filter(b => b.id !== id); saveData(); }
+        };
+        window.addBoardChapter = function(subId) {
+            const input = document.getElementById(`new-chap-${subId}`);
+            const val = input.value.trim();
+            if(!val) return;
+            const sub = state.boardData.find(b => b.id === subId);
+            sub.chapters.push({ id: 'c'+Date.now(), name: val, done: false });
+            input.value = ''; saveData();
+        };
+        window.toggleChapter = function(subId, chapId) {
+            const sub = state.boardData.find(b => b.id === subId);
+            const chap = sub.chapters.find(c => c.id === chapId);
+            chap.done = !chap.done;
+            if(chap.done) state.xp += 10; // XP for finishing chapter
+            saveData();
+        };
+        window.deleteChapter = function(subId, chapId) {
+            const sub = state.boardData.find(b => b.id === subId);
+            sub.chapters = sub.chapters.filter(c => c.id !== chapId);
+            saveData();
+        };
+
+        window.clearData = function() {
+            if(confirm("WARNING: Complete system wipe. Proceed?")) {
+                state = { xp: 0, shields: 1, habits: [], studyLogs: {}, boardData: [], warCry: "", recoveryUntil: null };
+                saveData();
+            }
+        };
+
+        // --- UI RENDER FUNCTIONS ---
+        function checkLevelUp() {
+            let status = "Aspirant";
+            if (state.xp >= 2000) status = "AIR 1 MATERIAL";
+            else if (state.xp >= 1000) status = "ADVANCE WARRIOR";
+            else if (state.xp >= 500) status = "Mains Ready";
+            else if (state.xp >= 200) status = "Concept Master";
+            document.getElementById('system-status').innerText = `System Online // Target: IIT 2027 // Rank: ${status}`;
+        }
+
+        function renderHeatmap() {
+            const container = document.getElementById('heatmap-container');
+            container.innerHTML = '';
+            const istDate = getISTDateObj();
+
+            for(let i=44; i>=0; i--) {
+                const d = new Date(istDate);
+                d.setDate(d.getDate() - i);
+                const ds = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+                
+                const hrs = calculateDailyTotal(state.studyLogs[ds]);
+                let bgClass = "bg-slate-800"; let extra = "";
+                if (hrs > 0 && hrs <= 3) bgClass = "bg-emerald-900/60";
+                else if (hrs > 3 && hrs <= 7) bgClass = "bg-emerald-600";
+                else if (hrs > 7) { bgClass = "bg-emerald-400"; extra = "heat-glow"; }
+
+                container.innerHTML += `<div class="w-[14px] h-[14px] rounded-sm ${bgClass} ${extra}" title="${ds}: ${hrs} Hrs"></div>`;
+            }
+        }
+
+        function analyzeDiagnostics() {
+            const diagContainer = document.getElementById('diagnostics-container');
+            diagContainer.innerHTML = '';
+            const istDate = getISTDateObj();
+            let sumP=0, sumC=0, sumM=0, sum11=0, sumTotal=0;
+
+            // Analyze last 7 days
+            for(let i=0; i<7; i++) {
+                const d = new Date(istDate); d.setDate(d.getDate() - i);
+                const ds = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+                const log = state.studyLogs[ds] || {};
+                
+                const p = (log.p12||0)+(log.p11||0);
+                const c = (log.c12||0)+(log.c11||0);
+                const m = (log.m12||0)+(log.m11||0);
+                const s11 = (log.p11||0)+(log.c11||0)+(log.m11||0);
+                
+                sumP += p; sumC += c; sumM += m; sum11 += s11;
+                sumTotal += (p+c+m);
+            }
+
+            const warnings = [];
+            if (sumTotal > 0) {
+                if (sumP / sumTotal < 0.2) warnings.push("Physics bias detected. (<20%)");
+                if (sumC / sumTotal < 0.2) warnings.push("Chemistry is lagging. (<20%)");
+                if (sumM / sumTotal < 0.2) warnings.push("Math practice critically low. (<20%)");
+            }
+            if (sumTotal > 10 && sum11 === 0) warnings.push("Class 11 Revision decayed to 0.");
+
+            if (warnings.length === 0) {
+                diagContainer.innerHTML = `<div class="bg-emerald-900/20 text-emerald-400 text-[10px] px-3 py-2 rounded flex items-center gap-2"><i data-lucide="check-circle" width="12" height="12"></i> Trinity Balanced.</div>`;
+            } else {
+                warnings.forEach(w => {
+                    diagContainer.innerHTML += `<div class="bg-amber-900/30 border border-amber-500/30 text-amber-400 text-[10px] px-3 py-2 rounded flex items-center gap-2"><i data-lucide="triangle-alert" width="12" height="12"></i> ${w}</div>`;
+                });
+            }
+
+            // Render Graphs
+            const graphContainer = document.getElementById('trinity-graphs-container');
+            if (sumTotal === 0) {
+                graphContainer.innerHTML = `<div class="text-xs text-gray-500 text-center py-4">No data logged for past 7 days.</div>`;
+                return;
+            }
+
+            const pPct = Math.round((sumP/sumTotal)*100);
+            const cPct = Math.round((sumC/sumTotal)*100);
+            const mPct = Math.round((sumM/sumTotal)*100);
+
+            graphContainer.innerHTML = `
+                <div>
+                    <div class="flex justify-between text-[10px] font-bold text-gray-400 mb-1"><span>Physics</span><span>${pPct}% (${sumP}h)</span></div>
+                    <div class="h-1.5 w-full bg-slate-800 rounded-full overflow-hidden"><div class="h-full bg-subjectP transition-all duration-1000" style="width: ${pPct}%"></div></div>
+                </div>
+                <div>
+                    <div class="flex justify-between text-[10px] font-bold text-gray-400 mb-1"><span>Chemistry</span><span>${cPct}% (${sumC}h)</span></div>
+                    <div class="h-1.5 w-full bg-slate-800 rounded-full overflow-hidden"><div class="h-full bg-subjectC transition-all duration-1000" style="width: ${cPct}%"></div></div>
+                </div>
+                <div>
+                    <div class="flex justify-between text-[10px] font-bold text-gray-400 mb-1"><span>Mathematics</span><span>${mPct}% (${sumM}h)</span></div>
+                    <div class="h-1.5 w-full bg-slate-800 rounded-full overflow-hidden"><div class="h-full bg-subjectM transition-all duration-1000" style="width: ${mPct}%"></div></div>
+                </div>
+                <div class="mt-4 pt-3 border-t border-slate-800 flex justify-between text-[10px] text-gray-400 font-bold uppercase tracking-wider">
+                    <span>Total 7D Hrs: <span class="text-white text-sm">${sumTotal}h</span></span>
+                    <span>11th Rev: <span class="text-warning text-sm">${sum11}h</span></span>
+                </div>
+            `;
+        }
+
+        function renderHabits() {
+            const container = document.getElementById('habits-container');
+            container.innerHTML = '';
+            const today = getTodayStr();
+            const isValidTime = isTimeWindowValid();
+
+            state.habits.forEach(habit => {
+                const isDoneToday = habit.lastCompleted === today;
+                let icColor="text-slate-600", icGlow="", icType="flame";
+                
+                if (habit.currentStreak > 0) icColor = "text-yellow-500";
+                if (habit.currentStreak >= 7) icColor = "text-orange-500";
+                if (habit.currentStreak >= 14) { icColor = "text-danger"; icType = "zap"; }
+                if (habit.currentStreak >= 30) { icColor = "text-iit"; icType = "zap"; icGlow = "iit-glow"; }
+                if (habit.currentStreak >= 90) { icColor = "text-purple-400"; icType = "crown"; icGlow = "flame-glow"; }
+
+                let mainBtn = "";
+                if (isDoneToday) {
+                    mainBtn = `<button class="col-span-2 bg-slate-800 text-slate-500 cursor-not-allowed font-black py-2.5 rounded-lg flex justify-center items-center gap-2" disabled><i data-lucide="check-circle" width="16" height="16"></i> Secured</button>`;
+                } else if (!isValidTime) {
+                    mainBtn = `<button onclick="window.markDone('${habit.id}')" class="col-span-2 bg-slate-800/80 border border-amber-500/30 text-amber-500 hover:bg-slate-700 font-black py-2.5 rounded-lg transition flex justify-center items-center gap-2 text-sm"><i data-lucide="lock" width="16" height="16"></i> 11 PM Unlock</button>`;
+                } else {
+                    mainBtn = `<button onclick="window.markDone('${habit.id}')" class="col-span-2 bg-accent hover:bg-emerald-400 text-slate-900 shadow-[0_0_15px_rgba(16,185,129,0.2)] font-black py-2.5 rounded-lg transition flex justify-center items-center gap-2 text-sm"><i data-lucide="check" width="16" height="16"></i> Done</button>`;
+                }
+
+                container.innerHTML += `
+                    <div class="glass-card rounded-2xl p-5 flex flex-col relative transition-all duration-300 ${isDoneToday ? 'border-emerald-500/30 bg-emerald-900/10' : ''}">
+                        <button onclick="window.deleteHabit('${habit.id}')" class="absolute top-4 right-4 text-slate-600 hover:text-danger transition"><i data-lucide="x" width="16" height="16"></i></button>
+                        <div class="flex items-center gap-3 mb-4">
+                            <div class="${icColor} ${icGlow}"><i data-lucide="${icType}" width="28" height="28"></i></div>
+                            <div>
+                                <h3 class="font-bold text-sm leading-tight w-[80%]">${habit.name}</h3>
+                                <p class="text-[9px] text-gray-500 mt-0.5 uppercase font-bold tracking-wider">Max: ${habit.maxStreak}</p>
+                            </div>
+                        </div>
+                        <div class="flex justify-between items-end mb-5">
+                            <div>
+                                <div class="text-4xl font-black text-white tracking-tighter">${habit.currentStreak}</div>
+                                <div class="text-[9px] uppercase tracking-widest text-gray-500 font-bold">Days Active</div>
+                            </div>
+                            ${isDoneToday ? 
+                                `<span class="bg-emerald-500/20 text-emerald-400 text-[10px] font-bold px-2 py-1 rounded flex items-center gap-1"><i data-lucide="check" width="12" height="12"></i> SECURED</span>` 
+                                : `<span class="bg-slate-800 text-gray-500 border border-slate-700 text-[10px] font-bold px-2 py-1 rounded flex items-center gap-1"><i data-lucide="clock" width="12" height="12"></i> PENDING</span>`
+                            }
+                        </div>
+                        <div class="grid grid-cols-3 gap-2 mt-auto">
+                            ${mainBtn}
+                            <button onclick="window.resetHabit('${habit.id}')" class="col-span-1 bg-slate-800/50 hover:bg-danger hover:text-white text-gray-500 font-bold py-2.5 rounded-lg transition flex justify-center items-center">
+                                <i data-lucide="rotate-ccw" width="16" height="16"></i>
+                            </button>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        function renderLogsVault() {
+            const container = document.getElementById('logs-vault-container');
+            container.innerHTML = '';
+            
+            // Sort dates descending
+            const dates = Object.keys(state.studyLogs).sort((a,b) => new Date(b) - new Date(a));
+            
+            if(dates.length === 0) {
+                container.innerHTML = `<div class="text-gray-500 text-sm py-10 text-center">No execution data logged yet.</div>`;
+                return;
+            }
+
+            dates.forEach(d => {
+                const l = state.studyLogs[d];
+                const total = calculateDailyTotal(l);
+                if (total === 0) return; // skip empty logs visually
+                
+                container.innerHTML += `
+                    <div class="bg-slate-900/60 border border-slate-700/50 rounded-xl p-4 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 transition hover:bg-slate-800/80">
+                        <div>
+                            <div class="text-xs font-bold text-accent uppercase tracking-widest mb-1">${formatDisplayDate(d)}</div>
+                            <div class="text-2xl font-black">${total}<span class="text-sm text-gray-500 font-bold ml-1">Total Hrs</span></div>
+                        </div>
+                        <div class="flex gap-4 md:gap-8 flex-wrap">
+                            <div class="space-y-1">
+                                <div class="text-[10px] uppercase font-bold text-gray-500 border-b border-slate-700 pb-0.5">Class 12</div>
+                                <div class="text-xs font-mono"><span class="text-subjectP">P:</span> ${l.p12||0}h <span class="text-subjectC ml-2">C:</span> ${l.c12||0}h <span class="text-subjectM ml-2">M:</span> ${l.m12||0}h</div>
+                            </div>
+                            <div class="space-y-1">
+                                <div class="text-[10px] uppercase font-bold text-gray-500 border-b border-slate-700 pb-0.5">Class 11</div>
+                                <div class="text-xs font-mono"><span class="text-subjectP">P:</span> ${l.p11||0}h <span class="text-subjectC ml-2">C:</span> ${l.c11||0}h <span class="text-subjectM ml-2">M:</span> ${l.m11||0}h</div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        function renderBoards() {
+            const container = document.getElementById('boards-container');
+            container.innerHTML = '';
+
+            if(state.boardData.length === 0) {
+                container.innerHTML = `<div class="col-span-full text-gray-500 text-sm py-10 text-center">No board subjects deployed.</div>`;
+                return;
+            }
+
+            state.boardData.forEach(sub => {
+                const total = sub.chapters.length;
+                const done = sub.chapters.filter(c => c.done).length;
+                const pct = total === 0 ? 0 : Math.round((done/total)*100);
+
+                let chapsHTML = sub.chapters.map(c => `
+                    <div class="flex items-center justify-between group py-1.5">
+                        <label class="flex items-center gap-3 cursor-pointer cyber-checkbox w-full">
+                            <input type="checkbox" ${c.done ? 'checked' : ''} onchange="window.toggleChapter('${sub.id}', '${c.id}')">
+                            <div class="box"></div>
+                            <span class="chapter-text text-sm font-semibold transition ${c.done ? 'text-gray-600' : 'text-gray-200'}">${c.name}</span>
+                        </label>
+                        <button onclick="window.deleteChapter('${sub.id}', '${c.id}')" class="opacity-0 group-hover:opacity-100 text-slate-600 hover:text-danger transition"><i data-lucide="trash-2" width="14" height="14"></i></button>
+                    </div>
+                `).join('');
+
+                container.innerHTML += `
+                    <div class="glass-card rounded-2xl p-6 flex flex-col h-full">
+                        <div class="flex justify-between items-start mb-4">
+                            <h3 class="text-lg font-black tracking-tight">${sub.name}</h3>
+                            <button onclick="window.deleteBoardSubject('${sub.id}')" class="text-slate-600 hover:text-danger transition"><i data-lucide="x" width="18" height="18"></i></button>
+                        </div>
+                        
+                        <!-- Progress Bar -->
+                        <div class="mb-5">
+                            <div class="flex justify-between text-[10px] font-bold text-gray-400 mb-1 tracking-wider uppercase">
+                                <span>Progress</span><span>${done}/${total} (${pct}%)</span>
+                            </div>
+                            <div class="h-2 w-full bg-slate-900 rounded-full overflow-hidden border border-slate-800">
+                                <div class="h-full bg-accent transition-all duration-500 shadow-[0_0_10px_rgba(16,185,129,0.5)]" style="width: ${pct}%"></div>
+                            </div>
+                        </div>
+
+                        <!-- Chapter List -->
+                        <div class="flex-1 space-y-1 overflow-y-auto mb-4 pr-2 custom-scrollbar" style="max-height: 200px;">
+                            ${chapsHTML || '<div class="text-xs text-slate-600 italic">No chapters assigned.</div>'}
+                        </div>
+
+                        <!-- Add Chapter Input -->
+                        <div class="mt-auto pt-4 border-t border-slate-800/50 flex gap-2">
+                            <input type="text" id="new-chap-${sub.id}" placeholder="Chapter Name" class="glass-input text-xs rounded p-2 flex-1">
+                            <button onclick="window.addBoardChapter('${sub.id}')" class="bg-slate-800 hover:bg-slate-700 text-white rounded px-3 transition"><i data-lucide="plus" width="14" height="14"></i></button>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        // --- GLOBAL RENDER ORCHESTRATOR ---
+        function updateGlobalUI() {
+            // Apply Relapse Tax / Recovery Mode globally
+            const body = document.getElementById('app-body');
+            const statusTxt = document.getElementById('system-status');
+            
+            if (state.recoveryUntil && Date.now() < state.recoveryUntil) {
+                body.classList.add('recovery-mode');
+                statusTxt.innerText = "RECOVERY PROTOCOL ACTIVE // EARN YOUR COLOR BACK";
+                statusTxt.classList.replace('text-accent', 'text-danger');
+            } else {
+                body.classList.remove('recovery-mode');
+                if (state.recoveryUntil) { state.recoveryUntil = null; saveData(); }
+            }
+
+            document.getElementById('xp-display').innerText = state.xp;
+            document.getElementById('shield-display').innerText = state.shields;
+            
+            checkLevelUp();
+            renderHeatmap();
+            analyzeDiagnostics();
+            renderHabits();
+            renderLogsVault();
+            renderBoards();
+            
+            lucide.createIcons();
+        }
+
+        function showMilestone(title, msg) {
+            const modal = document.getElementById('milestone-modal');
+            const content = document.getElementById('modal-content');
+            document.getElementById('modal-title').innerText = title;
+            document.getElementById('modal-msg').innerText = msg;
+            
+            modal.classList.remove('hidden');
+            setTimeout(() => {
+                modal.classList.remove('opacity-0');
+                content.classList.remove('scale-95');
+                content.classList.add('scale-100');
+            }, 10);
+            confetti({ particleCount: 200, spread: 100, origin: { y: 0.5 }, colors: ['#10b981', '#3b82f6', '#ffffff'] });
+        }
+        window.closeModal = function() {
+            const modal = document.getElementById('milestone-modal');
+            const content = document.getElementById('modal-content');
+            modal.classList.add('opacity-0');
+            content.classList.remove('scale-100');
+            content.classList.add('scale-95');
+            setTimeout(() => modal.classList.add('hidden'), 300);
+        };
+
+        // Auto-refresh Time checks for the 11 PM lock if app left open
+        setInterval(() => {
+            if (document.getElementById('db-status').innerText.includes("Uplink Secured")) updateGlobalUI();
+        }, 60000);
+
+    </script>
+</body>
+</html>
