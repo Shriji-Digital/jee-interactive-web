@@ -508,12 +508,15 @@
         function analyzeDiagnostics() {
             const diagContainer = document.getElementById('diagnostics-container'); diagContainer.innerHTML = '';
             const istDate = getISTDateObj();
-            let sumP=0, sumC=0, sumM=0, sum11=0, sumTotal=0;
+            let sumP=0, sumC=0, sumM=0, sum11=0, sumTotal=0, sumTest=0;
+            
             for(let i=0; i<7; i++) {
                 const d = new Date(istDate); d.setDate(d.getDate() - i);
                 const log = state.studyLogs[`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`] || {};
                 const p = (log.p12||0)+(log.p11||0), c = (log.c12||0)+(log.c11||0), m = (log.m12||0)+(log.m11||0), s11 = (log.p11||0)+(log.c11||0)+(log.m11||0);
-                sumP += p; sumC += c; sumM += m; sum11 += s11; sumTotal += (p+c+m);
+                sumP += p; sumC += c; sumM += m; sum11 += s11; 
+                sumTotal += (p+c+m); // Keep subject total separate for % calculation
+                sumTest += (log.test || 0);
             }
             const warnings = [];
             if (sumTotal > 0) {
@@ -527,14 +530,15 @@
             else warnings.forEach(w => diagContainer.innerHTML += `<div class="bg-amber-900/30 border border-amber-500/30 text-amber-400 text-[10px] px-3 py-2 rounded flex items-center gap-2"><i data-lucide="triangle-alert" width="12" height="12"></i> ${w}</div>`);
 
             const graphContainer = document.getElementById('trinity-graphs-container');
-            if (sumTotal === 0) { graphContainer.innerHTML = `<div class="text-xs text-gray-500 text-center py-4">No data logged for past 7 days.</div>`; return; }
+            if (sumTotal === 0 && sumTest === 0) { graphContainer.innerHTML = `<div class="text-xs text-gray-500 text-center py-4">No data logged for past 7 days.</div>`; return; }
+            
             graphContainer.innerHTML = `
-                <div><div class="flex justify-between text-[10px] font-bold text-gray-400 mb-1"><span>Physics</span><span>${Math.round((sumP/sumTotal)*100)}% (${sumP}h)</span></div><div class="h-1.5 w-full bg-slate-800 rounded-full overflow-hidden"><div class="h-full bg-subjectP transition-all duration-1000" style="width: ${Math.round((sumP/sumTotal)*100)}%"></div></div></div>
-                <div><div class="flex justify-between text-[10px] font-bold text-gray-400 mb-1"><span>Chemistry</span><span>${Math.round((sumC/sumTotal)*100)}% (${sumC}h)</span></div><div class="h-1.5 w-full bg-slate-800 rounded-full overflow-hidden"><div class="h-full bg-subjectC transition-all duration-1000" style="width: ${Math.round((sumC/sumTotal)*100)}%"></div></div></div>
-                <div><div class="flex justify-between text-[10px] font-bold text-gray-400 mb-1"><span>Mathematics</span><span>${Math.round((sumM/sumTotal)*100)}% (${sumM}h)</span></div><div class="h-1.5 w-full bg-slate-800 rounded-full overflow-hidden"><div class="h-full bg-subjectM transition-all duration-1000" style="width: ${Math.round((sumM/sumTotal)*100)}%"></div></div></div>
-                <div class="mt-4 pt-3 border-t border-slate-800 flex justify-between text-[10px] text-gray-400 font-bold uppercase tracking-wider"><span>Total 7D Hrs: <span class="text-white text-sm">${sumTotal}h</span></span><span>11th Rev: <span class="text-warning text-sm">${sum11}h</span></span></div>
+                <div><div class="flex justify-between text-[10px] font-bold text-gray-400 mb-1"><span>Physics</span><span>${sumTotal > 0 ? Math.round((sumP/sumTotal)*100) : 0}% (${sumP}h)</span></div><div class="h-1.5 w-full bg-slate-800 rounded-full overflow-hidden"><div class="h-full bg-subjectP transition-all duration-1000" style="width: ${sumTotal > 0 ? Math.round((sumP/sumTotal)*100) : 0}%"></div></div></div>
+                <div><div class="flex justify-between text-[10px] font-bold text-gray-400 mb-1"><span>Chemistry</span><span>${sumTotal > 0 ? Math.round((sumC/sumTotal)*100) : 0}% (${sumC}h)</span></div><div class="h-1.5 w-full bg-slate-800 rounded-full overflow-hidden"><div class="h-full bg-subjectC transition-all duration-1000" style="width: ${sumTotal > 0 ? Math.round((sumC/sumTotal)*100) : 0}%"></div></div></div>
+                <div><div class="flex justify-between text-[10px] font-bold text-gray-400 mb-1"><span>Mathematics</span><span>${sumTotal > 0 ? Math.round((sumM/sumTotal)*100) : 0}% (${sumM}h)</span></div><div class="h-1.5 w-full bg-slate-800 rounded-full overflow-hidden"><div class="h-full bg-subjectM transition-all duration-1000" style="width: ${sumTotal > 0 ? Math.round((sumM/sumTotal)*100) : 0}%"></div></div></div>
+                <div class="mt-4 pt-3 border-t border-slate-800 flex justify-between text-[10px] text-gray-400 font-bold uppercase tracking-wider"><span>Total Study: <span class="text-white text-sm">${sumTotal}h</span></span><span>11th Rev: <span class="text-warning text-sm">${sum11}h</span></span><span>Tests: <span class="text-purple-400 text-sm">${sumTest}h</span></span></div>
             `;
-        }
+            }
 
         function renderHabits() {
             const container = document.getElementById('habits-container'); container.innerHTML = '';
