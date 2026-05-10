@@ -204,7 +204,8 @@
                 <button onclick="window.closeLogModal()" class="text-gray-500 hover:text-white transition"><i data-lucide="x"></i></button>
             </div>
             <p class="text-xs text-gray-400 mb-6 uppercase tracking-widest font-bold">Log absolute numbers (e.g., 1.5, 2, 0.5)</p>
-            <div class="grid grid-cols-2 gap-8 mb-8">
+            
+            <div class="grid grid-cols-2 gap-8">
                 <div class="space-y-4">
                     <h3 class="text-xs text-iit font-bold border-b border-slate-800 pb-1">CLASS 12 (CURRENT)</h3>
                     <div><label class="text-[10px] uppercase text-gray-400">Physics (Hrs)</label><input type="number" id="h-p12" step="0.1" min="0" class="w-full glass-input rounded p-2 text-sm mt-1"></div>
@@ -218,6 +219,15 @@
                     <div><label class="text-[10px] uppercase text-gray-400">Math (Hrs)</label><input type="number" id="h-m11" step="0.1" min="0" class="w-full glass-input rounded p-2 text-sm mt-1"></div>
                 </div>
             </div>
+
+            <div class="mt-6 mb-8 pt-4 border-t border-slate-800">
+                <h3 class="text-xs text-purple-400 font-bold mb-2 uppercase tracking-widest flex items-center gap-1"><i data-lucide="microscope" width="12" height="12"></i> Tests & Evaluations</h3>
+                <div>
+                    <label class="text-[10px] uppercase text-gray-400">Mock Test / Exam (Hrs)</label>
+                    <input type="number" id="h-test" step="0.1" min="0" class="w-full glass-input rounded p-2 text-sm mt-1">
+                </div>
+            </div>
+
             <button onclick="window.saveStudyLog()" class="w-full bg-accent hover:bg-emerald-400 text-slate-900 font-black py-3 rounded-xl transition shadow-[0_0_15px_rgba(16,185,129,0.3)]">
                 Secure Data to Vault
             </button>
