@@ -293,7 +293,25 @@
                 state = { ...state, ...data };
                 if (!state.habits) state.habits = [];
                 if (!state.studyLogs) state.studyLogs = {};
-                if (!state.boardData || state.boardData.length === 0) initializeBoardData();
+                if (!state.boardData) state.boardData = [];
+                
+                // FIX: Force-inject the 5 Default Subjects if they are missing from existing Firebase data
+                let databaseChanged = false;
+                DEFAULT_SUBJECTS.forEach(name => {
+                    const exists = state.boardData.find(b => b.name === name);
+                    if (!exists) {
+                        state.boardData.push({
+                            id: 'sub_' + name.replace(/[^a-zA-Z0-9]/g, ''),
+                            name: name,
+                            chapters: []
+                        });
+                        databaseChanged = true;
+                    }
+                });
+                
+                // Save the injected subjects back to your database silently
+                if (databaseChanged) saveData();
+
             } else {
                 initializeBoardData();
                 set(dbRef, state);
