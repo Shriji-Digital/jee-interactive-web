@@ -364,8 +364,8 @@
 
         window.openLogModal = function() {
             const modal = document.getElementById('study-modal');
-            const log = state.studyLogs[getTodayStr()] || {p12:0, c12:0, m12:0, p11:0, c11:0, m11:0};
-            ['p12','c12','m12','p11','c11','m11'].forEach(k => document.getElementById(`h-${k}`).value = log[k] || '');
+            const log = state.studyLogs[getTodayStr()] || {p12:0, c12:0, m12:0, p11:0, c11:0, m11:0, test:0};
+            ['p12','c12','m12','p11','c11','m11', 'test'].forEach(k => document.getElementById(`h-${k}`).value = log[k] || '');
             modal.classList.remove('hidden');
             setTimeout(() => { modal.classList.remove('opacity-0'); document.getElementById('study-modal-content').classList.remove('scale-95'); }, 10);
         };
@@ -379,7 +379,7 @@
         window.saveStudyLog = function() {
             const today = getTodayStr();
             const log = {}; let totalHours = 0;
-            ['p12','c12','m12','p11','c11','m11'].forEach(k => {
+            ['p12','c12','m12','p11','c11','m11', 'test'].forEach(k => {
                 const val = parseFloat(document.getElementById(`h-${k}`).value) || 0;
                 log[k] = val; totalHours += val;
             });
@@ -388,7 +388,7 @@
             state.studyLogs[today] = log; saveData(); window.closeLogModal();
         };
 
-        function calculateDailyTotal(l) { return l ? (l.p12||0)+(l.c12||0)+(l.m12||0)+(l.p11||0)+(l.c11||0)+(l.m11||0) : 0; }
+        function calculateDailyTotal(l) { return l ? (l.p12||0)+(l.c12||0)+(l.m12||0)+(l.p11||0)+(l.c11||0)+(l.m11||0)+(l.test||0) : 0; }
 
         window.addHabit = function() {
             const name = document.getElementById('habit-name').value.trim();
