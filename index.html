@@ -490,8 +490,15 @@
             let status = "Aspirant";
             if (state.xp >= 2000) status = "AIR 1 MATERIAL"; else if (state.xp >= 1000) status = "ADVANCE WARRIOR";
             else if (state.xp >= 500) status = "Mains Ready"; else if (state.xp >= 200) status = "Concept Master";
-            document.getElementById('system-status').innerText = `System Online // Target: IIT 2027 // Rank: ${status}`;
-        }
+            
+            const statusTxt = document.getElementById('system-status');
+            
+            // Check if we are in Recovery Mode before setting the text
+            if (state.recoveryUntil && Date.now() < state.recoveryUntil) {
+                statusTxt.innerText = `RECOVERY PROTOCOL ACTIVE // Rank: ${status} // EARN YOUR COLOR BACK`;
+            } else {
+                statusTxt.innerText = `System Online // Target: IIT 2027 // Rank: ${status}`;
+            }
 
         function renderHeatmap() {
             const container = document.getElementById('heatmap-container'); container.innerHTML = '';
@@ -649,19 +656,32 @@
         function updateGlobalUI() {
             const body = document.getElementById('app-body');
             const statusTxt = document.getElementById('system-status');
+            
+            // Handle Color and Grayscale
             if (state.recoveryUntil && Date.now() < state.recoveryUntil) {
                 body.classList.add('recovery-mode');
-                statusTxt.innerText = "RECOVERY PROTOCOL ACTIVE // EARN YOUR COLOR BACK";
-                statusTxt.classList.replace('text-accent', 'text-danger');
+                statusTxt.classList.remove('text-accent');
+                statusTxt.classList.add('text-danger');
             } else {
                 body.classList.remove('recovery-mode');
+                statusTxt.classList.remove('text-danger');
+                statusTxt.classList.add('text-accent');
                 if (state.recoveryUntil) { state.recoveryUntil = null; saveData(); }
             }
+            
             document.getElementById('xp-display').innerText = state.xp;
             document.getElementById('shield-display').innerText = state.shields;
-            checkLevelUp(); renderHeatmap(); analyzeDiagnostics(); renderHabits(); renderLogsVault(); renderBoards();
+            
+            // Let checkLevelUp handle the actual text
+            checkLevelUp(); 
+            renderHeatmap(); 
+            analyzeDiagnostics(); 
+            renderHabits(); 
+            renderLogsVault(); 
+            renderBoards();
+            
             lucide.createIcons();
-        }
+    }
 
         function showMilestone(title, msg) {
             const modal = document.getElementById('milestone-modal'), content = document.getElementById('modal-content');
