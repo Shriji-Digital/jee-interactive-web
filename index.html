@@ -356,8 +356,8 @@
 
         window.openLogModal = function() {
             const modal = document.getElementById('study-modal');
-            const log = state.studyLogs[getTodayStr()] || {p12:0, c12:0, m12:0, p11:0, c11:0, m11:0, test:0};
-            ['p12','c12','m12','p11','c11','m11', 'test'].forEach(k => document.getElementById(`h-${k}`).value = log[k] || '');
+            const log = state.studyLogs[getTodayStr()] || {p12:0, c12:0, m12:0, p11:0, c11:0, m11:0, test:0, board:0};
+            ['p12','c12','m12','p11','c11','m11', 'test', 'board'].forEach(k => document.getElementById(`h-${k}`).value = log[k] || '');
             modal.classList.remove('hidden');
             setTimeout(() => { modal.classList.remove('opacity-0'); document.getElementById('study-modal-content').classList.remove('scale-95'); }, 10);
         };
@@ -370,17 +370,31 @@
 
         window.saveStudyLog = function() {
             const today = getTodayStr();
-            const log = {}; let totalHours = 0;
+            const log = {}; let xpRelevantHours = 0; let totalHours = 0;
+            
+            // Calculate JEE & Test hours (These grant XP)
             ['p12','c12','m12','p11','c11','m11', 'test'].forEach(k => {
                 const val = parseFloat(document.getElementById(`h-${k}`).value) || 0;
-                log[k] = val; totalHours += val;
+                log[k] = val; xpRelevantHours += val; totalHours += val;
             });
-            const oldTotal = calculateDailyTotal(state.studyLogs[today]);
-            if (totalHours - oldTotal > 0) state.xp += Math.round((totalHours - oldTotal) * 5);
+            
+            // Calculate Board hours (NO XP granted)
+            const boardVal = parseFloat(document.getElementById('h-board').value) || 0;
+            log['board'] = boardVal; totalHours += boardVal;
+
+            // Give XP only for JEE/Test differences
+            const oldLog = state.studyLogs[today] || {};
+            const oldXpRelevant = ['p12','c12','m12','p11','c11','m11', 'test'].reduce((sum, k) => sum + (oldLog[k] || 0), 0);
+            
+            if (xpRelevantHours - oldXpRelevant > 0) {
+                state.xp += Math.round((xpRelevantHours - oldXpRelevant) * 5);
+            }
+            
             state.studyLogs[today] = log; saveData(); window.closeLogModal();
         };
 
-        function calculateDailyTotal(l) { return l ? (l.p12||0)+(l.c12||0)+(l.m12||0)+(l.p11||0)+(l.c11||0)+(l.m11||0)+(l.test||0) : 0; }
+        // Includes all hours so it shows correctly on Heatmap & Vault
+        function calculateDailyTotal(l) { return l ? (l.p12||0)+(l.c12||0)+(l.m12||0)+(l.p11||0)+(l.c11||0)+(l.m11||0)+(l.test||0)+(l.board||0) : 0; }
 
         // --- SHIELD STORE ---
         window.buyShield = function() {
@@ -520,13 +534,15 @@
         function analyzeDiagnostics() {
             const diagContainer = document.getElementById('diagnostics-container'); diagContainer.innerHTML = '';
             const istDate = getISTDateObj();
-            let sumP=0, sumC=0, sumM=0, sum11=0, sumTotal=0, sumTest=0;
+            let sumP=0, sumC=0, sumM=0, sum11=0, sumTotal=0, sumTest=0, sumBoard=0;
             
             for(let i=0; i<7; i++) {
                 const d = new Date(istDate); d.setDate(d.getDate() - i);
                 const log = state.studyLogs[`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`] || {};
                 const p = (log.p12||0)+(log.p11||0), c = (log.c12||0)+(log.c11||0), m = (log.m12||0)+(log.m11||0), s11 = (log.p11||0)+(log.c11||0)+(log.m11||0);
-                sumP += p; sumC += c; sumM += m; sum11 += s11; sumTotal += (p+c+m); sumTest += (log.test||0);
+                sumP += p; sumC += c; sumM += m; sum11 += s11; 
+                sumTotal += (p+c+m); // JEE Subjects ONLY for the graph percentages
+                sumTest += (log.test||0); sumBoard += (log.board||0);
             }
             const warnings = [];
             if (sumTotal > 0) {
@@ -540,12 +556,18 @@
             else warnings.forEach(w => diagContainer.innerHTML += `<div class="bg-amber-900/30 border border-amber-500/30 text-amber-400 text-[10px] px-3 py-2 rounded flex items-center gap-2"><i data-lucide="triangle-alert" width="12" height="12"></i> ${w}</div>`);
 
             const graphContainer = document.getElementById('trinity-graphs-container');
-            if (sumTotal === 0 && sumTest === 0) { graphContainer.innerHTML = `<div class="text-xs text-gray-500 text-center py-4">No data logged for past 7 days.</div>`; return; }
+            if (sumTotal === 0 && sumTest === 0 && sumBoard === 0) { graphContainer.innerHTML = `<div class="text-xs text-gray-500 text-center py-4">No data logged for past 7 days.</div>`; return; }
+            
             graphContainer.innerHTML = `
                 <div><div class="flex justify-between text-[10px] font-bold text-gray-400 mb-1"><span>Physics</span><span>${sumTotal>0?Math.round((sumP/sumTotal)*100):0}% (${sumP}h)</span></div><div class="h-1.5 w-full bg-slate-800 rounded-full overflow-hidden"><div class="h-full bg-subjectP transition-all duration-1000" style="width: ${sumTotal>0?Math.round((sumP/sumTotal)*100):0}%"></div></div></div>
                 <div><div class="flex justify-between text-[10px] font-bold text-gray-400 mb-1"><span>Chemistry</span><span>${sumTotal>0?Math.round((sumC/sumTotal)*100):0}% (${sumC}h)</span></div><div class="h-1.5 w-full bg-slate-800 rounded-full overflow-hidden"><div class="h-full bg-subjectC transition-all duration-1000" style="width: ${sumTotal>0?Math.round((sumC/sumTotal)*100):0}%"></div></div></div>
                 <div><div class="flex justify-between text-[10px] font-bold text-gray-400 mb-1"><span>Mathematics</span><span>${sumTotal>0?Math.round((sumM/sumTotal)*100):0}% (${sumM}h)</span></div><div class="h-1.5 w-full bg-slate-800 rounded-full overflow-hidden"><div class="h-full bg-subjectM transition-all duration-1000" style="width: ${sumTotal>0?Math.round((sumM/sumTotal)*100):0}%"></div></div></div>
-                <div class="mt-4 pt-3 border-t border-slate-800 flex justify-between text-[10px] text-gray-400 font-bold uppercase tracking-wider"><span>Total Study: <span class="text-white text-sm">${sumTotal}h</span></span><span>11th Rev: <span class="text-warning text-sm">${sum11}h</span></span><span>Tests: <span class="text-purple-400 text-sm">${sumTest}h</span></span></div>
+                <div class="mt-4 pt-3 border-t border-slate-800 flex flex-wrap gap-x-3 gap-y-1 justify-between text-[10px] text-gray-400 font-bold uppercase tracking-wider">
+                    <span>JEE Study: <span class="text-white text-sm">${sumTotal}h</span></span>
+                    <span>11th Rev: <span class="text-warning text-sm">${sum11}h</span></span>
+                    <span>Tests: <span class="text-purple-400 text-sm">${sumTest}h</span></span>
+                    <span>Boards: <span class="text-yellow-500 text-sm">${sumBoard}h</span></span>
+                </div>
             `;
         }
 
@@ -571,8 +593,11 @@
             
             dates.forEach(d => {
                 const l = state.studyLogs[d], total = calculateDailyTotal(l); if (total === 0) return;
-                const testBadge = (l.test || 0) > 0 ? `<div class="mt-3 text-[10px] font-bold text-purple-400 bg-purple-900/20 px-2 py-1 rounded inline-flex items-center gap-1 border border-purple-500/20"><i data-lucide="microscope" width="12" height="12"></i> Mock Test: ${l.test}h</div>` : '';
-                container.innerHTML += `<div class="bg-slate-900/60 border border-slate-700/50 rounded-xl p-4 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 transition hover:bg-slate-800/80"><div><div class="text-xs font-bold text-accent uppercase tracking-widest mb-1">${formatDisplayDate(d)}</div><div class="text-2xl font-black">${total}<span class="text-sm text-gray-500 font-bold ml-1">Total Hrs</span></div>${testBadge}</div><div class="flex gap-4 md:gap-8 flex-wrap"><div class="space-y-1"><div class="text-[10px] uppercase font-bold text-gray-500 border-b border-slate-700 pb-0.5">Class 12</div><div class="text-xs font-mono"><span class="text-subjectP">P:</span> ${l.p12||0}h <span class="text-subjectC ml-2">C:</span> ${l.c12||0}h <span class="text-subjectM ml-2">M:</span> ${l.m12||0}h</div></div><div class="space-y-1"><div class="text-[10px] uppercase font-bold text-gray-500 border-b border-slate-700 pb-0.5">Class 11</div><div class="text-xs font-mono"><span class="text-subjectP">P:</span> ${l.p11||0}h <span class="text-subjectC ml-2">C:</span> ${l.c11||0}h <span class="text-subjectM ml-2">M:</span> ${l.m11||0}h</div></div></div></div>`;
+                
+                const testBadge = (l.test || 0) > 0 ? `<div class="mt-2 text-[10px] font-bold text-purple-400 bg-purple-900/20 px-2 py-1 rounded inline-flex items-center gap-1 border border-purple-500/20"><i data-lucide="microscope" width="12" height="12"></i> Mock Test: ${l.test}h</div>` : '';
+                const boardBadge = (l.board || 0) > 0 ? `<div class="mt-2 ml-1 text-[10px] font-bold text-yellow-500 bg-yellow-900/20 px-2 py-1 rounded inline-flex items-center gap-1 border border-yellow-500/20"><i data-lucide="book-open" width="12" height="12"></i> Board Prep: ${l.board}h</div>` : '';
+                
+                container.innerHTML += `<div class="bg-slate-900/60 border border-slate-700/50 rounded-xl p-4 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 transition hover:bg-slate-800/80"><div><div class="text-xs font-bold text-accent uppercase tracking-widest mb-1">${formatDisplayDate(d)}</div><div class="text-2xl font-black">${total}<span class="text-sm text-gray-500 font-bold ml-1">Total Hrs</span></div><div>${testBadge}${boardBadge}</div></div><div class="flex gap-4 md:gap-8 flex-wrap"><div class="space-y-1"><div class="text-[10px] uppercase font-bold text-gray-500 border-b border-slate-700 pb-0.5">Class 12</div><div class="text-xs font-mono"><span class="text-subjectP">P:</span> ${l.p12||0}h <span class="text-subjectC ml-2">C:</span> ${l.c12||0}h <span class="text-subjectM ml-2">M:</span> ${l.m12||0}h</div></div><div class="space-y-1"><div class="text-[10px] uppercase font-bold text-gray-500 border-b border-slate-700 pb-0.5">Class 11</div><div class="text-xs font-mono"><span class="text-subjectP">P:</span> ${l.p11||0}h <span class="text-subjectC ml-2">C:</span> ${l.c11||0}h <span class="text-subjectM ml-2">M:</span> ${l.m11||0}h</div></div></div></div>`;
             });
         }
 
