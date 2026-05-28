@@ -478,6 +478,16 @@
             document.getElementById('habit-name').value = ''; document.getElementById('habit-start-count').value = ''; saveData();
         };
 
+        // Utility to check missed days
+        function getDaysDiffIST(pastDateStr) {
+            if (!pastDateStr) return 0;
+            const p = pastDateStr.split('-');
+            const past = new Date(p[0], p[1]-1, p[2]);
+            const curr = getISTDateObj();
+            const today = new Date(curr.getFullYear(), curr.getMonth(), curr.getDate());
+            return Math.floor((today - past) / (1000 * 60 * 60 * 24));
+        }
+
         window.markDone = function(id) {
             if (!isTimeWindowValid()) { alert("STRICT DISCIPLINE PROTOCOL: Secure streaks only between 11:00 PM and Midnight (IST)."); return; }
             const habit = state.habits.find(h => h.id === id); const today = getTodayStr();
@@ -492,12 +502,15 @@
             saveData();
         };
 
+        // THE RESCUE MISSION LOGIC
         window.rescueHabit = function(id) {
             if (state.xp < 100) return alert("You need 100 Rank XP to initiate a Rescue Mission.");
             if (confirm("Initiate Rescue Mission? Cost: -100 XP. This bridges the gap for yesterday.")) {
                 state.xp -= 100;
                 const habit = state.habits.find(h => h.id === id);
-                habit.currentStreak++; habit.lastCompleted = getYesterdayStr();
+                habit.currentStreak++; 
+                const d = getISTDateObj(); d.setDate(d.getDate() - 1);
+                habit.lastCompleted = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
                 if (habit.currentStreak > habit.maxStreak) habit.maxStreak = habit.currentStreak;
                 saveData();
             }
