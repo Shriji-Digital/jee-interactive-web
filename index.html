@@ -387,7 +387,7 @@
                     if (habit.lastCompleted && habit.currentStreak > 0) {
                         const diffDays = getDaysDiffIST(habit.lastCompleted);
                         // If diffDays >= 2, they missed yesterday completely. Apply Auto-Nuke or use Shield.
-                        if (diffDays >= 2) {
+                        if (diffDays >= 3) { // Wait until they miss 2 full days before nuking
                             if (state.shields > 0) {
                                 state.shields--; 
                                 habit.lastCompleted = getYesterdayStr(); // Shield bridges the gap
@@ -670,7 +670,7 @@
                 const isDoneToday = (habit.lastCompleted === today);
                 
                 // If diffDays is 1, they missed yesterday. It is endangered.
-                const isEndangered = (diffDays === 1 && habit.currentStreak > 0); 
+                const isEndangered = (diffDays === 2 && habit.currentStreak > 0); // Show Rescue button ONLY if yesterday was skipped 
                 
                 let icColor="text-slate-600", icGlow="", icType="flame";
                 if (habit.currentStreak > 0) icColor = "text-yellow-500"; if (habit.currentStreak >= 7) icColor = "text-orange-500";
