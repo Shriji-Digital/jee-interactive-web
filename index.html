@@ -361,15 +361,16 @@
                     }
                 });
 
-                // THE AUTO-AUDIT ENGINE (Nukes streaks inactive for >= 2 days)
+                // --- THE AUTO-AUDIT ENGINE ---
                 state.habits.forEach(habit => {
                     if (habit.lastCompleted && habit.currentStreak > 0) {
                         const diffDays = getDaysDiffIST(habit.lastCompleted);
-                        // If diffDays == 1 (yesterday), it's pending. If diffDays == 2, they missed yesterday.
-                        if (diffDays >= 3) {
+                        // If diffDays >= 2, they missed yesterday. Apply Auto-Nuke.
+                        if (diffDays >= 2) {
                             if (state.shields > 0) {
                                 state.shields--; 
-                                habit.lastCompleted = getYesterdayStr(); // Shield covers the gap
+                                const d = getISTDateObj(); d.setDate(d.getDate() - 1);
+                                habit.lastCompleted = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
                             } else {
                                 habit.currentStreak = 0; habit.lastCompleted = null;
                                 state.recoveryUntil = Date.now() + 86400000;
