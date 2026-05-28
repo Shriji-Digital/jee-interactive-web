@@ -620,8 +620,10 @@
             const today = getTodayStr(), isValidTime = isTimeWindowValid();
             state.habits.forEach(habit => {
                 const diffDays = getDaysDiffIST(habit.lastCompleted);
-                const isDoneToday = (diffDays === 0 && habit.lastCompleted !== null);
-                const isEndangered = (diffDays === 2); // Missed yesterday completely
+                const isDoneToday = (habit.lastCompleted === today);
+                
+                // If diffDays is 1, they missed yesterday. It is endangered.
+                const isEndangered = (diffDays === 1 && habit.currentStreak > 0); 
                 
                 let icColor="text-slate-600", icGlow="", icType="flame";
                 if (habit.currentStreak > 0) icColor = "text-yellow-500"; if (habit.currentStreak >= 7) icColor = "text-orange-500";
@@ -635,7 +637,7 @@
                 } else if (isEndangered) {
                     mainBtn = `<button onclick="window.rescueHabit('${habit.id}')" class="col-span-2 bg-amber-500/10 border border-amber-500/50 text-amber-500 hover:bg-amber-500 hover:text-slate-900 shadow-[0_0_15px_rgba(245,158,11,0.2)] font-black py-2.5 rounded-lg transition flex justify-center items-center gap-2 text-sm"><i data-lucide="life-buoy" width="16" height="16"></i> Rescue (-100 XP)</button>`;
                 } else if (!isValidTime) {
-                    mainBtn = `<button onclick="window.markDone('${habit.id}')" class="col-span-2 bg-slate-800/80 border border-slate-700 text-gray-400 hover:bg-slate-700 font-black py-2.5 rounded-lg transition flex justify-center items-center gap-2 text-sm"><i data-lucide="lock" width="16" height="16"></i> 11 PM Unlock</button>`;
+                    mainBtn = `<button onclick="window.markDone('${habit.id}')" class="col-span-2 bg-slate-800/80 border border-amber-500/30 text-amber-500 hover:bg-slate-700 font-black py-2.5 rounded-lg transition flex justify-center items-center gap-2 text-sm"><i data-lucide="lock" width="16" height="16"></i> 11 PM Unlock</button>`;
                 } else {
                     mainBtn = `<button onclick="window.markDone('${habit.id}')" class="col-span-2 bg-accent hover:bg-emerald-400 text-slate-900 shadow-[0_0_15px_rgba(16,185,129,0.2)] font-black py-2.5 rounded-lg transition flex justify-center items-center gap-2 text-sm"><i data-lucide="check" width="16" height="16"></i> Done</button>`;
                 }
