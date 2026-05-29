@@ -628,9 +628,22 @@
             for(let i=44; i>=0; i--) {
                 const d = new Date(istDate); d.setDate(d.getDate() - i);
                 const ds = formatDateStr(d), hrs = calculateDailyTotal(state.studyLogs[ds]);
-                let bgClass = "bg-slate-800", extra = "";
-                if (hrs>0 && hrs<=3) bgClass = "bg-emerald-900/60"; else if (hrs>3 && hrs<=7) bgClass = "bg-emerald-600"; else if (hrs>7) { bgClass = "bg-emerald-400"; extra = "heat-glow"; }
-                container.innerHTML += `<div class="w-[14px] h-[14px] rounded-sm ${bgClass} ${extra}" title="${ds}: ${hrs} Hrs"></div>`;
+                
+                let style = "", extra = "", baseClass = "w-[14px] h-[14px] rounded-sm transition-all duration-300";
+                
+                if (hrs === 0) {
+                    baseClass += " bg-slate-800"; // Empty state
+                } else {
+                    let ratio = hrs / 10; // 10-Hour Ceiling
+                    let opacity = Math.min(ratio, 1.0); // Cap at 100%
+                    opacity = Math.max(0.20, opacity);  // Minimum 20% visibility for small sessions
+                    
+                    style = `style="background-color: rgba(16, 185, 129, ${opacity});"`;
+                    
+                    if (hrs >= 10) extra = "heat-glow border border-emerald-400/50"; // Overload state
+                }
+                
+                container.innerHTML += `<div class="${baseClass} ${extra}" ${style} title="${ds}: ${hrs} Hrs"></div>`;
             }
         }
 
