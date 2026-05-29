@@ -515,8 +515,10 @@
 
         // Includes all hours so it shows correctly on Heatmap & Vault
         function calculateDailyTotal(l) { 
-            return l ? (l.p12||0)+(l.c12||0)+(l.m12||0)+(l.p11||0)+(l.c11||0)+(l.m11||0)+(l.test||0)+(l.board||0) : 0; 
-        }
+            if (!l) return 0;
+            const rawTotal = (l.p12||0)+(l.c12||0)+(l.m12||0)+(l.p11||0)+(l.c11||0)+(l.m11||0)+(l.test||0)+(l.board||0);
+            return Number(rawTotal.toFixed(2)); // Forces the computer to round cleanly
+                }
 
         // --- SHIELD STORE ---
         window.buyShield = function() {
