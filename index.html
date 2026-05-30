@@ -202,19 +202,15 @@
             <i data-lucide="loader-2" class="animate-spin" width="14" height="14"></i> Establishing Uplink...
         </span>
         <button onclick="window.clearData()" class="hover:text-danger transition flex items-center gap-1">
-            <i data-lucide="triangle-alert" width="12" height="12"></i> Factory Reset
-        </button>
-    </div>
-
     <div id="study-modal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center hidden opacity-0 transition-opacity duration-300">
         <div class="bg-[#0f172a] p-8 rounded-3xl border border-slate-700 shadow-2xl max-w-lg w-full mx-4 transform scale-95 transition-transform duration-300 flex flex-col" id="study-modal-content">
+            
             <div class="flex justify-between items-center mb-6">
-                <div class="flex justify-between items-center mb-4">
                 <h2 class="text-xl font-black text-white flex items-center gap-2"><i data-lucide="target" class="text-accent"></i> Log Exact Hours</h2>
                 <button onclick="window.closeLogModal()" class="text-gray-500 hover:text-white transition"><i data-lucide="x"></i></button>
             </div>
 
-            <div class="mb-5 bg-slate-900/60 p-4 rounded-xl border border-slate-700 shadow-inner">
+            <div class="mb-6 bg-slate-900/60 p-4 rounded-xl border border-slate-700 shadow-inner">
                 <div class="flex justify-between items-center mb-3">
                     <label class="text-[10px] text-accent font-bold uppercase tracking-widest">Coaching Attended Today?</label>
                     <div class="flex items-center gap-2">
@@ -230,13 +226,13 @@
             
             <div class="grid grid-cols-2 gap-8">
                 <div class="space-y-4">
-                    <h3 class="text-xs text-iit font-bold border-b border-slate-800 pb-1">CLASS 12 (CURRENT)</h3>
+                    <h3 class="text-xs text-emerald-400 font-bold border-b border-slate-800 pb-1">CLASS 12 (CURRENT)</h3>
                     <div><label class="text-[10px] uppercase text-gray-400">Physics (Hrs)</label><input type="number" id="h-p12" step="0.1" min="0" class="w-full glass-input rounded p-2 text-sm mt-1"></div>
                     <div><label class="text-[10px] uppercase text-gray-400">Chemistry (Hrs)</label><input type="number" id="h-c12" step="0.1" min="0" class="w-full glass-input rounded p-2 text-sm mt-1"></div>
                     <div><label class="text-[10px] uppercase text-gray-400">Math (Hrs)</label><input type="number" id="h-m12" step="0.1" min="0" class="w-full glass-input rounded p-2 text-sm mt-1"></div>
                 </div>
                 <div class="space-y-4">
-                    <h3 class="text-xs text-warning font-bold border-b border-slate-800 pb-1">CLASS 11 (REVISION)</h3>
+                    <h3 class="text-xs text-orange-400 font-bold border-b border-slate-800 pb-1">CLASS 11 (REVISION)</h3>
                     <div><label class="text-[10px] uppercase text-gray-400">Physics (Hrs)</label><input type="number" id="h-p11" step="0.1" min="0" class="w-full glass-input rounded p-2 text-sm mt-1"></div>
                     <div><label class="text-[10px] uppercase text-gray-400">Chemistry (Hrs)</label><input type="number" id="h-c11" step="0.1" min="0" class="w-full glass-input rounded p-2 text-sm mt-1"></div>
                     <div><label class="text-[10px] uppercase text-gray-400">Math (Hrs)</label><input type="number" id="h-m11" step="0.1" min="0" class="w-full glass-input rounded p-2 text-sm mt-1"></div>
@@ -258,7 +254,7 @@
                 Secure Data to Vault
             </button>
         </div>
-    </div>
+                </div>
 
     <div id="tm-modal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center hidden opacity-0 transition-opacity duration-300">
         <div class="bg-[#0f172a] p-8 rounded-3xl border border-slate-700 shadow-2xl max-w-lg w-full mx-4 transform scale-95 transition-transform duration-300 flex flex-col" id="tm-modal-content">
