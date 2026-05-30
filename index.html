@@ -460,9 +460,34 @@
         window.saveWarCry = function() { state.warCry = document.getElementById('warcry-input').value; saveData(); };
 
         // --- MAIN LOG HOURS MODAL ---
+        // --- BINARY GATE LOGIC ---
+        window.setCoaching = function(didAttend) {
+            const input = document.getElementById('h-coaching');
+            const btnYes = document.getElementById('coach-yes');
+            const btnNo = document.getElementById('coach-no');
+
+            if (didAttend) {
+                input.value = "3";
+                btnYes.className = "bg-accent text-slate-900 px-3 py-1.5 rounded text-xs font-black shadow-[0_0_10px_rgba(16,185,129,0.2)] transition";
+                btnNo.className = "bg-slate-800 text-gray-500 hover:text-white px-3 py-1.5 rounded text-xs font-black border border-slate-700 transition";
+            } else {
+                input.value = "0";
+                btnNo.className = "bg-accent text-slate-900 px-3 py-1.5 rounded text-xs font-black shadow-[0_0_10px_rgba(16,185,129,0.2)] transition";
+                btnYes.className = "bg-slate-800 text-gray-500 hover:text-white px-3 py-1.5 rounded text-xs font-black border border-slate-700 transition";
+            }
+        };
+
         window.openLogModal = function() {
             const log = state.studyLogs[getTodayStr()] || {};
             ['p12','c12','m12','p11','c11','m11', 'test', 'board'].forEach(k => document.getElementById(`h-${k}`).value = log[k] || '');
+            
+            if (document.getElementById('h-coaching')) {
+                document.getElementById('h-coaching').value = log['coaching'] || '0';
+            }
+            
+            // Auto-set the binary toggle visually based on saved data
+            if ((log.coaching || 0) > 0) window.setCoaching(true); else window.setCoaching(false);
+            
             const modal = document.getElementById('study-modal');
             modal.classList.remove('hidden');
             setTimeout(() => { modal.classList.remove('opacity-0'); document.getElementById('study-modal-content').classList.remove('scale-95'); }, 10);
@@ -472,32 +497,46 @@
             document.getElementById('study-modal').classList.add('opacity-0'); document.getElementById('study-modal-content').classList.add('scale-95');
             setTimeout(() => document.getElementById('study-modal').classList.add('hidden'), 300);
         };
-        
+
         window.saveStudyLog = function() {
             const today = getTodayStr();
             const log = {}; 
             let xpRelevantHours = 0; 
-            let totalHours = 0;
             
-            // Calculate JEE & Test hours (These grant XP)
+            // Core Self-Study (Heatmap Data)
             ['p12','c12','m12','p11','c11','m11', 'test'].forEach(k => {
                 const val = parseFloat(document.getElementById(`h-${k}`).value) || 0;
-                log[k] = val; xpRelevantHours += val; totalHours += val;
+                log[k] = val; xpRelevantHours += val; 
             });
             
-            // Calculate Board hours (NO XP granted)
-            const boardVal = parseFloat(document.getElementById('h-board').value) || 0;
-            log['board'] = boardVal; totalHours += boardVal;
+            // Board Hours
+            log['board'] = parseFloat(document.getElementById('h-board').value) || 0;
 
-            // Give XP only for JEE/Test differences
+            // Shadow Logging (Coaching)
+            let coachingHrs = 0;
+            if (document.getElementById('h-coaching')) {
+                coachingHrs = parseFloat(document.getElementById('h-coaching').value) || 0;
+            }
+            log['coaching'] = coachingHrs;
+
+            // Database Fetch for Deltas
             const oldLog = state.studyLogs[today] || {};
             const oldXpRelevant = ['p12','c12','m12','p11','c11','m11', 'test'].reduce((sum, k) => sum + (oldLog[k] || 0), 0);
+            const oldCoaching = oldLog.coaching || 0;
             
-            if (xpRelevantHours - oldXpRelevant > 0) {
-                state.xp += Math.round((xpRelevantHours - oldXpRelevant) * 5);
-            }
+            const newSelfStudyHrs = Math.max(0, xpRelevantHours - oldXpRelevant);
+            const newCoachingHrs = Math.max(0, coachingHrs - oldCoaching);
+
+            // XP Injection
+            if (newSelfStudyHrs > 0) { state.xp += Math.round(newSelfStudyHrs * 5); }
+
+            // LIFETIME FORGE (Safely adds only new hours so you can't duplicate them)
+            if (!state.lifetimeHours) state.lifetimeHours = 0;
+            state.lifetimeHours += Number((newSelfStudyHrs + newCoachingHrs).toFixed(2));
             
-            state.studyLogs[today] = log; saveData(); window.closeLogModal();
+            state.studyLogs[today] = log; 
+            saveData(); 
+            window.closeLogModal();
         };
 
         // --- TIME MACHINE MODAL (BACKFILL) ---
