@@ -147,7 +147,7 @@
             <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
                 <div class="lg:col-span-3 glass-card rounded-2xl p-6 border border-slate-700">
                     <h3 class="text-[10px] text-gray-400 uppercase tracking-widest font-bold mb-4 flex items-center gap-2">
-                        <i data-lucide="calendar" width="14" height="14"></i> Active Cycle (Last 7 Days)
+                        <i data-lucide="calendar" width="14" height="14"></i> Active Cycle (Current Week)
                     </h3>
                     <div id="matrix-7day-grid" class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-3">
                         </div>
@@ -155,7 +155,7 @@
 
                 <div class="lg:col-span-1 glass-card rounded-2xl p-6 border border-slate-700 bg-gradient-to-b from-slate-800/20 to-slate-900/50">
                     <h3 class="text-[10px] text-gray-500 uppercase tracking-widest font-bold mb-4 flex items-center gap-2">
-                        <i data-lucide="ghost" width="14" height="14"></i> Past Self (T-7)
+                        <i data-lucide="ghost" width="14" height="14"></i> Past Self (Last Week)
                     </h3>
                     <div class="flex flex-col gap-4" id="matrix-ghost-grid">
                         </div>
@@ -549,53 +549,80 @@
             
             const currentGrid = document.getElementById('matrix-7day-grid');
             const ghostGrid = document.getElementById('matrix-ghost-grid');
-            let sum7 = 0; let sumPrev7 = 0;
             const todayObj = getISTDateObj();
             
-            // Render Active Cycle (0 to 6 days ago)
-            let html7 = '';
-            for (let i = 6; i >= 0; i--) {
-                const d = new Date(todayObj); d.setDate(d.getDate() - i);
+            // Core Calendar Logic (Shift from 0=Sun to 0=Mon for the week)
+            const todayDay = todayObj.getDay();
+            const currentDayIndex = todayDay === 0 ? 6 : todayDay - 1; // Mon=0, Tue=1... Sun=6
+            
+            let sumCurrentWeek = 0;
+            let sumCurrentUpToToday = 0;
+            let sumLastWeekTotal = 0;
+            let sumLastWeekUpToEquivalentDay = 0;
+            
+            // 1. Calculate Last Week's Stats (For Delta & Ghost Grid)
+            for (let i = 0; i < 7; i++) {
+                const daysFromToday = currentDayIndex - i + 7; // +7 shifts exactly to last week's Monday-Sunday
+                const d = new Date(todayObj); d.setDate(d.getDate() - daysFromToday);
                 const hrs = calculateDailyTotal(state.studyLogs[formatDateStr(d)]);
-                sum7 += hrs;
                 
-                const dayName = i === 0 ? "TODAY" : d.toLocaleDateString('en-US', { weekday: 'short' }).toUpperCase();
+                sumLastWeekTotal += hrs;
+                // Only count towards delta if it's earlier or equal to the current day of the week
+                if (i <= currentDayIndex) sumLastWeekUpToEquivalentDay += hrs;
+            }
+            
+            // 2. Render Active Cycle (Current Calendar Week: Mon-Sun)
+            let html7 = '';
+            for (let i = 0; i < 7; i++) {
+                const daysFromToday = currentDayIndex - i; 
+                const d = new Date(todayObj); d.setDate(d.getDate() - daysFromToday);
+                const isFuture = daysFromToday < 0; // Days later in the current week
+                const isToday = daysFromToday === 0;
                 
-                // Dynamic styling based on heat intensity
-                let heatClass = "bg-slate-900/60 border-slate-800 text-gray-500"; let valClass = "text-white";
-                if (hrs > 0 && hrs < 5) heatClass = "bg-emerald-900/20 border-emerald-900/50";
-                if (hrs >= 5 && hrs < 10) heatClass = "bg-emerald-800/40 border-emerald-700/50";
-                if (hrs >= 10) { heatClass = "bg-emerald-600/40 border-emerald-400/50 shadow-[0_0_15px_rgba(16,185,129,0.2)]"; valClass = "text-emerald-300"; }
+                const hrs = isFuture ? 0 : calculateDailyTotal(state.studyLogs[formatDateStr(d)]);
+                
+                if (!isFuture) sumCurrentWeek += hrs;
+                if (!isFuture) sumCurrentUpToToday += hrs;
+                
+                const dayName = isToday ? "TODAY" : d.toLocaleDateString('en-US', { weekday: 'short' }).toUpperCase();
+                
+                // Dynamic styling (Future days look dark and empty)
+                let heatClass = "bg-slate-900/60 border-slate-800 text-gray-500"; 
+                let valClass = isFuture ? "text-slate-700 font-medium" : "text-white";
+                let displayHrs = isFuture ? "-" : hrs; // Display a dash for future days
+                
+                if (!isFuture) {
+                    if (hrs > 0 && hrs < 5) heatClass = "bg-emerald-900/20 border-emerald-900/50";
+                    if (hrs >= 5 && hrs < 10) heatClass = "bg-emerald-800/40 border-emerald-700/50";
+                    if (hrs >= 10) { heatClass = "bg-emerald-600/40 border-emerald-400/50 shadow-[0_0_15px_rgba(16,185,129,0.2)]"; valClass = "text-emerald-300"; }
+                }
                 
                 html7 += `<div class="rounded-xl border p-3 flex flex-col justify-between h-24 transition-all hover:scale-105 ${heatClass}">
-                    <div class="text-[10px] font-bold uppercase tracking-wider ${i===0?'text-accent':''}">${dayName}</div>
-                    <div class="text-2xl font-black ${valClass}">${hrs}</div>
+                    <div class="text-[10px] font-bold uppercase tracking-wider ${isToday ? 'text-accent' : ''}">${dayName}</div>
+                    <div class="text-2xl font-black ${valClass}">${displayHrs}</div>
                 </div>`;
             }
             currentGrid.innerHTML = html7;
             
-            // Render Apex 70 Bar
+            // 3. Render Apex 70 Bar (Current Week Total)
             const apexCurrent = document.getElementById('apex-current'), apexBar = document.getElementById('apex-bar'), apexStatus = document.getElementById('apex-status');
-            apexCurrent.innerText = sum7.toFixed(1);
-            let pct = Math.min((sum7 / 70) * 100, 100);
+            apexCurrent.innerText = sumCurrentWeek.toFixed(1);
+            let pct = Math.min((sumCurrentWeek / 70) * 100, 100);
             setTimeout(() => { apexBar.style.width = pct + '%'; }, 100);
             
-            if (sum7 >= 70) { apexStatus.innerText = "BEAST MODE"; apexStatus.className = "text-xs font-bold uppercase tracking-widest text-iit bg-iit/20 px-3 py-1 rounded iit-glow"; }
-            else if (sum7 >= 40) { apexStatus.innerText = "OPTIMAL"; apexStatus.className = "text-xs font-bold uppercase tracking-widest text-emerald-400 bg-emerald-900/30 px-3 py-1 rounded"; }
+            if (sumCurrentWeek >= 70) { apexStatus.innerText = "BEAST MODE"; apexStatus.className = "text-xs font-bold uppercase tracking-widest text-iit bg-iit/20 px-3 py-1 rounded iit-glow"; }
+            else if (sumCurrentWeek >= 40) { apexStatus.innerText = "OPTIMAL"; apexStatus.className = "text-xs font-bold uppercase tracking-widest text-emerald-400 bg-emerald-900/30 px-3 py-1 rounded"; }
             else { apexStatus.innerText = "BUILDING"; apexStatus.className = "text-xs font-bold uppercase tracking-widest text-warning bg-amber-900/30 px-3 py-1 rounded"; }
 
-            // Render Ghost Grid (T-7 HUD)
-            for (let i = 13; i >= 7; i--) {
-                const d = new Date(todayObj); d.setDate(d.getDate() - i);
-                sumPrev7 += calculateDailyTotal(state.studyLogs[formatDateStr(d)]);
-            }
-            
-            let delta = (sum7 - sumPrev7).toFixed(1);
-            let deltaHTML = delta >= 0 ? `<span class="text-emerald-400 flex items-center gap-1"><i data-lucide="trending-up" width="14" height="14"></i> +${delta}h</span>` : `<span class="text-danger flex items-center gap-1"><i data-lucide="trending-down" width="14" height="14"></i> ${delta}h</span>`;
+            // 4. Render Ghost Grid (Smart Delta HUD)
+            let delta = (sumCurrentUpToToday - sumLastWeekUpToEquivalentDay).toFixed(1);
+            let deltaHTML = delta >= 0 
+                ? `<span class="text-emerald-400 flex items-center gap-1"><i data-lucide="trending-up" width="14" height="14"></i> +${delta}h</span>` 
+                : `<span class="text-danger flex items-center gap-1"><i data-lucide="trending-down" width="14" height="14"></i> ${delta}h</span>`;
 
             ghostGrid.innerHTML = `
-                <div class="bg-slate-900/50 p-4 rounded-xl border border-slate-800"><div class="text-[10px] text-gray-500 font-bold uppercase tracking-widest mb-1">Previous 7 Days</div><div class="text-xl font-black text-gray-300">${sumPrev7.toFixed(1)} <span class="text-xs">Hrs</span></div></div>
-                <div class="bg-slate-900/50 p-4 rounded-xl border border-slate-800"><div class="text-[10px] text-gray-500 font-bold uppercase tracking-widest mb-1">Current Delta</div><div class="text-xl font-black">${deltaHTML}</div></div>
+                <div class="bg-slate-900/50 p-4 rounded-xl border border-slate-800"><div class="text-[10px] text-gray-500 font-bold uppercase tracking-widest mb-1" title="Mon-Sun of Last Week">Last Wk Total</div><div class="text-xl font-black text-gray-300">${sumLastWeekTotal.toFixed(1)} <span class="text-xs">Hrs</span></div></div>
+                <div class="bg-slate-900/50 p-4 rounded-xl border border-slate-800"><div class="text-[10px] text-gray-500 font-bold uppercase tracking-widest mb-1" title="Compared to last week up to today">Smart Delta</div><div class="text-xl font-black">${deltaHTML}</div></div>
             `;
             lucide.createIcons();
         };
