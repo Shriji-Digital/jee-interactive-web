@@ -602,63 +602,6 @@
                     if (hrs >= 10) { heatClass = "bg-emerald-600/40 border-emerald-400/50 shadow-[0_0_15px_rgba(16,185,129,0.2)]"; valClass = "text-emerald-300"; }
                 }
                 
-                html7 += `<div class="rounded-xl border p-3 flex flex-col justify-between h-24 transition-all hover:scale-105 ${heatClass}">
-window.renderMatrixData = function() {
-            if (!isMatrixOpen) return;
-            
-            const currentGrid = document.getElementById('matrix-7day-grid');
-            const ghostGrid = document.getElementById('matrix-ghost-grid');
-            const todayObj = getISTDateObj();
-            
-            // Core Calendar Logic (Shift from 0=Sun to 0=Mon for the week)
-            const todayDay = todayObj.getDay();
-            const currentDayIndex = todayDay === 0 ? 6 : todayDay - 1; // Mon=0, Tue=1... Sun=6
-            
-            let sumCurrentWeekApex = 0; // The ONLY place coaching goes
-            let sumCurrentUpToTodayPure = 0;
-            let sumLastWeekTotalPure = 0;
-            let sumLastWeekUpToEquivalentDayPure = 0;
-            
-            // 1. Calculate Last Week's Stats (PURE SELF-STUDY)
-            for (let i = 0; i < 7; i++) {
-                const daysFromToday = currentDayIndex - i + 7; 
-                const d = new Date(todayObj); d.setDate(d.getDate() - daysFromToday);
-                const log = state.studyLogs[formatDateStr(d)];
-                const pureHrs = calculateDailyTotal(log);
-                
-                sumLastWeekTotalPure += pureHrs;
-                if (i <= currentDayIndex) sumLastWeekUpToEquivalentDayPure += pureHrs;
-            }
-            
-            // 2. Render Active Cycle (PURE SELF-STUDY FOR GRID, PLUS APEX TOTAL)
-            let html7 = '';
-            for (let i = 0; i < 7; i++) {
-                const daysFromToday = currentDayIndex - i; 
-                const d = new Date(todayObj); d.setDate(d.getDate() - daysFromToday);
-                const isFuture = daysFromToday < 0; 
-                const isToday = daysFromToday === 0;
-                
-                const log = state.studyLogs[formatDateStr(d)];
-                const pureHrs = isFuture ? 0 : calculateDailyTotal(log);
-                const coachingHrs = isFuture ? 0 : (log ? (log.coaching || 0) : 0);
-                
-                if (!isFuture) {
-                    sumCurrentWeekApex += (pureHrs + coachingHrs); // Apex gets everything
-                    sumCurrentUpToTodayPure += pureHrs; // Grid & Delta stay pure
-                }
-                
-                const dayName = isToday ? "TODAY" : d.toLocaleDateString('en-US', { weekday: 'short' }).toUpperCase();
-                
-                // Dynamic styling strictly based on Pure Hrs
-                let heatClass = "bg-slate-900/60 border-slate-800 text-gray-500"; 
-                let valClass = isFuture ? "text-slate-700 font-medium" : "text-white";
-                let displayHrs = isFuture ? "-" : pureHrs; 
-                
-                if (!isFuture) {
-                    if (pureHrs > 0 && pureHrs < 5) heatClass = "bg-emerald-900/20 border-emerald-900/50";
-                    if (pureHrs >= 5 && pureHrs < 10) heatClass = "bg-emerald-800/40 border-emerald-700/50";
-                    if (pureHrs >= 10) { heatClass = "bg-emerald-600/40 border-emerald-400/50 shadow-[0_0_15px_rgba(16,185,129,0.2)]"; valClass = "text-emerald-300"; }
-                }
                 
                 html7 += `<div class="rounded-xl border p-3 flex flex-col justify-between h-24 transition-all hover:scale-105 ${heatClass}">
                     <div class="text-[10px] font-bold uppercase tracking-wider ${isToday ? 'text-accent' : ''}">${dayName}</div>
