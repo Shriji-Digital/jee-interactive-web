@@ -560,14 +560,19 @@
             let sumLastWeekTotal = 0;
             let sumLastWeekUpToEquivalentDay = 0;
             
+            // --- ISOLATED MATRIX CALCULATOR: Self-Study + Coaching ---
+            function getMatrixHrs(log) {
+                if (!log) return 0;
+                return calculateDailyTotal(log) + (log.coaching || 0);
+            }
+            
             // 1. Calculate Last Week's Stats (For Delta & Ghost Grid)
             for (let i = 0; i < 7; i++) {
                 const daysFromToday = currentDayIndex - i + 7; // +7 shifts exactly to last week's Monday-Sunday
                 const d = new Date(todayObj); d.setDate(d.getDate() - daysFromToday);
-                const hrs = calculateDailyTotal(state.studyLogs[formatDateStr(d)]);
+                const hrs = getMatrixHrs(state.studyLogs[formatDateStr(d)]);
                 
                 sumLastWeekTotal += hrs;
-                // Only count towards delta if it's earlier or equal to the current day of the week
                 if (i <= currentDayIndex) sumLastWeekUpToEquivalentDay += hrs;
             }
             
@@ -576,20 +581,20 @@
             for (let i = 0; i < 7; i++) {
                 const daysFromToday = currentDayIndex - i; 
                 const d = new Date(todayObj); d.setDate(d.getDate() - daysFromToday);
-                const isFuture = daysFromToday < 0; // Days later in the current week
+                const isFuture = daysFromToday < 0; 
                 const isToday = daysFromToday === 0;
                 
-                const hrs = isFuture ? 0 : calculateDailyTotal(state.studyLogs[formatDateStr(d)]);
+                const hrs = isFuture ? 0 : getMatrixHrs(state.studyLogs[formatDateStr(d)]);
                 
                 if (!isFuture) sumCurrentWeek += hrs;
                 if (!isFuture) sumCurrentUpToToday += hrs;
                 
                 const dayName = isToday ? "TODAY" : d.toLocaleDateString('en-US', { weekday: 'short' }).toUpperCase();
                 
-                // Dynamic styling (Future days look dark and empty)
+                // Dynamic styling
                 let heatClass = "bg-slate-900/60 border-slate-800 text-gray-500"; 
                 let valClass = isFuture ? "text-slate-700 font-medium" : "text-white";
-                let displayHrs = isFuture ? "-" : hrs; // Display a dash for future days
+                let displayHrs = isFuture ? "-" : hrs; 
                 
                 if (!isFuture) {
                     if (hrs > 0 && hrs < 5) heatClass = "bg-emerald-900/20 border-emerald-900/50";
@@ -761,11 +766,12 @@
         };
 
         // Includes all hours so it shows correctly on Heatmap & Vault
+        // PURE SELF-STUDY CALCULATOR: Feeds Heatmap, Trinity, and Vault
         function calculateDailyTotal(l) { 
             if (!l) return 0;
             const rawTotal = (l.p12||0)+(l.c12||0)+(l.m12||0)+(l.p11||0)+(l.c11||0)+(l.m11||0)+(l.test||0)+(l.board||0);
-            return Number(rawTotal.toFixed(2)); // Forces the computer to round cleanly
-                }
+            return Number(rawTotal.toFixed(2)); 
+        }
 
         // --- SHIELD STORE ---
         window.buyShield = function() {
