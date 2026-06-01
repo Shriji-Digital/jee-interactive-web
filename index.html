@@ -645,18 +645,18 @@
         window.saveWarCry = function() { state.warCry = document.getElementById('warcry-input').value; saveData(); };
 
         // --- MAIN LOG HOURS MODAL ---
-        // --- BINARY GATE LOGIC ---
-        window.setCoaching = function(didAttend) {
+        // --- BINARY GATE LOGIC (UPGRADED) ---
+        window.setCoaching = function(didAttend, isUserClick = true) {
             const input = document.getElementById('h-coaching');
             const btnYes = document.getElementById('coach-yes');
             const btnNo = document.getElementById('coach-no');
 
             if (didAttend) {
-                input.value = "3";
+                if (isUserClick) input.value = "3"; // Only override if the user actually clicked it
                 btnYes.className = "bg-accent text-slate-900 px-3 py-1.5 rounded text-xs font-black shadow-[0_0_10px_rgba(16,185,129,0.2)] transition";
                 btnNo.className = "bg-slate-800 text-gray-500 hover:text-white px-3 py-1.5 rounded text-xs font-black border border-slate-700 transition";
             } else {
-                input.value = "0";
+                if (isUserClick) input.value = "0"; // Only override if the user actually clicked it
                 btnNo.className = "bg-accent text-slate-900 px-3 py-1.5 rounded text-xs font-black shadow-[0_0_10px_rgba(16,185,129,0.2)] transition";
                 btnYes.className = "bg-slate-800 text-gray-500 hover:text-white px-3 py-1.5 rounded text-xs font-black border border-slate-700 transition";
             }
@@ -670,8 +670,8 @@
                 document.getElementById('h-coaching').value = log['coaching'] || '0';
             }
             
-            // Auto-set the binary toggle visually based on saved data
-            if ((log.coaching || 0) > 0) window.setCoaching(true); else window.setCoaching(false);
+            // Auto-set the binary toggle visually based on saved data, WITHOUT overwriting the input box
+            if ((log.coaching || 0) > 0) window.setCoaching(true, false); else window.setCoaching(false, false);
             
             const modal = document.getElementById('study-modal');
             modal.classList.remove('hidden');
