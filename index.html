@@ -455,6 +455,46 @@
 
         function saveData() { set(dbRef, state); }
 
+        // --- SPA ROUTER: COMMAND CENTER vs MATRIX ---
+        let isMatrixOpen = false;
+        window.toggleMatrix = function() {
+            const commandCenter = document.getElementById('command-center-ui');
+            const matrix = document.getElementById('matrix-dashboard');
+            const btn = document.getElementById('btn-matrix');
+            
+            isMatrixOpen = !isMatrixOpen;
+            
+            if (isMatrixOpen) {
+                // Fade out Command Center
+                commandCenter.classList.add('opacity-0');
+                setTimeout(() => {
+                    commandCenter.classList.add('hidden');
+                    // Fade in Matrix
+                    matrix.classList.remove('hidden');
+                    setTimeout(() => matrix.classList.remove('opacity-0'), 50);
+                    btn.innerHTML = '<i data-lucide="layout-dashboard" width="12" height="12"></i> Exit Matrix';
+                    btn.classList.replace('bg-iit/10', 'bg-danger/10');
+                    btn.classList.replace('text-iit', 'text-danger');
+                    btn.classList.replace('hover:bg-iit', 'hover:bg-danger');
+                    lucide.createIcons();
+                }, 300); // Wait for fade out
+            } else {
+                // Fade out Matrix
+                matrix.classList.add('opacity-0');
+                setTimeout(() => {
+                    matrix.classList.add('hidden');
+                    // Fade in Command Center
+                    commandCenter.classList.remove('hidden');
+                    setTimeout(() => commandCenter.classList.remove('opacity-0'), 50);
+                    btn.innerHTML = '<i data-lucide="bar-chart-2" width="12" height="12"></i> Analyze';
+                    btn.classList.replace('bg-danger/10', 'bg-iit/10');
+                    btn.classList.replace('text-danger', 'text-iit');
+                    btn.classList.replace('hover:bg-danger', 'hover:bg-iit');
+                    lucide.createIcons();
+                }, 300);
+            }
+        };
+
         window.switchTab = function(tabName) {
             ['dashboard', 'boards', 'logs'].forEach(t => {
                 document.getElementById(`nav-${t}`).className = (t === tabName) ? 
