@@ -492,7 +492,7 @@
             if (document.activeElement.id !== 'warcry-input') document.getElementById('warcry-input').value = state.warCry || "";
             updateGlobalUI();
         }, (error) => {
-            document.getElementById('db-status').innerHTML = '<i data-lucide="wifi-off" width="14" height="14" class="text-danger"></i> <span class="text-danger">Connection Lost</span>';
+            document.getElementById('db-status').innerHTML = '<i data-lucide="wifi-off" width="14" height="14" class="text-danger"></i> <span class="text-danger">ERROR: ' + error.message + '</span>';
             lucide.createIcons();
         });
 
