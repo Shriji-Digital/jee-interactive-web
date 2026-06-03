@@ -974,22 +974,43 @@
         }
 
         function renderBoards() {
-            const container = document.getElementById('boards-container'); container.innerHTML = '';
+            const container = document.getElementById('boards-container');
+            
+            // --- UX SMOOTHNESS UPGRADE: Memorize Open States & Scroll Positions ---
+            const openAccs = new Set(Array.from(container.querySelectorAll('.accordion-content.open')).map(el => el.id));
+            const scrollPositions = Array.from(container.querySelectorAll('.custom-scrollbar')).map(el => el.scrollTop);
+            
+            container.innerHTML = '';
             if(!state.boardData || state.boardData.length === 0) return;
-            state.boardData.forEach(sub => {
+            
+            state.boardData.forEach((sub, subIndex) => {
                 if (!sub.chapters) sub.chapters = [];
                 sub.chapters.forEach(c => { if (!c.tasks) c.tasks = (SUBJECT_TASKS[sub.name] || ['Read Chapter', 'PYQs']).map((tName, idx) => ({ id: 't'+Date.now()+idx, name: tName, done: c.done || false })); });
                 const totalChaps = sub.chapters.length, doneChaps = sub.chapters.filter(c => c.tasks.every(t => t.done)).length;
                 const mainPct = totalChaps === 0 ? 0 : Math.round((doneChaps/totalChaps)*100);
+                
                 let chapsHTML = sub.chapters.map(c => {
                     const totalTasks = c.tasks.length, doneTasks = c.tasks.filter(t => t.done).length;
                     const chapPct = totalTasks === 0 ? 0 : Math.round((doneTasks/totalTasks)*100), isFullyDone = chapPct === 100;
+                    
+                    // CHECK MEMORY: Should this dropdown be open?
+                    const accId = `acc-${c.id}`;
+                    const isOpen = openAccs.has(accId);
+                    
                     let tasksHTML = c.tasks.map(t => `<div class="flex items-start gap-3 py-2 pl-4 border-l-2 border-slate-700/50 ml-2 relative"><div class="absolute -left-[9px] top-3 w-4 h-0.5 bg-slate-700/50"></div><label class="flex items-center gap-3 cursor-pointer cyber-checkbox pt-0.5"><input type="checkbox" ${t.done ? 'checked' : ''} onchange="window.toggleTask('${sub.id}', '${c.id}', '${t.id}')"><div class="box"></div></label><span class="text-xs leading-snug pt-0.5 transition-colors duration-300 ${t.done ? 'text-slate-500 line-through' : 'text-gray-300 hover:text-white'}">${t.name}</span></div>`).join('');
-                    return `<div class="mb-2 bg-slate-800/40 rounded-lg border border-slate-700/50 overflow-hidden transition-all duration-300"><div class="flex items-center justify-between p-3 cursor-pointer hover:bg-slate-800/80" onclick="window.toggleAccordion('${c.id}')"><div class="flex items-center gap-3 w-[70%]"><i data-lucide="${isFullyDone ? 'check-circle' : 'circle-dashed'}" class="shrink-0 ${isFullyDone ? 'text-accent' : 'text-slate-500'}" width="16" height="16"></i><span class="text-sm font-semibold truncate ${isFullyDone ? 'text-accent line-through' : 'text-gray-200'}">${c.name}</span></div><div class="flex items-center gap-2"><span class="text-[10px] font-black ${isFullyDone ? 'text-accent' : 'text-gray-400'}">${chapPct}%</span><i data-lucide="chevron-down" id="icon-${c.id}" class="text-slate-500 transition-transform duration-300" width="14" height="14"></i><button onclick="event.stopPropagation(); window.deleteChapter('${sub.id}', '${c.id}')" class="text-slate-600 hover:text-danger ml-1"><i data-lucide="trash-2" width="14" height="14"></i></button></div></div><div id="acc-${c.id}" class="accordion-content bg-slate-900/50 px-2 pb-2">${tasksHTML}</div></div>`;
+                    
+                    // Injecting the 'open' class and icon rotation if it was open before the click
+                    return `<div class="mb-2 bg-slate-800/40 rounded-lg border border-slate-700/50 overflow-hidden transition-all duration-300"><div class="flex items-center justify-between p-3 cursor-pointer hover:bg-slate-800/80" onclick="window.toggleAccordion('${c.id}')"><div class="flex items-center gap-3 w-[70%]"><i data-lucide="${isFullyDone ? 'check-circle' : 'circle-dashed'}" class="shrink-0 ${isFullyDone ? 'text-accent' : 'text-slate-500'}" width="16" height="16"></i><span class="text-sm font-semibold truncate ${isFullyDone ? 'text-accent line-through' : 'text-gray-200'}">${c.name}</span></div><div class="flex items-center gap-2"><span class="text-[10px] font-black ${isFullyDone ? 'text-accent' : 'text-gray-400'}">${chapPct}%</span><i data-lucide="chevron-down" id="icon-${c.id}" class="text-slate-500 transition-transform duration-300" width="14" height="14" style="${isOpen ? 'transform: rotate(180deg);' : ''}"></i><button onclick="event.stopPropagation(); window.deleteChapter('${sub.id}', '${c.id}')" class="text-slate-600 hover:text-danger ml-1"><i data-lucide="trash-2" width="14" height="14"></i></button></div></div><div id="${accId}" class="accordion-content bg-slate-900/50 px-2 pb-2 ${isOpen ? 'open' : ''}">${tasksHTML}</div></div>`;
                 }).join('');
+                
                 container.innerHTML += `<div class="glass-card rounded-2xl p-6 flex flex-col h-full"><div class="flex justify-between items-start mb-4"><h3 class="text-xl font-black tracking-tight text-white">${sub.name}</h3></div><div class="mb-5"><div class="flex justify-between text-[10px] font-bold text-gray-400 mb-1 tracking-wider uppercase"><span>Subject Mastery</span><span>${doneChaps}/${totalChaps} (${mainPct}%)</span></div><div class="h-1.5 w-full bg-slate-900 rounded-full overflow-hidden border border-slate-800"><div class="h-full bg-accent transition-all duration-500 shadow-[0_0_10px_rgba(16,185,129,0.5)]" style="width: ${mainPct}%"></div></div></div><div class="flex-1 space-y-1 overflow-y-auto mb-4 pr-1 custom-scrollbar" style="max-height: 280px;">${chapsHTML || '<div class="text-xs text-slate-600 italic mt-2">No chapters assigned yet.</div>'}</div><div class="mt-auto pt-4 border-t border-slate-800/50 flex gap-2"><input type="text" id="new-chap-${sub.id}" placeholder="Add Chapter..." class="glass-input text-xs rounded-lg p-2.5 flex-1"><button onclick="window.addBoardChapter('${sub.id}')" class="bg-slate-800 hover:bg-slate-700 text-white rounded-lg px-4 transition"><i data-lucide="plus" width="16" height="16"></i></button></div></div>`;
             });
-        }
+            
+            // --- UX SMOOTHNESS UPGRADE: Restore Scroll Positions ---
+            container.querySelectorAll('.custom-scrollbar').forEach((el, index) => {
+                if (scrollPositions[index]) el.scrollTop = scrollPositions[index];
+            });
+            }
 
         function updateGlobalUI() {
             const body = document.getElementById('app-body');
