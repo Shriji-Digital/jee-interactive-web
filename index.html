@@ -757,7 +757,12 @@
             });
             
             log['board'] = parseFloat(document.getElementById('tm-board').value) || 0;
+            
             const oldLog = state.studyLogs[selectedDate] || {};
+            
+            // --- THE FIX: PRESERVE EXISTING COACHING HOURS ---
+            log['coaching'] = oldLog.coaching || 0; 
+            
             const oldXpRelevant = ['p12','c12','m12','p11','c11','m11', 'test'].reduce((sum, k) => sum + (oldLog[k] || 0), 0);
             
             if (xpRelevantHours - oldXpRelevant > 0) state.xp += Math.round((xpRelevantHours - oldXpRelevant) * 5);
