@@ -339,9 +339,10 @@
                 </div>
             </div>
             
-            <div class="mt-4 mb-6 pt-4 border-t border-slate-800 grid grid-cols-2 gap-4 opacity-60 hover:opacity-100 transition">
-                <div class="flex items-center gap-2"><span class="text-[10px] w-8 text-purple-400 font-bold uppercase">Test</span><input type="number" id="tm-test" step="0.1" min="0" class="w-full glass-input rounded px-2 py-1 text-xs"></div>
-                <div class="flex items-center gap-2"><span class="text-[10px] w-8 text-yellow-500 font-bold uppercase">Brd</span><input type="number" id="tm-board" step="0.1" min="0" class="w-full glass-input rounded px-2 py-1 text-xs"></div>
+            <div class="mt-4 mb-6 pt-4 border-t border-slate-800 grid grid-cols-3 gap-3 opacity-60 hover:opacity-100 transition">
+                <div class="flex items-center gap-1"><span class="text-[10px] text-purple-400 font-bold uppercase">Test</span><input type="number" id="tm-test" step="0.1" min="0" class="w-full glass-input rounded px-2 py-1 text-xs"></div>
+                <div class="flex items-center gap-1"><span class="text-[10px] text-yellow-500 font-bold uppercase">Brd</span><input type="number" id="tm-board" step="0.1" min="0" class="w-full glass-input rounded px-2 py-1 text-xs"></div>
+                <div class="flex items-center gap-1"><span class="text-[10px] text-accent font-bold uppercase">Coach</span><input type="number" id="tm-coaching" step="0.5" min="0" class="w-full glass-input rounded px-2 py-1 text-xs"></div>
             </div>
 
             <button onclick="window.saveTimeMachineLog()" class="w-full bg-slate-800 border border-slate-700 hover:bg-slate-700 text-gray-300 font-black py-3 rounded-xl transition">
@@ -743,7 +744,10 @@
             const selectedDate = document.getElementById('tm-date').value;
             if (!selectedDate) return;
             const log = state.studyLogs[selectedDate] || {};
-            ['p12','c12','m12','p11','c11','m11', 'test', 'board'].forEach(k => document.getElementById(`tm-${k}`).value = log[k] || '');
+            ['p12','c12','m12','p11','c11','m11', 'test', 'board', 'coaching'].forEach(k => {
+                const el = document.getElementById(`tm-${k}`);
+                if (el) el.value = log[k] || '';
+            });
         };
         
         window.saveTimeMachineLog = function() {
@@ -757,12 +761,9 @@
             });
             
             log['board'] = parseFloat(document.getElementById('tm-board').value) || 0;
+            log['coaching'] = parseFloat(document.getElementById('tm-coaching').value) || 0; 
             
             const oldLog = state.studyLogs[selectedDate] || {};
-            
-            // --- THE FIX: PRESERVE EXISTING COACHING HOURS ---
-            log['coaching'] = oldLog.coaching || 0; 
-            
             const oldXpRelevant = ['p12','c12','m12','p11','c11','m11', 'test'].reduce((sum, k) => sum + (oldLog[k] || 0), 0);
             
             if (xpRelevantHours - oldXpRelevant > 0) state.xp += Math.round((xpRelevantHours - oldXpRelevant) * 5);
