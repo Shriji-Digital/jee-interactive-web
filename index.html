@@ -547,19 +547,26 @@
             if (!isMatrixOpen) return;
             
             const currentGrid = document.getElementById('matrix-7day-grid');
-            const ghostGrid = document.getElementById('matrix-ghost-grid');
+            const pastGrid = document.getElementById('matrix-past-grid'); 
+            const macroHud = document.getElementById('matrix-macro-hud'); 
             const todayObj = getISTDateObj();
             
             // Core Calendar Logic (Shift from 0=Sun to 0=Mon for the week)
             const todayDay = todayObj.getDay();
             const currentDayIndex = todayDay === 0 ? 6 : todayDay - 1; // Mon=0, Tue=1... Sun=6
             
-            let sumCurrentWeekApex = 0; // The ONLY place coaching goes
+            let sumCurrentWeekApex = 0; 
             let sumCurrentUpToTodayPure = 0;
             let sumLastWeekTotalPure = 0;
             let sumLastWeekUpToEquivalentDayPure = 0;
             
-            // 1. Calculate Last Week's Stats (PURE SELF-STUDY)
+            function getMatrixHrs(log) {
+                if (!log) return 0;
+                return calculateDailyTotal(log) + (log.coaching || 0);
+            }
+            
+            // 1. Calculate & Render Last Week's Stats (GHOST CYCLE)
+            let htmlPast = '';
             for (let i = 0; i < 7; i++) {
                 const daysFromToday = currentDayIndex - i + 7; 
                 const d = new Date(todayObj); d.setDate(d.getDate() - daysFromToday);
@@ -568,9 +575,25 @@
                 
                 sumLastWeekTotalPure += pureHrs;
                 if (i <= currentDayIndex) sumLastWeekUpToEquivalentDayPure += pureHrs;
+
+                const dayName = d.toLocaleDateString('en-US', { weekday: 'short' }).toUpperCase();
+                
+                // Desaturated, "ghost-like" styling for the past grid
+                let heatClass = "bg-slate-900/40 border-slate-800/50 text-slate-600"; 
+                let valClass = "text-slate-500";
+                
+                if (pureHrs > 0 && pureHrs < 5) { heatClass = "bg-emerald-900/10 border-emerald-900/30"; valClass = "text-emerald-500/70"; }
+                if (pureHrs >= 5 && pureHrs < 10) { heatClass = "bg-emerald-800/20 border-emerald-800/40"; valClass = "text-emerald-400/80"; }
+                if (pureHrs >= 10) { heatClass = "bg-emerald-700/20 border-emerald-600/30"; valClass = "text-emerald-300/90"; }
+                
+                htmlPast += `<div class="rounded-xl border p-3 flex flex-col justify-between h-20 transition-all ${heatClass}">
+                    <div class="text-[9px] font-bold uppercase tracking-wider">${dayName}</div>
+                    <div class="text-xl font-black ${valClass}">${pureHrs}</div>
+                </div>`;
             }
+            pastGrid.innerHTML = htmlPast;
             
-            // 2. Render Active Cycle (PURE SELF-STUDY FOR GRID, PLUS APEX TOTAL)
+            // 2. Render Active Cycle (CURRENT WEEK)
             let html7 = '';
             for (let i = 0; i < 7; i++) {
                 const daysFromToday = currentDayIndex - i; 
@@ -583,9 +606,57 @@
                 const coachingHrs = isFuture ? 0 : (log ? (log.coaching || 0) : 0);
                 
                 if (!isFuture) {
-                    sumCurrentWeekApex += (pureHrs + coachingHrs); // Apex gets everything
-                    sumCurrentUpToTodayPure += pureHrs; // Grid & Delta stay pure
+                    sumCurrentWeekApex += (pureHrs + coachingHrs); 
+                    sumCurrentUpToTodayPure += pureHrs; 
                 }
+                
+                const dayName = isToday ? "TODAY" : d.toLocaleDateString('en-US', { weekday: 'short' }).toUpperCase();
+                
+                let heatClass = "bg-slate-900/60 border-slate-800 text-gray-500"; 
+                let valClass = isFuture ? "text-slate-700 font-medium" : "text-white";
+                let displayHrs = isFuture ? "-" : pureHrs; 
+                
+                if (!isFuture) {
+                    if (pureHrs > 0 && pureHrs < 5) heatClass = "bg-emerald-900/20 border-emerald-900/50";
+                    if (pureHrs >= 5 && pureHrs < 10) heatClass = "bg-emerald-800/40 border-emerald-700/50";
+                    if (pureHrs >= 10) { heatClass = "bg-emerald-600/40 border-emerald-400/50 shadow-[0_0_15px_rgba(16,185,129,0.2)]"; valClass = "text-emerald-300"; }
+                }
+                
+                html7 += `<div class="rounded-xl border p-3 flex flex-col justify-between h-24 transition-all hover:scale-105 ${heatClass}">
+                    <div class="text-[10px] font-bold uppercase tracking-wider ${isToday ? 'text-accent' : ''}">${dayName}</div>
+                    <div class="text-2xl font-black ${valClass}">${displayHrs}</div>
+                </div>`;
+            }
+            currentGrid.innerHTML = html7;
+            
+            // 3. Render Apex 70 Bar
+            const apexCurrent = document.getElementById('apex-current'), apexBar = document.getElementById('apex-bar'), apexStatus = document.getElementById('apex-status');
+            apexCurrent.innerText = sumCurrentWeekApex.toFixed(1);
+            let pct = Math.min((sumCurrentWeekApex / 70) * 100, 100);
+            setTimeout(() => { apexBar.style.width = pct + '%'; }, 100);
+            
+            if (sumCurrentWeekApex >= 70) { apexStatus.innerText = "BEAST MODE"; apexStatus.className = "text-xs font-bold uppercase tracking-widest text-iit bg-iit/20 px-3 py-1 rounded iit-glow"; }
+            else if (sumCurrentWeekApex >= 40) { apexStatus.innerText = "OPTIMAL"; apexStatus.className = "text-xs font-bold uppercase tracking-widest text-emerald-400 bg-emerald-900/30 px-3 py-1 rounded"; }
+            else { apexStatus.innerText = "BUILDING"; apexStatus.className = "text-xs font-bold uppercase tracking-widest text-warning bg-amber-900/30 px-3 py-1 rounded"; }
+
+            // 4. Render MACRO HUD
+            let delta = (sumCurrentUpToTodayPure - sumLastWeekUpToEquivalentDayPure).toFixed(1);
+            let deltaHTML = delta >= 0 
+                ? `<span class="text-emerald-400 flex items-center gap-1"><i data-lucide="trending-up" width="16" height="16"></i> +${delta}h</span>` 
+                : `<span class="text-danger flex items-center gap-1"><i data-lucide="trending-down" width="16" height="16"></i> ${delta}h</span>`;
+
+            macroHud.innerHTML = `
+                <div class="glass-card bg-slate-900/50 py-3 px-5 rounded-xl border border-slate-800 flex justify-between items-center transition hover:bg-slate-800/80">
+                    <div class="text-[10px] text-gray-500 font-bold uppercase tracking-widest" title="Mon-Sun of Last Week">Last Wk Total</div>
+                    <div class="text-xl font-black text-gray-300">${sumLastWeekTotalPure.toFixed(1)} <span class="text-[10px] text-gray-500 uppercase tracking-widest ml-1">Hrs</span></div>
+                </div>
+                <div class="glass-card bg-slate-900/50 py-3 px-5 rounded-xl border border-slate-800 flex justify-between items-center transition hover:bg-slate-800/80">
+                    <div class="text-[10px] text-gray-500 font-bold uppercase tracking-widest" title="Compared to last week up to today">Smart Delta</div>
+                    <div class="text-xl font-black">${deltaHTML}</div>
+                </div>
+            `;
+            lucide.createIcons();
+        };
                 
                 const dayName = isToday ? "TODAY" : d.toLocaleDateString('en-US', { weekday: 'short' }).toUpperCase();
                 
