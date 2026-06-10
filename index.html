@@ -658,49 +658,6 @@
             `;
             lucide.createIcons();
         };
-                
-                const dayName = isToday ? "TODAY" : d.toLocaleDateString('en-US', { weekday: 'short' }).toUpperCase();
-                
-                // Dynamic styling strictly based on Pure Hrs
-                let heatClass = "bg-slate-900/60 border-slate-800 text-gray-500"; 
-                let valClass = isFuture ? "text-slate-700 font-medium" : "text-white";
-                let displayHrs = isFuture ? "-" : pureHrs; 
-                
-                if (!isFuture) {
-                    if (pureHrs > 0 && pureHrs < 5) heatClass = "bg-emerald-900/20 border-emerald-900/50";
-                    if (pureHrs >= 5 && pureHrs < 10) heatClass = "bg-emerald-800/40 border-emerald-700/50";
-                    if (pureHrs >= 10) { heatClass = "bg-emerald-600/40 border-emerald-400/50 shadow-[0_0_15px_rgba(16,185,129,0.2)]"; valClass = "text-emerald-300"; }
-                }
-                
-                html7 += `<div class="rounded-xl border p-3 flex flex-col justify-between h-24 transition-all hover:scale-105 ${heatClass}">
-                    <div class="text-[10px] font-bold uppercase tracking-wider ${isToday ? 'text-accent' : ''}">${dayName}</div>
-                    <div class="text-2xl font-black ${valClass}">${displayHrs}</div>
-                </div>`;
-            }
-            currentGrid.innerHTML = html7;
-            
-            // 3. Render Apex 70 Bar (Self-Study + Coaching)
-            const apexCurrent = document.getElementById('apex-current'), apexBar = document.getElementById('apex-bar'), apexStatus = document.getElementById('apex-status');
-            apexCurrent.innerText = sumCurrentWeekApex.toFixed(1);
-            let pct = Math.min((sumCurrentWeekApex / 70) * 100, 100);
-            setTimeout(() => { apexBar.style.width = pct + '%'; }, 100);
-            
-            if (sumCurrentWeekApex >= 70) { apexStatus.innerText = "BEAST MODE"; apexStatus.className = "text-xs font-bold uppercase tracking-widest text-iit bg-iit/20 px-3 py-1 rounded iit-glow"; }
-            else if (sumCurrentWeekApex >= 40) { apexStatus.innerText = "OPTIMAL"; apexStatus.className = "text-xs font-bold uppercase tracking-widest text-emerald-400 bg-emerald-900/30 px-3 py-1 rounded"; }
-            else { apexStatus.innerText = "BUILDING"; apexStatus.className = "text-xs font-bold uppercase tracking-widest text-warning bg-amber-900/30 px-3 py-1 rounded"; }
-
-            // 4. Render Ghost Grid (PURE SELF STUDY DELTA HUD)
-            let delta = (sumCurrentUpToTodayPure - sumLastWeekUpToEquivalentDayPure).toFixed(1);
-            let deltaHTML = delta >= 0 
-                ? `<span class="text-emerald-400 flex items-center gap-1"><i data-lucide="trending-up" width="14" height="14"></i> +${delta}h</span>` 
-                : `<span class="text-danger flex items-center gap-1"><i data-lucide="trending-down" width="14" height="14"></i> ${delta}h</span>`;
-
-            ghostGrid.innerHTML = `
-                <div class="bg-slate-900/50 p-4 rounded-xl border border-slate-800"><div class="text-[10px] text-gray-500 font-bold uppercase tracking-widest mb-1" title="Mon-Sun of Last Week">Last Wk Total</div><div class="text-xl font-black text-gray-300">${sumLastWeekTotalPure.toFixed(1)} <span class="text-xs">Hrs</span></div></div>
-                <div class="bg-slate-900/50 p-4 rounded-xl border border-slate-800"><div class="text-[10px] text-gray-500 font-bold uppercase tracking-widest mb-1" title="Compared to last week up to today">Smart Delta</div><div class="text-xl font-black">${deltaHTML}</div></div>
-            `;
-            lucide.createIcons();
-        };
         
         window.switchTab = function(tabName) {
             ['dashboard', 'boards', 'logs'].forEach(t => {
