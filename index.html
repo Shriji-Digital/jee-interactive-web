@@ -144,24 +144,22 @@
                 </div>
             </div>
 
-            <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
-                <div class="lg:col-span-3 glass-card rounded-2xl p-6 border border-slate-700">
-                    <h3 class="text-[10px] text-gray-400 uppercase tracking-widest font-bold mb-4 flex items-center gap-2">
-                        <i data-lucide="calendar" width="14" height="14"></i> Active Cycle (Current Week)
-                    </h3>
-                    <div id="matrix-7day-grid" class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-3">
-                        </div>
+            <div class="grid grid-cols-2 gap-4 lg:gap-6 mb-6" id="matrix-macro-hud">
                 </div>
 
-                <div class="lg:col-span-1 glass-card rounded-2xl p-6 border border-slate-700 bg-gradient-to-b from-slate-800/20 to-slate-900/50">
-                    <h3 class="text-[10px] text-gray-500 uppercase tracking-widest font-bold mb-4 flex items-center gap-2">
-                        <i data-lucide="ghost" width="14" height="14"></i> Past Self (Last Week)
-                    </h3>
-                    <div class="flex flex-col gap-4" id="matrix-ghost-grid">
-                        </div>
-                </div>
+            <div class="glass-card rounded-2xl p-6 mb-6 border border-slate-700 shadow-[0_0_20px_rgba(16,185,129,0.05)]">
+                <h3 class="text-[10px] text-emerald-400 uppercase tracking-widest font-bold mb-4 flex items-center gap-2">
+                    <i data-lucide="calendar" width="14" height="14"></i> Active Cycle (Current Week)
+                </h3>
+                <div id="matrix-7day-grid" class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-3"></div>
             </div>
-                    </div>
+
+            <div class="glass-card rounded-2xl p-6 border border-slate-800 bg-gradient-to-b from-slate-900/40 to-slate-900/80">
+                <h3 class="text-[10px] text-gray-500 uppercase tracking-widest font-bold mb-4 flex items-center gap-2">
+                    <i data-lucide="ghost" width="14" height="14"></i> Ghost Cycle (Last Week)
+                </h3>
+                <div id="matrix-past-grid" class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-3 opacity-70 hover:opacity-100 transition-opacity duration-300"></div>
+                        </div>
 
         <div id="command-center-ui" class="transition-opacity duration-500">
             <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 mb-10">
