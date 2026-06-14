@@ -165,12 +165,45 @@
         <div id="command-center-ui" class="transition-opacity duration-500">
             <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 mb-10">
                 
-                <div class="lg:col-span-4 flex flex-col gap-6">
-                    <div class="glass-card rounded-2xl p-5 border-l-4 border-l-danger">
-                        <h2 class="text-[11px] text-gray-400 uppercase tracking-widest font-bold mb-3 flex items-center gap-2">
-                            <i data-lucide="swords" width="14" height="14" class="text-danger"></i> Daily War Cry
-                        </h2>
-                        <textarea id="warcry-input" onchange="window.saveWarCry()" placeholder="e.g., I will finish Rotation Mechanics today no matter what." class="w-full glass-input rounded-lg p-3 text-sm resize-none" rows="3"></textarea>
+                <!-- THE MAIN STAGE (70% WIDTH) - Added right border for solid UI separation -->
+                <div class="lg:col-span-8 flex flex-col gap-6 lg:border-r lg:border-slate-800 lg:pr-6">
+                    
+                    <!-- THE NIGHTLY DIRECTIVE (Solid Obsidian Card) -->
+                    <div class="bg-[#0f172a] rounded-2xl p-6 border border-slate-700 shadow-[0_8px_30px_rgb(0,0,0,0.4)] relative overflow-hidden transition-all duration-500" id="directive-container">
+                        
+                        <!-- Header -->
+                        <div class="flex justify-between items-center mb-5 border-b border-slate-800 pb-3">
+                            <h2 class="text-xs text-iit uppercase tracking-widest font-black flex items-center gap-2">
+                                <i data-lucide="crosshair" width="16" height="16"></i> The Nightly Directive
+                            </h2>
+                            <span id="directive-status" class="text-[10px] font-bold bg-slate-800 text-gray-400 px-2 py-1 rounded border border-slate-700">UNLOCKED</span>
+                        </div>
+
+                        <!-- The 3 Inputs (Grid Layout) -->
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4" id="directive-inputs">
+                            <div>
+                                <label class="text-[9px] uppercase text-gray-500 font-bold mb-1.5 block">Target Alpha</label>
+                                <input type="text" id="dir-1" class="w-full bg-[#090e17] border border-slate-700 text-gray-300 rounded-lg px-3 py-2.5 text-xs focus:border-accent focus:ring-1 focus:ring-accent transition shadow-inner" placeholder="e.g., HCV Friction Q1-30">
+                            </div>
+                            <div>
+                                <label class="text-[9px] uppercase text-gray-500 font-bold mb-1.5 block">Target Beta</label>
+                                <input type="text" id="dir-2" class="w-full bg-[#090e17] border border-slate-700 text-gray-300 rounded-lg px-3 py-2.5 text-xs focus:border-accent focus:ring-1 focus:ring-accent transition shadow-inner" placeholder="e.g., Revise Periodic Table">
+                            </div>
+                            <div>
+                                <label class="text-[9px] uppercase text-gray-500 font-bold mb-1.5 block">Target Gamma</label>
+                                <input type="text" id="dir-3" class="w-full bg-[#090e17] border border-slate-700 text-gray-300 rounded-lg px-3 py-2.5 text-xs focus:border-accent focus:ring-1 focus:ring-accent transition shadow-inner" placeholder="e.g., Math Mock Test 1hr">
+                            </div>
+                        </div>
+
+                        <!-- The Execution View (Hidden by Default) -->
+                        <div class="hidden flex flex-col gap-3" id="directive-execution">
+                            <!-- JS Engine will inject the locked checkboxes here -->
+                        </div>
+
+                        <!-- Lock Button -->
+                        <button id="btn-lock-directive" onclick="window.lockDirective()" class="w-full mt-5 bg-slate-800 hover:bg-iit hover:text-white text-gray-400 font-black py-3 rounded-lg transition-all duration-300 border border-slate-700 hover:border-iit flex justify-center items-center gap-2">
+                            <i data-lucide="lock" width="14" height="14"></i> LOCK PROTOCOL (24 HOURS)
+                        </button>
                     </div>
 
                     <div class="glass-card rounded-2xl p-5 relative overflow-hidden">
@@ -206,7 +239,7 @@
                     </div>
                 </div>
 
-                <div class="lg:col-span-8 flex flex-col gap-6">
+                <div class="lg:col-span-4 flex flex-col gap-6">
                     <div class="glass-card rounded-2xl p-5 flex flex-col sm:flex-row gap-4 items-end bg-gradient-to-br from-slate-800/40 to-slate-900/60">
                         <div class="flex-1 w-full">
                             <label class="block text-[10px] text-gray-400 uppercase font-bold mb-2 tracking-wider">Deploy Mission Protocol</label>
