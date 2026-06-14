@@ -171,41 +171,37 @@
                     <!-- THE NIGHTLY DIRECTIVE (Solid Obsidian Card) -->
                     <div class="bg-[#0f172a] rounded-2xl p-6 border border-slate-700 shadow-[0_8px_30px_rgb(0,0,0,0.4)] relative overflow-hidden transition-all duration-500" id="directive-container">
                         
-                        <!-- Header -->
-                        <div class="flex justify-between items-center mb-5 border-b border-slate-800 pb-3">
+                        <div class="flex justify-between items-center mb-4 border-b border-slate-800 pb-3">
                             <h2 class="text-xs text-iit uppercase tracking-widest font-black flex items-center gap-2">
                                 <i data-lucide="crosshair" width="16" height="16"></i> The Nightly Directive
                             </h2>
                             <span id="directive-status" class="text-[10px] font-bold bg-slate-800 text-gray-400 px-2 py-1 rounded border border-slate-700">UNLOCKED</span>
                         </div>
 
-                        <!-- The 3 Inputs (Grid Layout) -->
+                        <div id="dir-msg" class="hidden mb-4 p-3 rounded-lg text-[10px] font-black uppercase tracking-widest text-center border"></div>
+
                         <div class="grid grid-cols-1 md:grid-cols-3 gap-4" id="directive-inputs">
                             <div>
                                 <label class="text-[9px] uppercase text-gray-500 font-bold mb-1.5 block">Target Alpha</label>
-                                <input type="text" id="dir-1" class="w-full bg-[#090e17] border border-slate-700 text-gray-300 rounded-lg px-3 py-2.5 text-xs focus:border-accent focus:ring-1 focus:ring-accent transition shadow-inner" placeholder="e.g., HCV Friction Q1-30">
+                                <input type="text" id="dir-1" oninput="window.validateDirective()" class="w-full bg-[#090e17] border border-slate-700 text-gray-300 rounded-lg px-3 py-2.5 text-xs focus:border-accent focus:ring-1 focus:ring-accent transition shadow-inner" placeholder="e.g., HCV Friction Q1-30">
                             </div>
                             <div>
                                 <label class="text-[9px] uppercase text-gray-500 font-bold mb-1.5 block">Target Beta</label>
-                                <input type="text" id="dir-2" class="w-full bg-[#090e17] border border-slate-700 text-gray-300 rounded-lg px-3 py-2.5 text-xs focus:border-accent focus:ring-1 focus:ring-accent transition shadow-inner" placeholder="e.g., Revise Periodic Table">
+                                <input type="text" id="dir-2" oninput="window.validateDirective()" class="w-full bg-[#090e17] border border-slate-700 text-gray-300 rounded-lg px-3 py-2.5 text-xs focus:border-accent focus:ring-1 focus:ring-accent transition shadow-inner" placeholder="e.g., Revise Periodic Table">
                             </div>
                             <div>
                                 <label class="text-[9px] uppercase text-gray-500 font-bold mb-1.5 block">Target Gamma</label>
-                                <input type="text" id="dir-3" class="w-full bg-[#090e17] border border-slate-700 text-gray-300 rounded-lg px-3 py-2.5 text-xs focus:border-accent focus:ring-1 focus:ring-accent transition shadow-inner" placeholder="e.g., Math Mock Test 1hr">
+                                <input type="text" id="dir-3" oninput="window.validateDirective()" class="w-full bg-[#090e17] border border-slate-700 text-gray-300 rounded-lg px-3 py-2.5 text-xs focus:border-accent focus:ring-1 focus:ring-accent transition shadow-inner" placeholder="e.g., Math Mock Test 1hr">
                             </div>
                         </div>
 
-                        <!-- The Execution View (Hidden by Default) -->
-                        <div class="hidden flex flex-col gap-3" id="directive-execution">
-                            <!-- JS Engine will inject the locked checkboxes here -->
-                        </div>
+                        <div class="hidden flex flex-col gap-3" id="directive-execution"></div>
 
-                        <!-- Lock Button -->
-                        <button id="btn-lock-directive" onclick="window.lockDirective()" class="w-full mt-5 bg-slate-800 hover:bg-iit hover:text-white text-gray-400 font-black py-3 rounded-lg transition-all duration-300 border border-slate-700 hover:border-iit flex justify-center items-center gap-2">
-                            <i data-lucide="lock" width="14" height="14"></i> LOCK PROTOCOL (24 HOURS)
+                        <button id="btn-lock-directive" disabled class="w-full mt-5 bg-slate-800 text-gray-500 font-black py-3 rounded-lg cursor-not-allowed border border-slate-700 flex justify-center items-center gap-2">
+                            <i data-lucide="lock" width="14" height="14"></i> MIN 20 CHARS REQUIRED PER TASK
                         </button>
                     </div>
-
+                    
                     <div class="glass-card rounded-2xl p-5 relative overflow-hidden">
                         <div class="absolute -right-4 -top-4 opacity-5"><i data-lucide="brain" width="100" height="100"></i></div>
                         <div class="flex justify-between items-center mb-4">
@@ -450,6 +446,12 @@
             return getISTDateObj().getHours() === 23; 
         }
 
+        function getDirectiveCycle() {
+            const d = getISTDateObj();
+            if (d.getHours() >= 22) d.setDate(d.getDate() + 1); // If it's past 10 PM, the deadline is tomorrow
+            return formatDateStr(d);
+        }
+
         function formatDisplayDate(dateStr) { 
             return new Date(dateStr).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }); 
         }
@@ -482,6 +484,36 @@
                         databaseChanged = true;
                     }
                 });
+
+                // --- DIRECTIVE AUTO-AUDIT (10 PM JUDGMENT) ---
+                const currentCycle = getDirectiveCycle();
+                if (!state.directive) {
+                    state.directive = { cycleKey: currentCycle, locked: false, tasks: [], message: null };
+                    databaseChanged = true;
+                } else if (state.directive.cycleKey < currentCycle) {
+                    // A cycle just ended! Execute Judgment.
+                    let msgText = ""; let msgType = ""; let xpChange = 0;
+                    
+                    if (state.directive.locked) {
+                        const allDone = state.directive.tasks.length === 3 && state.directive.tasks.every(t => t.done);
+                        if (allDone) {
+                            xpChange = 50; msgText = "DIRECTIVE SECURED: +50 XP"; msgType = "success";
+                        } else {
+                            xpChange = -100; msgText = "DIRECTIVE BREACHED (Incomplete): -100 XP"; msgType = "danger";
+                        }
+                    } else {
+                        xpChange = -50; msgText = "DIRECTIVE MISSED (Not Locked): -50 XP"; msgType = "warning";
+                    }
+                    
+                    state.xp = Math.max(0, state.xp + xpChange);
+                    
+                    // Set Message Expiry to 11 PM of the cycle day
+                    const [y, m, d] = state.directive.cycleKey.split('-');
+                    const expiryTs = new Date(`${y}-${m}-${d}T23:00:00+05:30`).getTime();
+                    
+                    state.directive = { cycleKey: currentCycle, locked: false, tasks: [], message: { text: msgText, type: msgType, expiresAt: expiryTs } };
+                    databaseChanged = true;
+                    }
 
                 // THE AUTO-AUDIT ENGINE
                 state.habits.forEach(habit => {
@@ -1084,6 +1116,78 @@
                 if (scrollPositions[index]) el.scrollTop = scrollPositions[index];
             });
             }
+
+        // --- NIGHTLY DIRECTIVE LOGIC ---
+        window.validateDirective = function() {
+            const t1 = document.getElementById('dir-1').value.trim();
+            const t2 = document.getElementById('dir-2').value.trim();
+            const t3 = document.getElementById('dir-3').value.trim();
+            const btn = document.getElementById('btn-lock-directive');
+            
+            if (t1.length >= 20 && t2.length >= 20 && t3.length >= 20) {
+                btn.disabled = false; btn.onclick = window.lockDirective;
+                btn.className = "w-full mt-5 bg-accent hover:bg-emerald-400 text-slate-900 font-black py-3 rounded-lg transition-all shadow-[0_0_15px_rgba(16,185,129,0.3)] flex justify-center items-center gap-2 cursor-pointer";
+                btn.innerHTML = `<i data-lucide="lock" width="14" height="14"></i> LOCK PROTOCOL`;
+            } else {
+                btn.disabled = true; btn.onclick = null;
+                btn.className = "w-full mt-5 bg-slate-800 text-gray-500 font-black py-3 rounded-lg cursor-not-allowed border border-slate-700 flex justify-center items-center gap-2";
+                btn.innerHTML = `<i data-lucide="lock" width="14" height="14"></i> MIN 20 CHARS REQUIRED PER TASK`;
+            }
+            lucide.createIcons();
+        };
+
+        window.lockDirective = function() {
+            const t1 = document.getElementById('dir-1').value.trim();
+            const t2 = document.getElementById('dir-2').value.trim();
+            const t3 = document.getElementById('dir-3').value.trim();
+            if (t1.length < 20 || t2.length < 20 || t3.length < 20) return;
+            
+            if (confirm("Lock Directive? This CANNOT be changed until the 10 PM reset. Proceed?")) {
+                state.directive.locked = true;
+                state.directive.tasks = [ { id: 'dt1', text: t1, done: false }, { id: 'dt2', text: t2, done: false }, { id: 'dt3', text: t3, done: false } ];
+                saveData(); renderDirective();
+            }
+        };
+
+        window.toggleDirectiveTask = function(taskId) {
+            const t = state.directive.tasks.find(x => x.id === taskId);
+            if (t) {
+                t.done = !t.done;
+                if (state.directive.tasks.every(x => x.done)) confetti({ particleCount: 80, spread: 60 });
+                saveData(); renderDirective();
+            }
+        };
+
+        function renderDirective() {
+            if (!state.directive) return;
+            
+            const msgBox = document.getElementById('dir-msg');
+            if (state.directive.message && Date.now() < state.directive.message.expiresAt) {
+                msgBox.classList.remove('hidden'); msgBox.innerText = state.directive.message.text;
+                if (state.directive.message.type === 'success') msgBox.className = "mb-5 p-3 rounded-lg text-[10px] font-black uppercase tracking-widest text-center border border-emerald-500/50 bg-emerald-900/20 text-emerald-400";
+                else if (state.directive.message.type === 'danger') msgBox.className = "mb-5 p-3 rounded-lg text-[10px] font-black uppercase tracking-widest text-center border border-danger/50 bg-danger/20 text-danger";
+                else msgBox.className = "mb-5 p-3 rounded-lg text-[10px] font-black uppercase tracking-widest text-center border border-warning/50 bg-warning/20 text-warning";
+            } else { msgBox.classList.add('hidden'); }
+            
+            const inputsDiv = document.getElementById('directive-inputs'), execDiv = document.getElementById('directive-execution');
+            const lockBtn = document.getElementById('btn-lock-directive'), statusSpan = document.getElementById('directive-status');
+            
+            if (state.directive.locked) {
+                inputsDiv.classList.add('hidden'); lockBtn.classList.add('hidden'); execDiv.classList.remove('hidden');
+                statusSpan.innerText = "LOCKED"; statusSpan.className = "text-[10px] font-bold bg-danger/20 text-danger px-2 py-1 rounded border border-danger/30";
+                
+                execDiv.innerHTML = state.directive.tasks.map(t => `
+                    <div class="flex items-start gap-3 py-3 px-4 bg-slate-900/50 rounded-lg border border-slate-700/50">
+                        <label class="flex items-center gap-3 cursor-pointer cyber-checkbox pt-0.5"><input type="checkbox" ${t.done ? 'checked' : ''} onchange="window.toggleDirectiveTask('${t.id}')"><div class="box"></div></label>
+                        <span class="text-sm font-medium leading-snug transition-colors duration-300 ${t.done ? 'text-slate-500 line-through' : 'text-gray-200'}">${t.text}</span>
+                    </div>`).join('');
+            } else {
+                inputsDiv.classList.remove('hidden'); lockBtn.classList.remove('hidden'); execDiv.classList.add('hidden');
+                statusSpan.innerText = "UNLOCKED"; statusSpan.className = "text-[10px] font-bold bg-slate-800 text-gray-400 px-2 py-1 rounded border border-slate-700";
+                window.validateDirective();
+            }
+            lucide.createIcons();
+        }
 
         function updateGlobalUI() {
             const body = document.getElementById('app-body');
