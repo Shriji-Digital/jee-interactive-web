@@ -522,7 +522,6 @@
             }
             
             document.getElementById('db-status').innerHTML = '<i data-lucide="wifi" width="14" height="14" class="text-accent"></i> <span class="text-accent">Live Uplink Secured</span>';
-            if (document.activeElement.id !== 'warcry-input') document.getElementById('warcry-input').value = state.warCry || "";
             updateGlobalUI();
         }, (error) => {
             document.getElementById('db-status').innerHTML = '<i data-lucide="wifi-off" width="14" height="14" class="text-danger"></i> <span class="text-danger">ERROR: ' + error.message + '</span>';
@@ -702,8 +701,6 @@
                 else { el.classList.remove('active'); el.style.display = 'none'; }
             });
         };
-
-        window.saveWarCry = function() { state.warCry = document.getElementById('warcry-input').value; saveData(); };
 
         // --- MAIN LOG HOURS MODAL ---
         // --- BINARY GATE LOGIC (UPGRADED) ---
