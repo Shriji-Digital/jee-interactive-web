@@ -1312,33 +1312,72 @@
         // --- PHASE 4: THE VAULT ENGINE ---
         let openVaultUnits = new Set(); // Memory for which accordions are open
 
+        // --- IN-APP INPUT MODAL LOGIC ---
+        let vaultInputAction = null;
+
+        window.openVaultInput = function(title, desc, placeholder, callback) {
+            document.getElementById('vault-input-title').innerHTML = `<i data-lucide="terminal" class="text-accent" width="20" height="20"></i> ${title}`;
+            document.getElementById('vault-input-desc').innerText = desc;
+            const inputField = document.getElementById('vault-input-field');
+            inputField.placeholder = placeholder;
+            inputField.value = '';
+            
+            vaultInputAction = callback;
+            
+            const modal = document.getElementById('vault-input-modal');
+            const content = document.getElementById('vault-input-modal-content');
+            modal.classList.remove('hidden');
+            setTimeout(() => { modal.classList.remove('opacity-0'); content.classList.remove('scale-95'); inputField.focus(); }, 10);
+            lucide.createIcons();
+        };
+
+        window.closeVaultInput = function() {
+            const modal = document.getElementById('vault-input-modal');
+            const content = document.getElementById('vault-input-modal-content');
+            modal.classList.add('opacity-0'); content.classList.add('scale-95');
+            setTimeout(() => modal.classList.add('hidden'), 300);
+            vaultInputAction = null;
+        };
+
+        window.submitVaultInput = function() {
+            const val = document.getElementById('vault-input-field').value.trim();
+            if (!val) return;
+            if (vaultInputAction) vaultInputAction(val);
+            window.closeVaultInput();
+        };
+
+        // --- UPGRADED CRUD OPERATIONS (No Browser Prompts) ---
         window.addVaultUnit = function() {
-            const name = prompt("Enter Unit Name (e.g., Mechanics):");
-            if (!name) return;
-            if (!state.vault[currentVaultSubject].units) state.vault[currentVaultSubject].units = [];
-            const newId = 'vu_' + Date.now();
-            state.vault[currentVaultSubject].units.push({ id: newId, name: name, chapters: [] });
-            openVaultUnits.add(newId); // Auto-open new unit
-            saveData(); renderVaultData();
+            window.openVaultInput("NEW UNIT", "Define the master topic", "e.g., Mechanics", (name) => {
+                if (!state.vault[currentVaultSubject].units) state.vault[currentVaultSubject].units = [];
+                const newId = 'vu_' + Date.now();
+                state.vault[currentVaultSubject].units.push({ id: newId, name: name, chapters: [] });
+                openVaultUnits.add(newId); // Auto-open new unit
+                saveData(); window.renderVaultData();
+            });
         };
 
         window.addVaultChapter = function(unitId) {
-            const name = prompt("Enter Chapter Name (e.g., Kinematics):");
-            if (!name) return;
-            const unit = state.vault[currentVaultSubject].units.find(u => u.id === unitId);
-            if (!unit.chapters) unit.chapters = [];
-            unit.chapters.push({ id: 'vc_' + Date.now(), name: name, items: [] });
-            saveData(); renderVaultData();
+            window.openVaultInput("NEW CHAPTER", "Define the sub-topic", "e.g., Kinematics 1D", (name) => {
+                const unit = state.vault[currentVaultSubject].units.find(u => u.id === unitId);
+                if (!unit.chapters) unit.chapters = [];
+                unit.chapters.push({ id: 'vc_' + Date.now(), name: name, items: [] });
+                saveData(); window.renderVaultData();
+            });
         };
 
         window.addVaultItem = function(unitId, chapId, type) {
-            const text = prompt(type === 'note' ? "Enter Concept Note / Formula:" : "Enter Specific Task:");
-            if (!text) return;
-            const unit = state.vault[currentVaultSubject].units.find(u => u.id === unitId);
-            const chap = unit.chapters.find(c => c.id === chapId);
-            if (!chap.items) chap.items = [];
-            chap.items.push({ id: 'vi_' + Date.now(), type: type, text: text, done: false });
-            saveData(); window.renderVaultData();
+            const title = type === 'note' ? "NEW NOTE" : "NEW TASK";
+            const desc = type === 'note' ? "Enter Concept / Formula" : "Enter Specific Action Item";
+            const placeholder = type === 'note' ? "e.g., Remember parallel axis theorem..." : "e.g., Solve 30 PYQs";
+            
+            window.openVaultInput(title, desc, placeholder, (text) => {
+                const unit = state.vault[currentVaultSubject].units.find(u => u.id === unitId);
+                const chap = unit.chapters.find(c => c.id === chapId);
+                if (!chap.items) chap.items = [];
+                chap.items.push({ id: 'vi_' + Date.now(), type: type, text: text, done: false });
+                saveData(); window.renderVaultData();
+            });
         };
 
         window.toggleVaultTask = function(unitId, chapId, itemId) {
