@@ -1315,6 +1315,40 @@
             saveData(); renderVaultData();
         };
 
+        window.addVaultItem = function(unitId, chapId, type) {
+            const text = prompt(type === 'note' ? "Enter Concept Note / Formula:" : "Enter Specific Task:");
+            if (!text) return;
+            const unit = state.vault[currentVaultSubject].units.find(u => u.id === unitId);
+            const chap = unit.chapters.find(c => c.id === chapId);
+            if (!chap.items) chap.items = [];
+            chap.items.push({ id: 'vi_' + Date.now(), type: type, text: text, done: false });
+            saveData(); window.renderVaultData();
+        };
+
+        window.toggleVaultTask = function(unitId, chapId, itemId) {
+            const unit = state.vault[currentVaultSubject].units.find(u => u.id === unitId);
+            const chap = unit.chapters.find(c => c.id === chapId);
+            const item = chap.items.find(i => i.id === itemId);
+            item.done = !item.done;
+            saveData(); window.renderVaultData();
+        };
+
+        window.deleteVaultEntity = function(unitId, chapId = null, itemId = null) {
+            if (!confirm("Erase this data permanently from the Vault?")) return;
+            const units = state.vault[currentVaultSubject].units;
+            if (itemId) {
+                const chap = units.find(u => u.id === unitId).chapters.find(c => c.id === chapId);
+                chap.items = chap.items.filter(i => i.id !== itemId);
+            } else if (chapId) {
+                const unit = units.find(u => u.id === unitId);
+                unit.chapters = unit.chapters.filter(c => c.id !== chapId);
+            } else {
+                state.vault[currentVaultSubject].units = units.filter(u => u.id !== unitId);
+                openVaultUnits.delete(unitId);
+            }
+            saveData(); window.renderVaultData();
+        };
+
         function updateGlobalUI() {
             const body = document.getElementById('app-body');
             const statusTxt = document.getElementById('system-status');
