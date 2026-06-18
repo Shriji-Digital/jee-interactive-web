@@ -1250,6 +1250,46 @@
             lucide.createIcons();
         }
 
+        // --- SYLLABUS VAULT NAVIGATION ENGINE ---
+        let currentVaultSubject = null;
+
+        window.openVault = function() {
+            const modal = document.getElementById('vault-modal');
+            const content = document.getElementById('vault-modal-content');
+            window.backToVaultHub(); // Ensure we open to the 3 big buttons
+            modal.classList.remove('hidden');
+            setTimeout(() => { modal.classList.remove('opacity-0'); content.classList.remove('scale-95'); }, 10);
+        };
+        
+        window.closeVault = function() {
+            const modal = document.getElementById('vault-modal');
+            const content = document.getElementById('vault-modal-content');
+            modal.classList.add('opacity-0'); content.classList.add('scale-95');
+            setTimeout(() => modal.classList.add('hidden'), 300);
+        };
+
+        window.openVaultSubject = function(subjectName) {
+            currentVaultSubject = subjectName;
+            document.getElementById('vault-subjects-view').classList.add('hidden');
+            document.getElementById('vault-details-view').classList.remove('hidden');
+            
+            const titleEl = document.getElementById('vault-current-subject');
+            titleEl.innerText = subjectName;
+            
+            // Apply subject specific glowing accent
+            if(subjectName === 'Physics') titleEl.className = "text-3xl font-black text-white uppercase tracking-widest border-l-4 pl-4 border-subjectP text-shadow-glow";
+            if(subjectName === 'Chemistry') titleEl.className = "text-3xl font-black text-white uppercase tracking-widest border-l-4 pl-4 border-subjectC text-shadow-glow";
+            if(subjectName === 'Maths') titleEl.className = "text-3xl font-black text-white uppercase tracking-widest border-l-4 pl-4 border-subjectM text-shadow-glow";
+            
+            // We will call renderVaultData() here in Phase 4!
+        };
+
+        window.backToVaultHub = function() {
+            currentVaultSubject = null;
+            document.getElementById('vault-details-view').classList.add('hidden');
+            document.getElementById('vault-subjects-view').classList.remove('hidden');
+        };
+
         function updateGlobalUI() {
             const body = document.getElementById('app-body');
             const statusTxt = document.getElementById('system-status');
