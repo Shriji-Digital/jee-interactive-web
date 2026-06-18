@@ -1284,13 +1284,35 @@
             if(subjectName === 'Chemistry') titleEl.className = "text-3xl font-black text-white uppercase tracking-widest border-l-4 pl-4 border-subjectC text-shadow-glow";
             if(subjectName === 'Maths') titleEl.className = "text-3xl font-black text-white uppercase tracking-widest border-l-4 pl-4 border-subjectM text-shadow-glow";
             
-            // We will call renderVaultData() here in Phase 4!
+            window.renderVaultData();
         };
 
         window.backToVaultHub = function() {
             currentVaultSubject = null;
             document.getElementById('vault-details-view').classList.add('hidden');
             document.getElementById('vault-subjects-view').classList.remove('hidden');
+        };
+
+        // --- PHASE 4: THE VAULT ENGINE ---
+        let openVaultUnits = new Set(); // Memory for which accordions are open
+
+        window.addVaultUnit = function() {
+            const name = prompt("Enter Unit Name (e.g., Mechanics):");
+            if (!name) return;
+            if (!state.vault[currentVaultSubject].units) state.vault[currentVaultSubject].units = [];
+            const newId = 'vu_' + Date.now();
+            state.vault[currentVaultSubject].units.push({ id: newId, name: name, chapters: [] });
+            openVaultUnits.add(newId); // Auto-open new unit
+            saveData(); renderVaultData();
+        };
+
+        window.addVaultChapter = function(unitId) {
+            const name = prompt("Enter Chapter Name (e.g., Kinematics):");
+            if (!name) return;
+            const unit = state.vault[currentVaultSubject].units.find(u => u.id === unitId);
+            if (!unit.chapters) unit.chapters = [];
+            unit.chapters.push({ id: 'vc_' + Date.now(), name: name, items: [] });
+            saveData(); renderVaultData();
         };
 
         function updateGlobalUI() {
