@@ -396,6 +396,52 @@
         </div>
     </div>
 
+    <div id="vault-modal" class="fixed inset-0 bg-black/95 backdrop-blur-xl z-50 flex items-center justify-center hidden opacity-0 transition-opacity duration-300">
+        <div class="bg-[#0f172a] border border-slate-700 shadow-2xl w-full h-full md:w-[95%] md:h-[95%] md:rounded-3xl flex flex-col transform scale-95 transition-transform duration-300 overflow-hidden" id="vault-modal-content">
+            
+            <div class="flex justify-between items-center p-6 border-b border-slate-800 bg-[#090e17]">
+                <h2 class="text-2xl font-black text-white flex items-center gap-3 tracking-tight">
+                    <i data-lucide="database" class="text-accent"></i> THE SYLLABUS VAULT
+                </h2>
+                <button onclick="window.closeVault()" class="text-gray-500 hover:text-white transition"><i data-lucide="x" width="24" height="24"></i></button>
+            </div>
+
+            <div class="flex-1 overflow-y-auto p-6 md:p-10 custom-scrollbar" id="vault-body">
+                
+                <div id="vault-subjects-view" class="flex flex-col gap-6 max-w-3xl mx-auto mt-10">
+                    <button onclick="window.openVaultSubject('Physics')" class="bg-gradient-to-r from-slate-900 to-slate-800 border-l-8 border-subjectP hover:bg-slate-800 p-8 rounded-2xl shadow-lg transition-all hover:scale-[1.02] flex justify-between items-center group">
+                        <span class="text-3xl font-black text-white tracking-widest uppercase">Physics</span>
+                        <i data-lucide="chevron-right" class="text-subjectP opacity-50 group-hover:opacity-100 transition-opacity" width="32" height="32"></i>
+                    </button>
+                    <button onclick="window.openVaultSubject('Chemistry')" class="bg-gradient-to-r from-slate-900 to-slate-800 border-l-8 border-subjectC hover:bg-slate-800 p-8 rounded-2xl shadow-lg transition-all hover:scale-[1.02] flex justify-between items-center group">
+                        <span class="text-3xl font-black text-white tracking-widest uppercase">Chemistry</span>
+                        <i data-lucide="chevron-right" class="text-subjectC opacity-50 group-hover:opacity-100 transition-opacity" width="32" height="32"></i>
+                    </button>
+                    <button onclick="window.openVaultSubject('Maths')" class="bg-gradient-to-r from-slate-900 to-slate-800 border-l-8 border-subjectM hover:bg-slate-800 p-8 rounded-2xl shadow-lg transition-all hover:scale-[1.02] flex justify-between items-center group">
+                        <span class="text-3xl font-black text-white tracking-widest uppercase">Mathematics</span>
+                        <i data-lucide="chevron-right" class="text-subjectM opacity-50 group-hover:opacity-100 transition-opacity" width="32" height="32"></i>
+                    </button>
+                </div>
+
+                <div id="vault-details-view" class="hidden max-w-4xl mx-auto flex flex-col gap-6 pb-20">
+                    <div class="flex items-center gap-4 mb-4">
+                        <button onclick="window.backToVaultHub()" class="text-gray-500 hover:text-white transition flex items-center gap-1 font-bold text-sm uppercase tracking-widest bg-slate-800/50 px-4 py-2 rounded-lg hover:bg-slate-800">
+                            <i data-lucide="arrow-left" width="16" height="16"></i> Back
+                        </button>
+                        <h3 id="vault-current-subject" class="text-3xl font-black text-white uppercase tracking-widest border-l-4 pl-4">SUBJECT</h3>
+                    </div>
+                    
+                    <div id="vault-units-container" class="flex flex-col gap-6"></div>
+
+                    <button onclick="window.addVaultUnit()" class="w-full bg-slate-800/30 hover:bg-slate-800 text-gray-500 hover:text-white font-black py-6 rounded-2xl border-2 border-slate-700 border-dashed transition-all flex justify-center items-center gap-2 mt-4 text-xl tracking-widest uppercase">
+                        <i data-lucide="folder-plus" width="24" height="24"></i> Add New Unit
+                    </button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
