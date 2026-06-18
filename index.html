@@ -535,6 +535,17 @@
                     }
                 });
 
+                // --- THE VAULT INITIALIZER ---
+                if (!state.vault || Object.keys(state.vault).length === 0) {
+                    state.vault = {
+                        Physics: { units: [] },
+                        Chemistry: { units: [] },
+                        Maths: { units: [] }
+                    };
+                    databaseChanged = true;
+                }
+        
+
                 // --- DIRECTIVE AUTO-AUDIT (10 PM JUDGMENT) ---
                 const currentCycle = getDirectiveCycle();
                 if (!state.directive) {
