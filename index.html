@@ -1283,119 +1283,13 @@
             lucide.createIcons();
         }
 
-        // --- SYLLABUS VAULT NAVIGATION ENGINE ---
-        let currentVaultSubject = null;
-
-        window.openVault = function() {
-            const modal = document.getElementById('vault-modal');
-            const content = document.getElementById('vault-modal-content');
-            window.backToVaultHub(); // Ensure we open to the 3 big buttons
-            modal.classList.remove('hidden');
-            setTimeout(() => { modal.classList.remove('opacity-0'); content.classList.remove('scale-95'); }, 10);
-        };
-        
-        window.closeVault = function() {
-            const modal = document.getElementById('vault-modal');
-            const content = document.getElementById('vault-modal-content');
-            modal.classList.add('opacity-0'); content.classList.add('scale-95');
-            setTimeout(() => modal.classList.add('hidden'), 300);
-        };
-
-        window.openVaultSubject = function(subjectName) {
-            currentVaultSubject = subjectName;
-            document.getElementById('vault-subjects-view').classList.add('hidden');
-            document.getElementById('vault-details-view').classList.remove('hidden');
-            
-            const titleEl = document.getElementById('vault-current-subject');
-            titleEl.innerText = subjectName;
-            
-            // Apply subject specific glowing accent
-            if(subjectName === 'Physics') titleEl.className = "text-3xl font-black text-white uppercase tracking-widest border-l-4 pl-4 border-subjectP text-shadow-glow";
-            if(subjectName === 'Chemistry') titleEl.className = "text-3xl font-black text-white uppercase tracking-widest border-l-4 pl-4 border-subjectC text-shadow-glow";
-            if(subjectName === 'Maths') titleEl.className = "text-3xl font-black text-white uppercase tracking-widest border-l-4 pl-4 border-subjectM text-shadow-glow";
-            
-            window.renderVaultData();
-        };
-
-        window.backToVaultHub = function() {
-            currentVaultSubject = null;
-            document.getElementById('vault-details-view').classList.add('hidden');
-            document.getElementById('vault-subjects-view').classList.remove('hidden');
-        };
-
         // --- PHASE 4: THE VAULT ENGINE ---
         let openVaultUnits = new Set(); // Memory for which accordions are open
 
         // --- IN-APP INPUT MODAL LOGIC ---
         let vaultInputAction = null;
         let selectedVaultColor = 'slate-500'; // Default
-
-        window.selectVaultColor = function(color) {
-            selectedVaultColor = color;
-            const colors = ['slate-500', 'blue-500', 'emerald-500', 'amber-500', 'red-500', 'purple-500', 'pink-500'];
-            colors.forEach(c => {
-                const btn = document.getElementById(`vc-${c}`);
-                if (c === color) {
-                    btn.className = `w-6 h-6 rounded-full bg-${c} border-2 border-white transition-all shadow-[0_0_10px_rgba(255,255,255,0.2)]`;
-                } else {
-                    btn.className = `w-6 h-6 rounded-full bg-${c} border-2 border-transparent hover:border-white/50 transition-all`;
-                }
-            });
-        };
-
-        window.openVaultInput = function(title, desc, placeholder, showPicker, callback) {
-            document.getElementById('vault-input-title').innerHTML = `<i data-lucide="terminal" class="text-accent" width="20" height="20"></i> ${title}`;
-            document.getElementById('vault-input-desc').innerText = desc;
-            const inputField = document.getElementById('vault-input-field');
-            inputField.placeholder = placeholder;
-            inputField.value = '';
-            
-            const picker = document.getElementById('vault-color-picker');
-            if (showPicker) {
-                picker.classList.remove('hidden');
-                window.selectVaultColor('slate-500'); // Reset to default grey
-            } else {
-                picker.classList.add('hidden');
-            }
-            
-            vaultInputAction = callback;
-            
-            const modal = document.getElementById('vault-input-modal');
-            const content = document.getElementById('vault-input-modal-content');
-            modal.classList.remove('hidden');
-            setTimeout(() => { modal.classList.remove('opacity-0'); content.classList.remove('scale-95'); inputField.focus(); }, 10);
-            lucide.createIcons();
-        };
-
-        window.closeVaultInput = function() {
-            const modal = document.getElementById('vault-input-modal');
-            const content = document.getElementById('vault-input-modal-content');
-            modal.classList.add('opacity-0'); content.classList.add('scale-95');
-            setTimeout(() => modal.classList.add('hidden'), 300);
-            vaultInputAction = null;
-        };
-
-        window.submitVaultInput = function() {
-            const val = document.getElementById('vault-input-field').value.trim();
-            if (!val) return;
-            if (vaultInputAction) vaultInputAction(val, selectedVaultColor);
-            window.closeVaultInput();
-        };
-
-        // --- UPGRADED CRUD OPERATIONS (No Browser Prompts) ---
-        window.addVaultUnit = function() {
-            window.openVaultInput("NEW UNIT", "Define the master topic", "e.g., Mechanics", false, (name) => {
-                // Safely rebuild folders before adding data
-                if (!state.vault) state.vault = {};
-                if (!state.vault[currentVaultSubject]) state.vault[currentVaultSubject] = { units: [] };
-                if (!state.vault[currentVaultSubject].units) state.vault[currentVaultSubject].units = [];
-                
-                const newId = 'vu_' + Date.now();
-                state.vault[currentVaultSubject].units.push({ id: newId, name: name, chapters: [] });
-// --- IN-APP INPUT MODAL LOGIC ---
-        let vaultInputAction = null;
-        let selectedVaultColor = 'slate-500'; // Default
-        let vaultInputIsMultiline = false; // Tracks if "Enter" should submit or make a new line
+        let vaultInputIsMultiline = false;
 
         window.selectVaultColor = function(color) {
             selectedVaultColor = color;
@@ -1417,7 +1311,7 @@
             const inputField = document.getElementById('vault-input-field');
             inputField.placeholder = placeholder;
             inputField.value = '';
-            inputField.rows = isMultiline ? 4 : 1; // Expand the box if it's a note
+            inputField.rows = isMultiline ? 4 : 1;
             vaultInputIsMultiline = isMultiline;
             
             const picker = document.getElementById('vault-color-picker');
@@ -1452,14 +1346,12 @@
             window.closeVaultInput();
         };
 
-        // Custom Key Handler
         window.handleVaultInputKey = function(e) {
             if (e.key === 'Enter' && !e.shiftKey) {
                 if (!vaultInputIsMultiline) {
-                    e.preventDefault(); // Stop newline, submit immediately
+                    e.preventDefault(); 
                     window.submitVaultInput();
                 }
-                // If it IS a note, do nothing. Let native "Enter" drop to a new line.
             }
         };
 
@@ -1474,7 +1366,7 @@
                 state.vault[currentVaultSubject].units.push({ id: newId, name: name, chapters: [] });
                 openVaultUnits.add(newId); 
                 saveData(); window.renderVaultData();
-            }, false); // isMultiline = false
+            }, false);
         };
 
         window.addVaultChapter = function(unitId) {
@@ -1483,7 +1375,7 @@
                 if (!unit.chapters) unit.chapters = [];
                 unit.chapters.push({ id: 'vc_' + Date.now(), name: name, items: [] });
                 saveData(); window.renderVaultData();
-            }, false); // isMultiline = false
+            }, false);
         };
 
         window.addVaultItem = function(unitId, chapId, type) {
@@ -1492,7 +1384,6 @@
             const desc = isNote ? "Enter Concept / Formula" : "Enter Specific Action Item";
             const placeholder = isNote ? "e.g., Remember parallel axis theorem..." : "e.g., Solve 30 PYQs";
             
-            // Pass 'isNote' at the very end to trigger the larger multiline box
             window.openVaultInput(title, desc, placeholder, isNote, (text, color) => {
                 const unit = state.vault[currentVaultSubject].units.find(u => u.id === unitId);
                 const chap = unit.chapters.find(c => c.id === chapId);
@@ -1536,9 +1427,8 @@
         window.renderVaultData = function() {
             if (!currentVaultSubject) return;
             const container = document.getElementById('vault-units-container');
-            container.innerHTML = ''; // 1. Clear the screen immediately!
+            container.innerHTML = ''; 
             
-            // 2. Safely rebuild missing folders if Firebase deleted them
             if (!state.vault) state.vault = {};
             if (!state.vault[currentVaultSubject]) state.vault[currentVaultSubject] = { units: [] };
             
@@ -1559,7 +1449,6 @@
                     const items = chap.items || [];
                     
                     items.forEach(item => {
-                        // Protects Math Symbols like < and > from breaking the HTML
                         const safeText = item.text.replace(/</g, "&lt;").replace(/>/g, "&gt;");
 
                         if (item.type === 'note') {
