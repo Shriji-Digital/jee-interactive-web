@@ -1384,7 +1384,11 @@
         // --- UPGRADED CRUD OPERATIONS (No Browser Prompts) ---
         window.addVaultUnit = function() {
             window.openVaultInput("NEW UNIT", "Define the master topic", "e.g., Mechanics", false, (name) => {
+                // Safely rebuild folders before adding data
+                if (!state.vault) state.vault = {};
+                if (!state.vault[currentVaultSubject]) state.vault[currentVaultSubject] = { units: [] };
                 if (!state.vault[currentVaultSubject].units) state.vault[currentVaultSubject].units = [];
+                
                 const newId = 'vu_' + Date.now();
                 state.vault[currentVaultSubject].units.push({ id: newId, name: name, chapters: [] });
                 openVaultUnits.add(newId); 
@@ -1450,9 +1454,13 @@
         };
 
         window.renderVaultData = function() {
-            if (!currentVaultSubject || !state.vault || !state.vault[currentVaultSubject]) return;
+            if (!currentVaultSubject) return;
             const container = document.getElementById('vault-units-container');
-            container.innerHTML = '';
+            container.innerHTML = ''; // 1. Clear the screen immediately!
+            
+            // 2. Safely rebuild missing folders if Firebase deleted them
+            if (!state.vault) state.vault = {};
+            if (!state.vault[currentVaultSubject]) state.vault[currentVaultSubject] = { units: [] };
             
             const units = state.vault[currentVaultSubject].units || [];
             if (units.length === 0) {
