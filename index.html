@@ -452,8 +452,21 @@
             </h2>
             <p id="vault-input-desc" class="text-[10px] text-gray-500 font-bold uppercase tracking-widest mb-6">Enter your data below</p>
             
-            <input type="text" id="vault-input-field" onkeypress="if(event.key === 'Enter') window.submitVaultInput()" class="w-full bg-[#090e17] border border-slate-700 text-white font-medium rounded-lg px-4 py-4 text-sm focus:border-accent focus:ring-1 focus:ring-accent transition shadow-inner mb-6" placeholder="...">
+            <input type="text" id="vault-input-field" onkeypress="if(event.key === 'Enter') window.submitVaultInput()" class="w-full bg-[#090e17] border border-slate-700 text-white font-medium rounded-lg px-4 py-4 text-sm focus:border-accent focus:ring-1 focus:ring-accent transition shadow-inner mb-4" placeholder="...">
             
+            <div id="vault-color-picker" class="hidden mb-6">
+                <label class="text-[10px] text-gray-500 font-bold uppercase tracking-widest mb-3 block">Color Tag (Optional)</label>
+                <div class="flex gap-3 items-center">
+                    <button onclick="window.selectVaultColor('slate-500')" id="vc-slate-500" class="w-6 h-6 rounded-full bg-slate-500 border-2 border-white transition-all shadow-[0_0_10px_rgba(255,255,255,0.2)]"></button>
+                    <button onclick="window.selectVaultColor('blue-500')" id="vc-blue-500" class="w-6 h-6 rounded-full bg-blue-500 border-2 border-transparent hover:border-white/50 transition-all"></button>
+                    <button onclick="window.selectVaultColor('emerald-500')" id="vc-emerald-500" class="w-6 h-6 rounded-full bg-emerald-500 border-2 border-transparent hover:border-white/50 transition-all"></button>
+                    <button onclick="window.selectVaultColor('amber-500')" id="vc-amber-500" class="w-6 h-6 rounded-full bg-amber-500 border-2 border-transparent hover:border-white/50 transition-all"></button>
+                    <button onclick="window.selectVaultColor('red-500')" id="vc-red-500" class="w-6 h-6 rounded-full bg-red-500 border-2 border-transparent hover:border-white/50 transition-all"></button>
+                    <button onclick="window.selectVaultColor('purple-500')" id="vc-purple-500" class="w-6 h-6 rounded-full bg-purple-500 border-2 border-transparent hover:border-white/50 transition-all"></button>
+                    <button onclick="window.selectVaultColor('pink-500')" id="vc-pink-500" class="w-6 h-6 rounded-full bg-pink-500 border-2 border-transparent hover:border-white/50 transition-all"></button>
+                </div>
+            </div>
+
             <div class="flex gap-3 mt-auto">
                 <button onclick="window.closeVaultInput()" class="flex-1 bg-slate-800 hover:bg-slate-700 text-gray-400 font-bold uppercase tracking-widest text-xs py-3.5 rounded-xl transition">Cancel</button>
                 <button onclick="window.submitVaultInput()" class="flex-1 bg-accent hover:bg-emerald-400 text-slate-900 font-black uppercase tracking-widest text-xs py-3.5 rounded-xl transition shadow-[0_0_15px_rgba(16,185,129,0.3)]">Confirm</button>
@@ -1314,13 +1327,35 @@
 
         // --- IN-APP INPUT MODAL LOGIC ---
         let vaultInputAction = null;
+        let selectedVaultColor = 'slate-500'; // Default
 
-        window.openVaultInput = function(title, desc, placeholder, callback) {
+        window.selectVaultColor = function(color) {
+            selectedVaultColor = color;
+            const colors = ['slate-500', 'blue-500', 'emerald-500', 'amber-500', 'red-500', 'purple-500', 'pink-500'];
+            colors.forEach(c => {
+                const btn = document.getElementById(`vc-${c}`);
+                if (c === color) {
+                    btn.className = `w-6 h-6 rounded-full bg-${c} border-2 border-white transition-all shadow-[0_0_10px_rgba(255,255,255,0.2)]`;
+                } else {
+                    btn.className = `w-6 h-6 rounded-full bg-${c} border-2 border-transparent hover:border-white/50 transition-all`;
+                }
+            });
+        };
+
+        window.openVaultInput = function(title, desc, placeholder, showPicker, callback) {
             document.getElementById('vault-input-title').innerHTML = `<i data-lucide="terminal" class="text-accent" width="20" height="20"></i> ${title}`;
             document.getElementById('vault-input-desc').innerText = desc;
             const inputField = document.getElementById('vault-input-field');
             inputField.placeholder = placeholder;
             inputField.value = '';
+            
+            const picker = document.getElementById('vault-color-picker');
+            if (showPicker) {
+                picker.classList.remove('hidden');
+                window.selectVaultColor('slate-500'); // Reset to default grey
+            } else {
+                picker.classList.add('hidden');
+            }
             
             vaultInputAction = callback;
             
@@ -1342,23 +1377,23 @@
         window.submitVaultInput = function() {
             const val = document.getElementById('vault-input-field').value.trim();
             if (!val) return;
-            if (vaultInputAction) vaultInputAction(val);
+            if (vaultInputAction) vaultInputAction(val, selectedVaultColor);
             window.closeVaultInput();
         };
 
         // --- UPGRADED CRUD OPERATIONS (No Browser Prompts) ---
         window.addVaultUnit = function() {
-            window.openVaultInput("NEW UNIT", "Define the master topic", "e.g., Mechanics", (name) => {
+            window.openVaultInput("NEW UNIT", "Define the master topic", "e.g., Mechanics", false, (name) => {
                 if (!state.vault[currentVaultSubject].units) state.vault[currentVaultSubject].units = [];
                 const newId = 'vu_' + Date.now();
                 state.vault[currentVaultSubject].units.push({ id: newId, name: name, chapters: [] });
-                openVaultUnits.add(newId); // Auto-open new unit
+                openVaultUnits.add(newId); 
                 saveData(); window.renderVaultData();
             });
         };
 
         window.addVaultChapter = function(unitId) {
-            window.openVaultInput("NEW CHAPTER", "Define the sub-topic", "e.g., Kinematics 1D", (name) => {
+            window.openVaultInput("NEW CHAPTER", "Define the sub-topic", "e.g., Kinematics 1D", false, (name) => {
                 const unit = state.vault[currentVaultSubject].units.find(u => u.id === unitId);
                 if (!unit.chapters) unit.chapters = [];
                 unit.chapters.push({ id: 'vc_' + Date.now(), name: name, items: [] });
@@ -1367,15 +1402,19 @@
         };
 
         window.addVaultItem = function(unitId, chapId, type) {
-            const title = type === 'note' ? "NEW NOTE" : "NEW TASK";
-            const desc = type === 'note' ? "Enter Concept / Formula" : "Enter Specific Action Item";
-            const placeholder = type === 'note' ? "e.g., Remember parallel axis theorem..." : "e.g., Solve 30 PYQs";
+            const isNote = (type === 'note');
+            const title = isNote ? "NEW NOTE" : "NEW TASK";
+            const desc = isNote ? "Enter Concept / Formula" : "Enter Specific Action Item";
+            const placeholder = isNote ? "e.g., Remember parallel axis theorem..." : "e.g., Solve 30 PYQs";
             
-            window.openVaultInput(title, desc, placeholder, (text) => {
+            // Pass `isNote` to tell the modal whether to show the color picker
+            window.openVaultInput(title, desc, placeholder, isNote, (text, color) => {
                 const unit = state.vault[currentVaultSubject].units.find(u => u.id === unitId);
                 const chap = unit.chapters.find(c => c.id === chapId);
                 if (!chap.items) chap.items = [];
-                chap.items.push({ id: 'vi_' + Date.now(), type: type, text: text, done: false });
+                
+                // Save the color ONLY if it's a note
+                chap.items.push({ id: 'vi_' + Date.now(), type: type, text: text, done: false, color: isNote ? color : null });
                 saveData(); window.renderVaultData();
             });
         };
@@ -1433,8 +1472,9 @@
                     
                     items.forEach(item => {
                         if (item.type === 'note') {
+                            const noteColor = item.color || 'slate-500'; // Default to grey if older note
                             itemsHTML += `
-                            <div class="bg-slate-800/40 border-l-4 border-slate-500 p-5 rounded-r-xl mb-3 relative group transition hover:bg-slate-800/60">
+                            <div class="bg-slate-800/40 border-l-4 border-${noteColor} p-5 rounded-r-xl mb-3 relative group transition hover:bg-slate-800/60">
                                 <button onclick="window.deleteVaultEntity('${unit.id}', '${chap.id}', '${item.id}')" class="absolute top-3 right-3 text-slate-600 hover:text-danger opacity-0 group-hover:opacity-100 transition-opacity"><i data-lucide="x" width="18" height="18"></i></button>
                                 <p class="text-gray-300 text-base md:text-lg leading-relaxed pr-6">${item.text}</p>
                             </div>`;
