@@ -452,7 +452,7 @@
             </h2>
             <p id="vault-input-desc" class="text-[10px] text-gray-500 font-bold uppercase tracking-widest mb-6">Enter your data below</p>
             
-            <input type="text" id="vault-input-field" onkeypress="if(event.key === 'Enter') window.submitVaultInput()" class="w-full bg-[#090e17] border border-slate-700 text-white font-medium rounded-lg px-4 py-4 text-sm focus:border-accent focus:ring-1 focus:ring-accent transition shadow-inner mb-4" placeholder="...">
+            <textarea id="vault-input-field" onkeydown="window.handleVaultInputKey(event)" class="w-full bg-[#090e17] border border-slate-700 text-white font-medium rounded-lg px-4 py-3 text-sm focus:border-accent focus:ring-1 focus:ring-accent transition shadow-inner mb-4 custom-scrollbar resize-y min-h-[50px] max-h-[250px]" rows="1" placeholder="..."></textarea>
             
             <div id="vault-color-picker" class="hidden mb-6">
                 <label class="text-[10px] text-gray-500 font-bold uppercase tracking-widest mb-3 block">Color Tag (Optional)</label>
@@ -1391,9 +1391,89 @@
                 
                 const newId = 'vu_' + Date.now();
                 state.vault[currentVaultSubject].units.push({ id: newId, name: name, chapters: [] });
+// --- IN-APP INPUT MODAL LOGIC ---
+        let vaultInputAction = null;
+        let selectedVaultColor = 'slate-500'; // Default
+        let vaultInputIsMultiline = false; // Tracks if "Enter" should submit or make a new line
+
+        window.selectVaultColor = function(color) {
+            selectedVaultColor = color;
+            const colors = ['slate-500', 'blue-500', 'emerald-500', 'amber-500', 'red-500', 'purple-500', 'pink-500'];
+            colors.forEach(c => {
+                const btn = document.getElementById(`vc-${c}`);
+                if (c === color) {
+                    btn.className = `w-6 h-6 rounded-full bg-${c} border-2 border-white transition-all shadow-[0_0_10px_rgba(255,255,255,0.2)]`;
+                } else {
+                    btn.className = `w-6 h-6 rounded-full bg-${c} border-2 border-transparent hover:border-white/50 transition-all`;
+                }
+            });
+        };
+
+        window.openVaultInput = function(title, desc, placeholder, showPicker, callback, isMultiline = false) {
+            document.getElementById('vault-input-title').innerHTML = `<i data-lucide="terminal" class="text-accent" width="20" height="20"></i> ${title}`;
+            document.getElementById('vault-input-desc').innerText = desc;
+            
+            const inputField = document.getElementById('vault-input-field');
+            inputField.placeholder = placeholder;
+            inputField.value = '';
+            inputField.rows = isMultiline ? 4 : 1; // Expand the box if it's a note
+            vaultInputIsMultiline = isMultiline;
+            
+            const picker = document.getElementById('vault-color-picker');
+            if (showPicker) {
+                picker.classList.remove('hidden');
+                window.selectVaultColor('slate-500'); 
+            } else {
+                picker.classList.add('hidden');
+            }
+            
+            vaultInputAction = callback;
+            
+            const modal = document.getElementById('vault-input-modal');
+            const content = document.getElementById('vault-input-modal-content');
+            modal.classList.remove('hidden');
+            setTimeout(() => { modal.classList.remove('opacity-0'); content.classList.remove('scale-95'); inputField.focus(); }, 10);
+            lucide.createIcons();
+        };
+
+        window.closeVaultInput = function() {
+            const modal = document.getElementById('vault-input-modal');
+            const content = document.getElementById('vault-input-modal-content');
+            modal.classList.add('opacity-0'); content.classList.add('scale-95');
+            setTimeout(() => modal.classList.add('hidden'), 300);
+            vaultInputAction = null;
+        };
+
+        window.submitVaultInput = function() {
+            const val = document.getElementById('vault-input-field').value.trim();
+            if (!val) return;
+            if (vaultInputAction) vaultInputAction(val, selectedVaultColor);
+            window.closeVaultInput();
+        };
+
+        // Custom Key Handler
+        window.handleVaultInputKey = function(e) {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                if (!vaultInputIsMultiline) {
+                    e.preventDefault(); // Stop newline, submit immediately
+                    window.submitVaultInput();
+                }
+                // If it IS a note, do nothing. Let native "Enter" drop to a new line.
+            }
+        };
+
+        // --- UPGRADED CRUD OPERATIONS ---
+        window.addVaultUnit = function() {
+            window.openVaultInput("NEW UNIT", "Define the master topic", "e.g., Mechanics", false, (name) => {
+                if (!state.vault) state.vault = {};
+                if (!state.vault[currentVaultSubject]) state.vault[currentVaultSubject] = { units: [] };
+                if (!state.vault[currentVaultSubject].units) state.vault[currentVaultSubject].units = [];
+                
+                const newId = 'vu_' + Date.now();
+                state.vault[currentVaultSubject].units.push({ id: newId, name: name, chapters: [] });
                 openVaultUnits.add(newId); 
                 saveData(); window.renderVaultData();
-            });
+            }, false); // isMultiline = false
         };
 
         window.addVaultChapter = function(unitId) {
@@ -1402,7 +1482,7 @@
                 if (!unit.chapters) unit.chapters = [];
                 unit.chapters.push({ id: 'vc_' + Date.now(), name: name, items: [] });
                 saveData(); window.renderVaultData();
-            });
+            }, false); // isMultiline = false
         };
 
         window.addVaultItem = function(unitId, chapId, type) {
@@ -1411,16 +1491,15 @@
             const desc = isNote ? "Enter Concept / Formula" : "Enter Specific Action Item";
             const placeholder = isNote ? "e.g., Remember parallel axis theorem..." : "e.g., Solve 30 PYQs";
             
-            // Pass `isNote` to tell the modal whether to show the color picker
+            // Pass 'isNote' at the very end to trigger the larger multiline box
             window.openVaultInput(title, desc, placeholder, isNote, (text, color) => {
                 const unit = state.vault[currentVaultSubject].units.find(u => u.id === unitId);
                 const chap = unit.chapters.find(c => c.id === chapId);
                 if (!chap.items) chap.items = [];
                 
-                // Save the color ONLY if it's a note
                 chap.items.push({ id: 'vi_' + Date.now(), type: type, text: text, done: false, color: isNote ? color : null });
                 saveData(); window.renderVaultData();
-            });
+            }, isNote); 
         };
 
         window.toggleVaultTask = function(unitId, chapId, itemId) {
@@ -1484,7 +1563,7 @@
                             itemsHTML += `
                             <div class="bg-slate-800/40 border-l-4 border-${noteColor} p-5 rounded-r-xl mb-3 relative group transition hover:bg-slate-800/60">
                                 <button onclick="window.deleteVaultEntity('${unit.id}', '${chap.id}', '${item.id}')" class="absolute top-3 right-3 text-slate-600 hover:text-danger opacity-0 group-hover:opacity-100 transition-opacity"><i data-lucide="x" width="18" height="18"></i></button>
-                                <p class="text-gray-300 text-base md:text-lg leading-relaxed pr-6">${item.text}</p>
+                                <p class="text-gray-300 text-base md:text-lg leading-relaxed pr-6 whitespace-pre-wrap">${item.text}</p>
                             </div>`;
                         } else if (item.type === 'task') {
                             itemsHTML += `
