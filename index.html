@@ -289,10 +289,15 @@
         <span id="db-status" class="flex items-center gap-2">
             <i data-lucide="loader-2" class="animate-spin" width="14" height="14"></i> Establishing Uplink...
         </span>
-        <button onclick="window.clearData()" class="hover:text-danger transition flex items-center gap-1">
-            <i data-lucide="triangle-alert" width="12" height="12"></i> Factory Reset
-        </button>
-    </div>
+        <div class="flex items-center gap-6">
+            <button onclick="window.enableNotifications()" id="btn-notify" class="hover:text-accent transition flex items-center gap-1">
+                <i data-lucide="bell" width="12" height="12"></i> Enable Alerts
+            </button>
+            <button onclick="window.clearData()" class="hover:text-danger transition flex items-center gap-1">
+                <i data-lucide="triangle-alert" width="12" height="12"></i> Factory Reset
+            </button>
+        </div>
+     </div>
             
     <div id="study-modal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center hidden opacity-0 transition-opacity duration-300">
         <div class="bg-[#0f172a] p-8 rounded-3xl border border-slate-700 shadow-2xl max-w-lg w-full mx-4 transform scale-95 transition-transform duration-300 flex flex-col" id="study-modal-content">
@@ -1583,9 +1588,64 @@
             modal.classList.add('opacity-0'); content.classList.remove('scale-100'); content.classList.add('scale-95');
             setTimeout(() => modal.classList.add('hidden'), 300);
         };
-        
-        setInterval(() => { if (document.getElementById('db-status').innerText.includes("Uplink Secured")) updateGlobalUI(); }, 60000);
 
+        // --- NOTIFICATION ENGINE ---
+        window.enableNotifications = function() {
+            if (!("Notification" in window)) {
+                alert("Your browser does not support web notifications.");
+                return;
+            }
+            Notification.requestPermission().then(permission => {
+                const btn = document.getElementById('btn-notify');
+                if (permission === "granted") {
+                    btn.classList.add('text-accent');
+                    btn.innerHTML = `<i data-lucide="bell-ring" width="12" height="12"></i> Alerts Active`;
+                    lucide.createIcons();
+                    new Notification("SYSTEM SECURED", { body: "JEE Beast Tracker is now authorized to send critical alerts.", icon: "rocket.png" });
+                } else {
+                    alert("Notification permission denied.");
+                }
+            });
+        };
+
+        window.sendCriticalAlert = function(title, body) {
+            if ("Notification" in window && Notification.permission === "granted") {
+                new Notification(title, { body: body, icon: "rocket.png" });
+            }
+        };
+
+        // Initialize button state on load
+        if ("Notification" in window && Notification.permission === "granted") {
+            const btn = document.getElementById('btn-notify');
+            if(btn) {
+                btn.classList.add('text-accent');
+                btn.innerHTML = `<i data-lucide="bell-ring" width="12" height="12"></i> Alerts Active`;
+            }
+        }
+        
+        // --- THE AUTOMATED CRON JOB (Runs every 60 seconds) ---
+        setInterval(() => { 
+            if (document.getElementById('db-status').innerText.includes("Uplink Secured")) {
+                updateGlobalUI(); 
+            }
+            
+            // Time-based Alerts
+            const now = getISTDateObj();
+            const hours = now.getHours();
+            const minutes = now.getMinutes();
+
+            // 9:45 PM Warning: Lock the Directive!
+            if (hours === 21 && minutes === 45 && state.directive && !state.directive.locked) {
+                window.sendCriticalAlert("⚠️ DIRECTIVE WARNING", "It is 9:45 PM. You have 15 minutes to lock your Nightly Directive or suffer an XP penalty!");
+            }
+            
+            // 11:00 PM Alert: Habit Unlock
+            if (hours === 23 && minutes === 0) {
+                window.sendCriticalAlert("🔓 PROTOCOL UNLOCKED", "It is 11:00 PM. You may now secure your active habit streaks.");
+            }
+
+        }, 60000); // 60000ms = 1 minute
+        
     </script>
 </body>
 </html>
