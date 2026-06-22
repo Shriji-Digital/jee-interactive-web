@@ -1434,20 +1434,99 @@
             }, false);
         };
 
-        window.addVaultItem = function(unitId, chapId, type) {
-            const isNote = (type === 'note');
-            const title = isNote ? "NEW NOTE" : "NEW TASK";
-            const desc = isNote ? "Enter Concept / Formula" : "Enter Specific Action Item";
-            const placeholder = isNote ? "e.g., Remember parallel axis theorem..." : "e.g., Solve 30 PYQs";
+        // --- THE GHOST EDITOR & LIVE PALETTE ---
+        window.currentInlineColor = 'slate-500';
+
+        window.openInlineEditor = function(unitId, chapId, type) {
+            // Clear any existing ghost editors
+            const existingInput = document.getElementById('inline-text-input');
+            if (existingInput) window.saveInlineEdit(existingInput.dataset.uid, existingInput.dataset.cid, existingInput.dataset.type);
+
+            window.currentInlineColor = 'slate-500'; // Default to grey
+            const anchor = document.getElementById(`editor-anchor-${chapId}`);
+            if (!anchor) return;
+
+            let paletteHTML = '';
+            let editorClass = '';
+            let prefixHTML = '';
+
+            if (type === 'note') {
+                editorClass = `border-l-2 border-slate-500 pl-6 py-1`;
+                // The floating palette (using onmousedown so it triggers before the text box loses focus)
+                paletteHTML = `
+                <div class="absolute -top-12 left-0 bg-[#0f172a] border border-slate-800 p-2 rounded-xl flex gap-3 shadow-2xl z-20">
+                    <button onmousedown="window.setInlineColor('slate-500')" id="ic-slate-500" class="w-5 h-5 rounded-full bg-slate-500 ring-2 ring-white transition-all"></button>
+                    <button onmousedown="window.setInlineColor('blue-500')" id="ic-blue-500" class="w-5 h-5 rounded-full bg-blue-500 hover:ring-2 ring-white/50 transition-all"></button>
+                    <button onmousedown="window.setInlineColor('emerald-500')" id="ic-emerald-500" class="w-5 h-5 rounded-full bg-emerald-500 hover:ring-2 ring-white/50 transition-all"></button>
+                    <button onmousedown="window.setInlineColor('amber-500')" id="ic-amber-500" class="w-5 h-5 rounded-full bg-amber-500 hover:ring-2 ring-white/50 transition-all"></button>
+                    <button onmousedown="window.setInlineColor('red-500')" id="ic-red-500" class="w-5 h-5 rounded-full bg-red-500 hover:ring-2 ring-white/50 transition-all"></button>
+                    <button onmousedown="window.setInlineColor('purple-500')" id="ic-purple-500" class="w-5 h-5 rounded-full bg-purple-500 hover:ring-2 ring-white/50 transition-all"></button>
+                    <button onmousedown="window.setInlineColor('pink-500')" id="ic-pink-500" class="w-5 h-5 rounded-full bg-pink-500 hover:ring-2 ring-white/50 transition-all"></button>
+                </div>`;
+            } else {
+                editorClass = `flex items-start gap-5 py-2`;
+                prefixHTML = `<div class="box w-5 h-5 border-2 border-slate-600 bg-black shrink-0 mt-1"></div>`;
+            }
+
+            anchor.innerHTML = `
+            <div class="relative mb-6 ${editorClass} group" id="active-inline-editor">
+                ${paletteHTML}
+                ${prefixHTML}
+                <textarea id="inline-text-input" data-uid="${unitId}" data-cid="${chapId}" data-type="${type}" class="w-full bg-transparent text-gray-200 text-lg md:text-xl font-medium tracking-wide outline-none resize-none overflow-hidden placeholder-slate-700" rows="1" placeholder="Type here... (Enter to save, Shift+Enter for new line)"></textarea>
+            </div>`;
+
+            const tx = document.getElementById('inline-text-input');
             
-            window.openVaultInput(title, desc, placeholder, isNote, (text, color) => {
+            // Auto-expand height as you type
+            tx.addEventListener("input", function() {
+                this.style.height = "auto";
+                this.style.height = (this.scrollHeight) + "px";
+            }, false);
+
+            // Save automatically when you hit Enter (without Shift)
+            tx.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    window.saveInlineEdit(unitId, chapId, type);
+                }
+            });
+
+            // Save automatically if you click away (blur)
+            tx.addEventListener('blur', function() {
+                setTimeout(() => window.saveInlineEdit(unitId, chapId, type), 150);
+            });
+
+            tx.focus();
+        };
+
+        window.setInlineColor = function(color) {
+            window.currentInlineColor = color;
+            const ed = document.getElementById('active-inline-editor');
+            if (ed) ed.className = `relative mb-6 border-l-2 border-${color} pl-6 py-1 group`;
+            
+            const colors = ['slate-500', 'blue-500', 'emerald-500', 'amber-500', 'red-500', 'purple-500', 'pink-500'];
+            colors.forEach(c => {
+                const btn = document.getElementById(`ic-${c}`);
+                if(btn) btn.className = (c === color) ? `w-5 h-5 rounded-full bg-${c} ring-2 ring-white transition-all` : `w-5 h-5 rounded-full bg-${c} border-2 border-transparent hover:ring-2 ring-white/50 transition-all`;
+            });
+        };
+
+        window.saveInlineEdit = function(unitId, chapId, type) {
+            const tx = document.getElementById('inline-text-input');
+            if(!tx) return; // already saved
+            
+            const text = tx.value.trim();
+            if(text) {
+                if (!state.vault) state.vault = {};
+                if (!state.vault[currentVaultSubject]) state.vault[currentVaultSubject] = { units: [] };
                 const unit = state.vault[currentVaultSubject].units.find(u => u.id === unitId);
                 const chap = unit.chapters.find(c => c.id === chapId);
                 if (!chap.items) chap.items = [];
                 
-                chap.items.push({ id: 'vi_' + Date.now(), type: type, text: text, done: false, color: isNote ? color : null });
-                saveData(); window.renderVaultData();
-            }, isNote); 
+                chap.items.push({ id: 'vi_' + Date.now(), type: type, text: text, done: false, color: type === 'note' ? window.currentInlineColor : null });
+                saveData();
+            }
+            window.renderVaultData(); // Clears the editor natively
         };
 
         window.toggleVaultTask = function(unitId, chapId, itemId) {
@@ -1574,11 +1653,12 @@
                     
                     <div class="mb-8">
                         ${itemsHTML}
+                        <div id="editor-anchor-${chapId}"></div> <!-- THE INVISIBLE SPAWN POINT -->
                     </div>
                     
                     <div class="flex gap-6 opacity-20 hover:opacity-100 transition-opacity pt-4">
-                        <button onclick="window.addVaultItem('${unit.id}', '${chap.id}', 'note')" class="text-gray-500 hover:text-white text-xs font-bold uppercase tracking-widest transition flex items-center gap-2"><i data-lucide="align-left" width="14" height="14"></i> Add Note</button>
-                        <button onclick="window.addVaultItem('${unit.id}', '${chap.id}', 'task')" class="text-gray-500 hover:text-white text-xs font-bold uppercase tracking-widest transition flex items-center gap-2"><i data-lucide="check-square" width="14" height="14"></i> Add Task</button>
+                        <button onclick="window.openInlineEditor('${unitId}', '${chapId}', 'note')" class="text-gray-500 hover:text-white text-xs font-bold uppercase tracking-widest transition flex items-center gap-2"><i data-lucide="align-left" width="14" height="14"></i> Add Note</button>
+                        <button onclick="window.openInlineEditor('${unitId}', '${chapId}', 'task')" class="text-gray-500 hover:text-white text-xs font-bold uppercase tracking-widest transition flex items-center gap-2"><i data-lucide="check-square" width="14" height="14"></i> Add Task</button>
                     </div>
                 </div>`;
             });
