@@ -1294,6 +1294,10 @@
         window.openVault = function() {
             const modal = document.getElementById('vault-modal');
             window.setVaultSubject(currentVaultSubject); 
+            
+            // LOCK THE BACKGROUND
+            document.body.style.overflow = 'hidden'; 
+            
             modal.classList.remove('hidden');
             setTimeout(() => { modal.classList.remove('opacity-0'); }, 10);
         };
@@ -1301,6 +1305,10 @@
         window.closeVault = function() {
             const modal = document.getElementById('vault-modal');
             modal.classList.add('opacity-0');
+            
+            // UNLOCK THE BACKGROUND
+            document.body.style.overflow = ''; 
+            
             setTimeout(() => modal.classList.add('hidden'), 300);
         };
 
