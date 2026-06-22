@@ -1411,7 +1411,54 @@
             }
         };
 
-        // --- UPGRADED CRUD OPERATIONS ---
+        // --- UPGRADED CRUD OPERATIONS & GHOST EDITOR ---
+        let activeVaultEditor = null;
+
+        window.openInlineEditor = function(unitId, chapId, type) {
+            activeVaultEditor = { unitId, chapId, type, color: type === 'note' ? 'slate-500' : null };
+            window.renderVaultData();
+            setTimeout(() => {
+                const input = document.getElementById('ghost-editor-input');
+                if(input) { 
+                    input.focus(); 
+                    input.style.height = 'auto'; 
+                    input.style.height = input.scrollHeight + 'px'; 
+                }
+            }, 50);
+        };
+
+        window.closeInlineEditor = function() {
+            activeVaultEditor = null;
+            window.renderVaultData();
+        };
+
+        window.saveInlineEditor = function() {
+            if (!activeVaultEditor) return;
+            const inputEl = document.getElementById('ghost-editor-input');
+            const text = inputEl ? inputEl.value.trim() : '';
+            if (text) {
+                const unit = state.vault[currentVaultSubject].units.find(u => u.id === activeVaultEditor.unitId);
+                const chap = unit.chapters.find(c => c.id === activeVaultEditor.chapId);
+                if (!chap.items) chap.items = [];
+                chap.items.push({ id: 'vi_' + Date.now(), type: activeVaultEditor.type, text: text, done: false, color: activeVaultEditor.color });
+                saveData();
+            }
+            activeVaultEditor = null;
+            window.renderVaultData();
+        };
+
+        window.setGhostColor = function(color) {
+            if (activeVaultEditor) activeVaultEditor.color = color;
+            const editorDiv = document.getElementById('ghost-editor-wrapper');
+            if (editorDiv && activeVaultEditor.type === 'note') {
+                editorDiv.className = editorDiv.className.replace(/border-\w+-\d00/g, '');
+                editorDiv.classList.add(`border-${color}`);
+            }
+            const input = document.getElementById('ghost-editor-input');
+            if(input) input.focus(); 
+        };
+            
+
         window.addVaultUnit = function() {
             window.openVaultInput("NEW UNIT", "Define the master topic", "e.g., Mechanics", false, (name) => {
                 if (!state.vault) state.vault = {};
@@ -1420,8 +1467,7 @@
                 
                 const newId = 'vu_' + Date.now();
                 state.vault[currentVaultSubject].units.push({ id: newId, name: name, chapters: [] });
-                openVaultUnits.add(newId); 
-                saveData(); window.renderVaultData();
+                saveData(); window.setVaultUnit(newId);
             }, false);
         };
 
@@ -1432,101 +1478,6 @@
                 unit.chapters.push({ id: 'vc_' + Date.now(), name: name, items: [] });
                 saveData(); window.renderVaultData();
             }, false);
-        };
-
-        // --- THE GHOST EDITOR & LIVE PALETTE ---
-        window.currentInlineColor = 'slate-500';
-
-        window.openInlineEditor = function(unitId, chapId, type) {
-            // Clear any existing ghost editors
-            const existingInput = document.getElementById('inline-text-input');
-            if (existingInput) window.saveInlineEdit(existingInput.dataset.uid, existingInput.dataset.cid, existingInput.dataset.type);
-
-            window.currentInlineColor = 'slate-500'; // Default to grey
-            const anchor = document.getElementById(`editor-anchor-${chapId}`);
-            if (!anchor) return;
-
-            let paletteHTML = '';
-            let editorClass = '';
-            let prefixHTML = '';
-
-            if (type === 'note') {
-                editorClass = `border-l-2 border-slate-500 pl-6 py-1`;
-                // The floating palette (using onmousedown so it triggers before the text box loses focus)
-                paletteHTML = `
-                <div class="absolute -top-12 left-0 bg-[#0f172a] border border-slate-800 p-2 rounded-xl flex gap-3 shadow-2xl z-20">
-                    <button onmousedown="window.setInlineColor('slate-500')" id="ic-slate-500" class="w-5 h-5 rounded-full bg-slate-500 ring-2 ring-white transition-all"></button>
-                    <button onmousedown="window.setInlineColor('blue-500')" id="ic-blue-500" class="w-5 h-5 rounded-full bg-blue-500 hover:ring-2 ring-white/50 transition-all"></button>
-                    <button onmousedown="window.setInlineColor('emerald-500')" id="ic-emerald-500" class="w-5 h-5 rounded-full bg-emerald-500 hover:ring-2 ring-white/50 transition-all"></button>
-                    <button onmousedown="window.setInlineColor('amber-500')" id="ic-amber-500" class="w-5 h-5 rounded-full bg-amber-500 hover:ring-2 ring-white/50 transition-all"></button>
-                    <button onmousedown="window.setInlineColor('red-500')" id="ic-red-500" class="w-5 h-5 rounded-full bg-red-500 hover:ring-2 ring-white/50 transition-all"></button>
-                    <button onmousedown="window.setInlineColor('purple-500')" id="ic-purple-500" class="w-5 h-5 rounded-full bg-purple-500 hover:ring-2 ring-white/50 transition-all"></button>
-                    <button onmousedown="window.setInlineColor('pink-500')" id="ic-pink-500" class="w-5 h-5 rounded-full bg-pink-500 hover:ring-2 ring-white/50 transition-all"></button>
-                </div>`;
-            } else {
-                editorClass = `flex items-start gap-5 py-2`;
-                prefixHTML = `<div class="box w-5 h-5 border-2 border-slate-600 bg-black shrink-0 mt-1"></div>`;
-            }
-
-            anchor.innerHTML = `
-            <div class="relative mb-6 ${editorClass} group" id="active-inline-editor">
-                ${paletteHTML}
-                ${prefixHTML}
-                <textarea id="inline-text-input" data-uid="${unitId}" data-cid="${chapId}" data-type="${type}" class="w-full bg-transparent text-gray-200 text-lg md:text-xl font-medium tracking-wide outline-none resize-none overflow-hidden placeholder-slate-700" rows="1" placeholder="Type here... (Enter to save, Shift+Enter for new line)"></textarea>
-            </div>`;
-
-            const tx = document.getElementById('inline-text-input');
-            
-            // Auto-expand height as you type
-            tx.addEventListener("input", function() {
-                this.style.height = "auto";
-                this.style.height = (this.scrollHeight) + "px";
-            }, false);
-
-            // Save automatically when you hit Enter (without Shift)
-            tx.addEventListener('keydown', function(e) {
-                if (e.key === 'Enter' && !e.shiftKey) {
-                    e.preventDefault();
-                    window.saveInlineEdit(unitId, chapId, type);
-                }
-            });
-
-            // Save automatically if you click away (blur)
-            tx.addEventListener('blur', function() {
-                setTimeout(() => window.saveInlineEdit(unitId, chapId, type), 150);
-            });
-
-            tx.focus();
-        };
-
-        window.setInlineColor = function(color) {
-            window.currentInlineColor = color;
-            const ed = document.getElementById('active-inline-editor');
-            if (ed) ed.className = `relative mb-6 border-l-2 border-${color} pl-6 py-1 group`;
-            
-            const colors = ['slate-500', 'blue-500', 'emerald-500', 'amber-500', 'red-500', 'purple-500', 'pink-500'];
-            colors.forEach(c => {
-                const btn = document.getElementById(`ic-${c}`);
-                if(btn) btn.className = (c === color) ? `w-5 h-5 rounded-full bg-${c} ring-2 ring-white transition-all` : `w-5 h-5 rounded-full bg-${c} border-2 border-transparent hover:ring-2 ring-white/50 transition-all`;
-            });
-        };
-
-        window.saveInlineEdit = function(unitId, chapId, type) {
-            const tx = document.getElementById('inline-text-input');
-            if(!tx) return; // already saved
-            
-            const text = tx.value.trim();
-            if(text) {
-                if (!state.vault) state.vault = {};
-                if (!state.vault[currentVaultSubject]) state.vault[currentVaultSubject] = { units: [] };
-                const unit = state.vault[currentVaultSubject].units.find(u => u.id === unitId);
-                const chap = unit.chapters.find(c => c.id === chapId);
-                if (!chap.items) chap.items = [];
-                
-                chap.items.push({ id: 'vi_' + Date.now(), type: type, text: text, done: false, color: type === 'note' ? window.currentInlineColor : null });
-                saveData();
-            }
-            window.renderVaultData(); // Clears the editor natively
         };
 
         window.toggleVaultTask = function(unitId, chapId, itemId) {
@@ -1548,17 +1499,11 @@
                 unit.chapters = unit.chapters.filter(c => c.id !== chapId);
             } else {
                 state.vault[currentVaultSubject].units = units.filter(u => u.id !== unitId);
-                openVaultUnits.delete(unitId);
+                currentVaultUnit = null;
             }
             saveData(); window.renderVaultData();
         };
-
-        window.toggleVaultUnit = function(unitId) {
-            if (openVaultUnits.has(unitId)) openVaultUnits.delete(unitId);
-            else openVaultUnits.add(unitId);
-            window.renderVaultData();
-        };
-
+        
         window.renderVaultData = function() {
             if (!state.vault) state.vault = {};
             if (!state.vault[currentVaultSubject]) state.vault[currentVaultSubject] = { units: [] };
@@ -1570,8 +1515,7 @@
             if (units.length === 0) {
                 sidebarContainer.innerHTML = `<div class="text-[10px] text-gray-600 uppercase tracking-widest font-bold text-center mt-10">No units deployed</div>`;
             } else {
-                // Auto-select first unit if none selected
-                if (!currentVaultUnit) currentVaultUnit = units[0].id;
+                if (!currentVaultUnit && units.length > 0) currentVaultUnit = units[0].id;
                 
                 let sidebarHtml = '';
                 units.forEach(unit => {
@@ -1599,7 +1543,6 @@
             const unit = units.find(u => u.id === currentVaultUnit);
             if (!unit) return;
 
-            // Chapter Header with glowing text
             let canvasHtml = `
             <div class="mb-16 pb-6 flex justify-between items-end border-b border-slate-800/50">
                 <h1 class="text-4xl md:text-6xl font-black text-white uppercase tracking-tighter" style="text-shadow: 0 0 20px rgba(255,255,255,0.2), 0 0 40px rgba(255,255,255,0.05);">${unit.name}</h1>
@@ -1616,7 +1559,6 @@
                 canvasHtml += `<div class="text-slate-700 italic mt-10 font-medium tracking-wide">No chapters defined. Deploy a chapter to initialize the workspace.</div>`;
             }
 
-            // Document Flow Rendering
             chapters.forEach(chap => {
                 let itemsHTML = '';
                 const items = chap.items || [];
@@ -1628,13 +1570,13 @@
                         const noteColor = item.color || 'slate-500'; 
                         itemsHTML += `
                         <div class="border-l-2 border-${noteColor} pl-6 py-1 mb-6 relative group">
-                            <button onclick="window.deleteVaultEntity('${unit.id}', '${chap.id}', '${item.id}')" class="absolute top-1 right-2 text-slate-800 hover:text-danger opacity-0 group-hover:opacity-100 transition-opacity bg-black p-1"><i data-lucide="x" width="16" height="16"></i></button>
+                            <button onclick="window.deleteVaultEntity('${unit.id}', '${chap.id}', '${item.id}')" class="absolute top-1 -right-4 text-slate-800 hover:text-danger opacity-0 group-hover:opacity-100 transition-opacity bg-black p-1 rounded"><i data-lucide="x" width="16" height="16"></i></button>
                             <p class="text-gray-300 text-lg md:text-xl leading-relaxed whitespace-pre-wrap font-medium tracking-wide pr-8">${safeText}</p>
                         </div>`;
                     } else if (item.type === 'task') {
                         itemsHTML += `
                         <div class="flex items-start gap-5 py-2 mb-4 relative group pr-8">
-                            <button onclick="window.deleteVaultEntity('${unit.id}', '${chap.id}', '${item.id}')" class="absolute top-3 right-2 text-slate-800 hover:text-danger opacity-0 group-hover:opacity-100 transition-opacity bg-black p-1"><i data-lucide="x" width="16" height="16"></i></button>
+                            <button onclick="window.deleteVaultEntity('${unit.id}', '${chap.id}', '${item.id}')" class="absolute top-3 -right-4 text-slate-800 hover:text-danger opacity-0 group-hover:opacity-100 transition-opacity bg-black p-1 rounded"><i data-lucide="x" width="16" height="16"></i></button>
                             <label class="flex items-center gap-4 cursor-pointer cyber-checkbox pt-1">
                                 <input type="checkbox" ${item.done ? 'checked' : ''} onchange="window.toggleVaultTask('${unit.id}', '${chap.id}', '${item.id}')">
                                 <div class="box w-5 h-5 border-2 border-slate-600 bg-black"></div>
@@ -1644,29 +1586,63 @@
                     }
                 });
 
+                let editorHTML = '';
+                let actionButtonsHTML = '';
+
+                if (activeVaultEditor && activeVaultEditor.chapId === chap.id) {
+                    const isNote = activeVaultEditor.type === 'note';
+                    const color = activeVaultEditor.color || 'slate-500';
+
+                    let colorPickerHTML = '';
+                    if (isNote) {
+                        const colors = ['slate-500', 'blue-500', 'emerald-500', 'amber-500', 'red-500', 'purple-500', 'pink-500'];
+                        colorPickerHTML = `
+                        <div class="absolute -top-12 left-0 bg-[#0f172a] border border-slate-700 px-3 py-2 rounded-lg flex gap-3 shadow-xl z-20 transition-all">
+                            ${colors.map(c => `<button onmousedown="window.setGhostColor('${c}'); event.preventDefault();" class="w-4 h-4 rounded-full bg-${c} hover:scale-125 transition-transform"></button>`).join('')}
+                        </div>`;
+                    }
+
+                    editorHTML = `
+                    <div id="ghost-editor-wrapper" class="${isNote ? `border-l-2 border-${color} pl-6` : 'flex items-start gap-5 pr-8'} py-1 mb-6 relative group transition-colors duration-300 z-10">
+                        ${colorPickerHTML}
+                        ${!isNote ? `<div class="w-5 h-5 border-2 border-slate-600 bg-black mt-1 shrink-0"></div>` : ''}
+                        <div class="w-full relative">
+                            <textarea id="ghost-editor-input" placeholder="${isNote ? 'Type your note... (Enter for new line)' : 'Type task...'}" class="w-full bg-transparent text-gray-200 text-lg md:text-xl leading-relaxed whitespace-pre-wrap font-medium tracking-wide outline-none resize-none overflow-hidden placeholder-slate-700 pb-10" rows="1" oninput="this.style.height = 'auto'; this.style.height = this.scrollHeight + 'px';" onblur="setTimeout(() => window.saveInlineEditor(), 150)"></textarea>
+                            
+                            <div class="absolute bottom-0 right-0 flex gap-4">
+                                <button onmousedown="window.closeInlineEditor(); event.preventDefault();" class="text-[10px] uppercase tracking-widest text-gray-500 hover:text-danger font-bold transition px-2 py-1">Cancel</button>
+                                <button onmousedown="window.saveInlineEditor(); event.preventDefault();" class="text-[10px] uppercase tracking-widest text-accent font-black bg-accent/10 hover:bg-accent hover:text-slate-900 px-4 py-1.5 rounded shadow-lg transition">SAVE</button>
+                            </div>
+                        </div>
+                    </div>`;
+                } else {
+                    actionButtonsHTML = `
+                    <div class="flex gap-6 opacity-20 hover:opacity-100 transition-opacity pt-4 border-t border-slate-900/50 mt-4">
+                        <button onclick="window.openInlineEditor('${unit.id}', '${chap.id}', 'note')" class="text-gray-500 hover:text-white text-xs font-bold uppercase tracking-widest transition flex items-center gap-2"><i data-lucide="align-left" width="14" height="14"></i> Add Note</button>
+                        <button onclick="window.openInlineEditor('${unit.id}', '${chap.id}', 'task')" class="text-gray-500 hover:text-white text-xs font-bold uppercase tracking-widest transition flex items-center gap-2"><i data-lucide="check-square" width="14" height="14"></i> Add Task</button>
+                    </div>`;
+                }
+
                 canvasHtml += `
                 <div class="mb-20 group/chap relative max-w-4xl">
                     <div class="flex items-center justify-between mb-8 group-hover/chap:border-slate-800 transition-colors">
                         <h3 class="text-3xl font-black text-gray-100 tracking-tight">${chap.name}</h3>
-                        <button onclick="window.deleteVaultEntity('${unit.id}', '${chap.id}')" class="text-slate-800 hover:text-danger opacity-0 group-hover/chap:opacity-100 transition"><i data-lucide="trash-2" width="18" height="18"></i></button>
+                        <button onclick="window.deleteVaultEntity('${unit.id}', '${chap.id}')" class="text-slate-800 hover:text-danger opacity-0 group-hover/chap:opacity-100 transition bg-black p-1.5 rounded"><i data-lucide="trash-2" width="18" height="18"></i></button>
                     </div>
                     
-                    <div class="mb-8">
+                    <div class="mb-4">
                         ${itemsHTML}
-                        <div id="editor-anchor-${chap.id}"></div> <!-- THE INVISIBLE SPAWN POINT -->
+                        ${editorHTML}
                     </div>
                     
-                    <div class="flex gap-6 opacity-20 hover:opacity-100 transition-opacity pt-4">
-                        <button onclick="window.openInlineEditor('${unit.id}', '${chap.id}', 'note')" class="text-gray-500 hover:text-white text-xs font-bold uppercase tracking-widest transition flex items-center gap-2"><i data-lucide="align-left" width="14" height="14"></i> Add Note</button>
-                        <button onclick="window.openInlineEditor('${unit.id}', '${chap.id}', 'task')" class="text-gray-500 hover:text-white text-xs font-bold uppercase tracking-widest transition flex items-center gap-2"><i data-lucide="check-square" width="14" height="14"></i> Add Task</button>
-                    </div>
+                    ${actionButtonsHTML}
                 </div>`;
             });
             
             canvasContainer.innerHTML = canvasHtml;
             lucide.createIcons();
         };
-
+                
         function updateGlobalUI() {
             const body = document.getElementById('app-body');
             const statusTxt = document.getElementById('system-status');
