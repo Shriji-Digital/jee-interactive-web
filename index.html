@@ -70,6 +70,25 @@
     </style>
 </head>
 <body id="app-body" class="min-h-screen p-4 md:p-6 lg:p-8 flex flex-col">
+    <div id="system-boot-screen" class="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-[#000000] transition-all duration-1000 ease-in-out">
+        <div class="relative flex items-center justify-center mb-8">
+            <div class="absolute w-32 h-32 border-t-2 border-r-2 border-accent rounded-full animate-[spin_1.5s_linear_infinite]"></div>
+            <div class="absolute w-24 h-24 border-b-2 border-l-2 border-blue-500 rounded-full animate-[spin_2s_linear_infinite_reverse]"></div>
+            
+            <div class="w-16 h-16 bg-[#0f172a] rounded-full flex items-center justify-center border border-slate-800 shadow-[0_0_30px_rgba(16,185,129,0.15)] relative z-10">
+                <i data-lucide="rocket" class="text-accent animate-pulse" width="28" height="28"></i>
+            </div>
+        </div>
+        
+        <h1 class="text-3xl md:text-4xl font-black text-white uppercase tracking-[0.3em] mb-4" style="text-shadow: 0 0 20px rgba(16,185,129,0.3);">
+            SYSTEM <span class="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-blue-500">BOOT</span>
+        </h1>
+        
+        <div class="flex items-center gap-3 text-xs font-bold uppercase tracking-widest text-gray-500">
+            <i data-lucide="loader-2" id="boot-spinner" class="animate-spin text-emerald-500" width="16" height="16"></i>
+            <span id="boot-text" class="animate-pulse transition-colors duration-500">Establishing Secure Uplink...</span>
+        </div>
+    </div>
     <div class="hidden border-slate-500 border-blue-500 border-emerald-500 border-amber-500 border-red-500 border-purple-500 border-pink-500"></div>
 
     <div class="max-w-7xl mx-auto w-full mb-6 flex flex-col md:flex-row justify-between items-center gap-6">
@@ -652,6 +671,32 @@
             
             document.getElementById('db-status').innerHTML = '<i data-lucide="wifi" width="14" height="14" class="text-accent"></i> <span class="text-accent">Live Uplink Secured</span>';
             updateGlobalUI();
+
+            // --- BOOT SEQUENCE DISENGAGE ---
+            const bootScreen = document.getElementById('system-boot-screen');
+            if (bootScreen && !bootScreen.classList.contains('pointer-events-none')) {
+                const bootText = document.getElementById('boot-text');
+                const bootSpinner = document.getElementById('boot-spinner');
+                
+                if (bootText && bootSpinner) {
+                    bootSpinner.classList.remove('animate-spin'); // Lock the spinner
+                    bootSpinner.innerHTML = '<polyline points="20 6 9 17 4 12"></polyline>'; // Morph to checkmark
+                    bootSpinner.setAttribute('data-lucide', 'check');
+                    
+                    bootText.classList.remove('text-gray-500', 'animate-pulse');
+                    bootText.classList.add('text-accent');
+                    bootText.innerText = "UPLINK SECURED. ENTERING MATRIX.";
+                    lucide.createIcons();
+                }
+                
+                // Cinematic Pause: Wait 600ms so you can actually read the success message, then fade out
+                setTimeout(() => {
+                    bootScreen.classList.add('opacity-0', 'scale-110', 'pointer-events-none');
+                    // Remove it from the DOM flow after fade completes so it doesn't block clicks
+                    setTimeout(() => bootScreen.classList.add('hidden'), 1000);
+                }, 600);
+            }
+            
         }, (error) => {
             document.getElementById('db-status').innerHTML = '<i data-lucide="wifi-off" width="14" height="14" class="text-danger"></i> <span class="text-danger">ERROR: ' + error.message + '</span>';
             lucide.createIcons();
