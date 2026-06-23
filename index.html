@@ -217,6 +217,44 @@
 
     </div>
 
+    <!-- TAB 4: SAVES (The Vault) -->
+        <div id="tab-saves" class="tab-content">
+            <!-- Embedded Container: Fills the screen beautifully above the bottom nav -->
+            <div class="flex h-[calc(100vh-240px)] border border-slate-800 rounded-2xl overflow-hidden bg-[#090e17] mt-2">
+                
+                <!-- Left Sidebar: Units -->
+                <div class="w-1/3 md:w-64 border-r border-slate-800 flex flex-col bg-[#0f172a]">
+                    <div class="p-4 border-b border-slate-800 flex justify-between items-center bg-slate-900/50">
+                        <h2 class="text-sm md:text-xl font-black text-white flex items-center gap-2 tracking-tight">
+                            <i data-lucide="sticky-note" class="text-accent" width="18" height="18"></i> SAVES
+                        </h2>
+                    </div>
+                    
+                    <!-- Subject Selector -->
+                    <div class="flex border-b border-slate-800 text-[10px] font-bold uppercase tracking-widest text-center">
+                        <button onclick="window.setVaultSubject('phy')" id="vault-tab-phy" class="flex-1 py-3 text-subjectP border-b-2 border-subjectP bg-slate-800/50">PHY</button>
+                        <button onclick="window.setVaultSubject('chem')" id="vault-tab-chem" class="flex-1 py-3 text-slate-600 hover:text-subjectC hover:bg-slate-800/30 border-b-2 border-transparent transition">CHEM</button>
+                        <button onclick="window.setVaultSubject('math')" id="vault-tab-math" class="flex-1 py-3 text-slate-600 hover:text-subjectM hover:bg-slate-800/30 border-b-2 border-transparent transition">MATH</button>
+                    </div>
+
+                    <!-- Unit List -->
+                    <div class="flex-1 overflow-y-auto custom-scrollbar p-2" id="vault-sidebar-units"></div>
+
+                    <!-- Deploy Unit Button -->
+                    <div class="p-3 border-t border-slate-800 bg-slate-900/50">
+                        <button onclick="window.addVaultUnit()" class="w-full bg-[#0f172a] hover:bg-slate-800 text-gray-400 py-3 rounded-lg text-[10px] font-black uppercase tracking-widest transition flex items-center justify-center gap-2 border border-slate-800">
+                            <i data-lucide="folder-plus" width="14" height="14"></i> Deploy Unit
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Right Content: The Canvas / Void -->
+                <div class="flex-1 flex flex-col bg-[#05080f] relative">
+                    <div class="flex-1 overflow-y-auto custom-scrollbar p-6 md:p-10" id="vault-canvas-content"></div>
+                </div>
+            </div>
+        </div>
+
     <div class="fixed bottom-24 right-4 md:right-8 z-40 flex flex-col items-end gap-3 pointer-events-none">
         <div class="pointer-events-auto flex items-center gap-2 bg-[#090e17]/80 backdrop-blur-md px-3 py-1.5 rounded-full border border-slate-800 text-[9px] uppercase tracking-widest font-bold">
             <span id="db-status" class="flex items-center gap-1"><i data-lucide="loader-2" class="animate-spin" width="10" height="10"></i> Syncing...</span>
@@ -247,7 +285,7 @@
                 <i data-lucide="book-open" width="22" height="22"></i>
                 <span class="text-[9px] font-bold uppercase tracking-widest">Boards</span>
             </button>
-            <button onclick="window.openVault()" id="nav-saves" class="flex flex-col items-center gap-1 text-slate-500 hover:text-gray-300 transition-all">
+            <button onclick="window.switchTab('saves')" id="nav-saves" class="flex flex-col items-center gap-1 text-slate-500 hover:text-gray-300 transition-all">
                 <i data-lucide="sticky-note" width="22" height="22"></i>
                 <span class="text-[9px] font-bold uppercase tracking-widest">Saves</span>
             </button>
@@ -360,49 +398,6 @@
         </div>
     </div>
 
-    <div id="vault-modal" class="fixed inset-0 z-40 pb-24 hidden opacity-0 transition-opacity duration-300 flex" style="background-color: #000000;">
-        <!-- LEFT SIDEBAR (The Navigation) -->
-        <div class="w-full md:w-80 lg:w-96 bg-[#090e17] border-r border-slate-800 flex flex-col h-full shrink-0 transition-transform duration-300 z-20 absolute md:relative -translate-x-full md:translate-x-0" id="vault-sidebar">
-            <div class="p-6 border-b border-slate-800 flex justify-between items-center bg-[#0f172a]">
-                <h2 class="text-xl font-black text-white flex items-center gap-2 tracking-tight">
-                    <i data-lucide="sticky-note" class="text-accent"></i> SAVES
-                </h2>
-                <button onclick="window.closeVault()" class="text-gray-500 hover:text-white transition md:hidden"><i data-lucide="x" width="20" height="20"></i></button>
-            </div>
-            
-            <!-- SUBJECT TABS -->
-            <div class="flex border-b border-slate-800 bg-[#090e17]">
-                <button onclick="window.setVaultSubject('Physics')" id="tab-Physics" class="flex-1 py-4 text-xs font-black uppercase tracking-widest text-white border-b-2 border-subjectP transition">PHY</button>
-                <button onclick="window.setVaultSubject('Chemistry')" id="tab-Chemistry" class="flex-1 py-4 text-xs font-black uppercase tracking-widest text-gray-600 hover:text-gray-300 border-b-2 border-transparent transition">CHEM</button>
-                <button onclick="window.setVaultSubject('Maths')" id="tab-Maths" class="flex-1 py-4 text-xs font-black uppercase tracking-widest text-gray-600 hover:text-gray-300 border-b-2 border-transparent transition">MATH</button>
-            </div>
-
-            <!-- UNIT LIST -->
-            <div class="flex-1 overflow-y-auto p-4 custom-scrollbar" id="vault-sidebar-units"></div>
-            
-            <div class="p-4 border-t border-slate-800 bg-[#090e17]">
-                <button onclick="window.addVaultUnit()" class="w-full bg-slate-800/30 hover:bg-slate-800 text-gray-400 hover:text-white py-3.5 rounded-xl text-xs font-black uppercase tracking-widest transition border border-slate-700/50 flex justify-center items-center gap-2">
-                    <i data-lucide="folder-plus" width="16" height="16"></i> Deploy Unit
-                </button>
-            </div>
-        </div>
-
-        <!-- RIGHT CANVAS (The Void) -->
-        <div class="flex-1 h-full flex flex-col relative overflow-hidden" id="vault-canvas">
-            <!-- Mobile Sidebar Toggle -->
-            <div class="md:hidden absolute top-4 left-4 z-30">
-                <button onclick="window.toggleSidebar()" class="bg-slate-900 p-2.5 rounded-lg text-white border border-slate-700 shadow-2xl"><i data-lucide="menu" width="20" height="20"></i></button>
-            </div>
-
-            <!-- Close Button (Desktop) -->
-            <button onclick="window.closeVault()" class="hidden md:flex absolute top-6 right-8 text-slate-500 hover:text-white transition z-30"><i data-lucide="x" width="28" height="28"></i></button>
-
-            <!-- CANVAS CONTENT -->
-            <div class="flex-1 overflow-y-auto custom-scrollbar p-6 pt-20 md:p-16 lg:p-24 pb-40" id="vault-canvas-content">
-                <!-- Chapters render here -->
-            </div>
-        </div>
-    </div>
     
     <div id="vault-input-modal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-[60] flex items-center justify-center hidden opacity-0 transition-opacity duration-300">
         <div class="bg-[#0f172a] p-8 rounded-3xl border border-slate-700 shadow-[0_0_50px_rgba(16,185,129,0.1)] max-w-md w-full mx-4 transform scale-95 transition-transform duration-300 flex flex-col" id="vault-input-modal-content">
@@ -1169,7 +1164,8 @@
         }
 
         window.switchTab = function(tabName) {
-            ['home', 'matrix', 'boards'].forEach(t => {
+            // Now loops through all 4 tabs
+            ['home', 'matrix', 'boards', 'saves'].forEach(t => {
                 const navBtn = document.getElementById(`nav-${t}`);
                 if(navBtn) navBtn.className = (t === tabName) ? 
                     "flex flex-col items-center gap-1 text-accent transition-all scale-110" : 
@@ -1181,7 +1177,13 @@
                     else { el.classList.remove('active'); el.style.display = 'none'; }
                 }
             });
+            
+            // Render data triggers based on the active tab
             if (tabName === 'matrix') window.renderMatrixData();
+            if (tabName === 'saves') {
+                if (!currentVaultSubject) window.setVaultSubject('phy');
+                window.renderVaultData();
+            }
         };
 
         function renderHabits() {
