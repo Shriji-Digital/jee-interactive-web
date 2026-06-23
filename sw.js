@@ -1,4 +1,4 @@
-const CACHE_NAME = 'jee-beast-v1';
+const CACHE_NAME = 'jee-beast-v2';
 const ASSETS_TO_CACHE = [
     './',
     './index.html',
