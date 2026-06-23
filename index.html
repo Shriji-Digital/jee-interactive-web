@@ -4,6 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>JEE BEAST TRACKER</title>
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#090e17">
+    <link rel="apple-touch-icon" href="rocket.png">
     <link rel="icon" type="image/png" href="rocket.png">
     
     <script src="https://cdn.tailwindcss.com"></script>
@@ -702,7 +705,49 @@
             lucide.createIcons();
         });
 
-        function saveData() { set(dbRef, state); }
+        // --- GHOST SYNC & DATA SAVING ---
+        function saveData() { 
+            // 1. Always save a local ghost backup immediately
+            localStorage.setItem('jee_ghost_backup', JSON.stringify(state)); 
+            
+            // 2. Attempt to push to Firebase (Firebase automatically queues this if offline)
+            set(dbRef, state); 
+        }
+
+        // --- PROGRESSIVE WEB APP (PWA) BOOT SEQUENCE ---
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('./sw.js')
+                    .then(reg => console.log('Matrix Booted: Service Worker Active'))
+                    .catch(err => console.error('Matrix Boot Failed:', err));
+            });
+        }
+
+        // --- CONNECTION LISTENERS ---
+        window.addEventListener('online', () => {
+            const status = document.getElementById('db-status');
+            if(status) status.innerHTML = '<i data-lucide="wifi" width="14" height="14" class="text-accent"></i> <span class="text-accent">Uplink Restored. Syncing...</span>';
+            lucide.createIcons();
+            // Force Firebase to execute any queued offline writes
+            saveData(); 
+        });
+
+        window.addEventListener('offline', () => {
+            const status = document.getElementById('db-status');
+            if(status) status.innerHTML = '<i data-lucide="wifi-off" width="14" height="14" class="text-warning"></i> <span class="text-warning">Offline. Ghost Sync Active.</span>';
+            lucide.createIcons();
+        });
+
+        // --- OFFLINE COLD-START RECOVERY ---
+        window.addEventListener('DOMContentLoaded', () => {
+            if (!navigator.onLine) {
+                const ghostData = localStorage.getItem('jee_ghost_backup');
+                if (ghostData) {
+                    state = { ...state, ...JSON.parse(ghostData) };
+                    updateGlobalUI();
+                }
+            }
+        });
 
         // --- THE DEEP DIVE MATRIX ENGINE ---
         let isMatrixOpen = false;
