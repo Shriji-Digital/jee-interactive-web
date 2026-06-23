@@ -1467,15 +1467,32 @@
         // --- UPGRADED CRUD OPERATIONS & GHOST EDITOR ---
         let activeVaultEditor = null;
 
-        window.openInlineEditor = function(unitId, chapId, type) {
-            activeVaultEditor = { unitId, chapId, type, color: type === 'note' ? 'slate-500' : null };
+        window.openInlineEditor = function(unitId, chapId, type, itemId = null) {
+            let existingText = '';
+            let existingColor = type === 'note' ? 'slate-500' : null;
+            
+            // If we are editing an existing item, fetch its current data
+            if (itemId) {
+                const unit = state.vault[currentVaultSubject].units.find(u => u.id === unitId);
+                const chap = unit.chapters.find(c => c.id === chapId);
+                const item = chap.items.find(i => i.id === itemId);
+                if (item) {
+                    existingText = item.text;
+                    existingColor = item.color || existingColor;
+                }
+            }
+
+            activeVaultEditor = { unitId, chapId, type, itemId, color: existingColor };
             window.renderVaultData();
+            
             setTimeout(() => {
                 const input = document.getElementById('ghost-editor-input');
                 if(input) { 
+                    input.value = existingText; // Pre-fill the text
                     input.focus(); 
                     input.style.height = 'auto'; 
                     input.style.height = input.scrollHeight + 'px'; 
+                    input.setSelectionRange(input.value.length, input.value.length); // Move cursor to end
                 }
             }, 50);
         };
@@ -1489,13 +1506,30 @@
             if (!activeVaultEditor) return;
             const inputEl = document.getElementById('ghost-editor-input');
             const text = inputEl ? inputEl.value.trim() : '';
+            
+            const unit = state.vault[currentVaultSubject].units.find(u => u.id === activeVaultEditor.unitId);
+            const chap = unit.chapters.find(c => c.id === activeVaultEditor.chapId);
+            if (!chap.items) chap.items = [];
+
             if (text) {
-                const unit = state.vault[currentVaultSubject].units.find(u => u.id === activeVaultEditor.unitId);
-                const chap = unit.chapters.find(c => c.id === activeVaultEditor.chapId);
-                if (!chap.items) chap.items = [];
-                chap.items.push({ id: 'vi_' + Date.now(), type: activeVaultEditor.type, text: text, done: false, color: activeVaultEditor.color });
+                if (activeVaultEditor.itemId) {
+                    // Update an existing item
+                    const item = chap.items.find(i => i.id === activeVaultEditor.itemId);
+                    if (item) {
+                        item.text = text;
+                        if (activeVaultEditor.type === 'note') item.color = activeVaultEditor.color;
+                    }
+                } else {
+                    // Save a brand new item
+                    chap.items.push({ id: 'vi_' + Date.now(), type: activeVaultEditor.type, text: text, done: false, color: activeVaultEditor.color });
+                }
+                saveData();
+            } else if (activeVaultEditor.itemId) {
+                // If user erased all the text, completely delete the note
+                chap.items = chap.items.filter(i => i.id !== activeVaultEditor.itemId);
                 saveData();
             }
+            
             activeVaultEditor = null;
             window.renderVaultData();
         };
@@ -1556,7 +1590,7 @@
             }
             saveData(); window.renderVaultData();
         };
-        
+
         window.renderVaultData = function() {
             if (!state.vault) state.vault = {};
             if (!state.vault[currentVaultSubject]) state.vault[currentVaultSubject] = { units: [] };
@@ -1612,69 +1646,75 @@
                 canvasHtml += `<div class="text-slate-700 italic mt-10 font-medium tracking-wide">No chapters defined. Deploy a chapter to initialize the workspace.</div>`;
             }
 
+            // Centralized Editor UI Builder
+            const getEditorUI = (isNote, color) => {
+                let colorPickerHTML = '';
+                if (isNote) {
+                    const colors = ['slate-500', 'blue-500', 'emerald-500', 'amber-500', 'red-500', 'purple-500', 'pink-500'];
+                    colorPickerHTML = `
+                    <div class="absolute -top-12 left-0 bg-[#0f172a] border border-slate-700 px-3 py-2 rounded-lg flex gap-3 shadow-xl z-20 transition-all">
+                        ${colors.map(c => `<button onmousedown="window.setGhostColor('${c}'); event.preventDefault();" class="w-4 h-4 rounded-full bg-${c} hover:scale-125 transition-transform"></button>`).join('')}
+                    </div>`;
+                }
+                return `
+                <div id="ghost-editor-wrapper" class="${isNote ? `border-l-2 border-${color} pl-6` : 'flex items-start gap-5 pr-8'} py-1 mb-6 relative group transition-colors duration-300 z-10">
+                    ${colorPickerHTML}
+                    ${!isNote ? `<div class="w-5 h-5 border-2 border-slate-600 bg-black mt-1 shrink-0"></div>` : ''}
+                    <div class="w-full relative">
+                        <textarea id="ghost-editor-input" placeholder="${isNote ? 'Type your note... (Enter for new line)' : 'Type task...'}" class="w-full bg-transparent text-gray-200 text-lg md:text-xl leading-relaxed whitespace-pre-wrap font-medium tracking-wide outline-none resize-none overflow-hidden placeholder-slate-700 pb-10" rows="1" oninput="this.style.height = 'auto'; this.style.height = this.scrollHeight + 'px';" onblur="setTimeout(() => window.saveInlineEditor(), 150)"></textarea>
+                        
+                        <div class="absolute bottom-0 right-0 flex gap-4">
+                            <button onmousedown="window.closeInlineEditor(); event.preventDefault();" class="text-[10px] uppercase tracking-widest text-gray-500 hover:text-danger font-bold transition px-2 py-1">Cancel</button>
+                            <button onmousedown="window.saveInlineEditor(); event.preventDefault();" class="text-[10px] uppercase tracking-widest text-accent font-black bg-accent/10 hover:bg-accent hover:text-slate-900 px-4 py-1.5 rounded shadow-lg transition">SAVE</button>
+                        </div>
+                    </div>
+                </div>`;
+            };
+
             chapters.forEach(chap => {
                 let itemsHTML = '';
                 const items = chap.items || [];
                 
                 items.forEach(item => {
-                    const safeText = item.text.replace(/</g, "&lt;").replace(/>/g, "&gt;");
-                    
-                    if (item.type === 'note') {
-                        const noteColor = item.color || 'slate-500'; 
-                        itemsHTML += `
-                        <div class="border-l-2 border-${noteColor} pl-6 py-1 mb-6 relative group">
-                            <button onclick="window.deleteVaultEntity('${unit.id}', '${chap.id}', '${item.id}')" class="absolute top-1 -right-4 text-slate-800 hover:text-danger opacity-0 group-hover:opacity-100 transition-opacity bg-black p-1 rounded"><i data-lucide="x" width="16" height="16"></i></button>
-                            <p class="text-gray-300 text-lg md:text-xl leading-relaxed whitespace-pre-wrap font-medium tracking-wide pr-8">${safeText}</p>
-                        </div>`;
-                    } else if (item.type === 'task') {
-                        itemsHTML += `
-                        <div class="flex items-start gap-5 py-2 mb-4 relative group pr-8">
-                            <button onclick="window.deleteVaultEntity('${unit.id}', '${chap.id}', '${item.id}')" class="absolute top-3 -right-4 text-slate-800 hover:text-danger opacity-0 group-hover:opacity-100 transition-opacity bg-black p-1 rounded"><i data-lucide="x" width="16" height="16"></i></button>
-                            <label class="flex items-center gap-4 cursor-pointer cyber-checkbox pt-1">
-                                <input type="checkbox" ${item.done ? 'checked' : ''} onchange="window.toggleVaultTask('${unit.id}', '${chap.id}', '${item.id}')">
-                                <div class="box w-5 h-5 border-2 border-slate-600 bg-black"></div>
-                            </label>
-                            <span class="text-xl font-medium leading-snug transition-colors duration-300 ${item.done ? 'text-slate-700 line-through' : 'text-gray-200'}">${safeText}</span>
-                        </div>`;
+                    // Check if this specific item is currently being edited
+                    if (activeVaultEditor && activeVaultEditor.itemId === item.id) {
+                        itemsHTML += getEditorUI(activeVaultEditor.type === 'note', activeVaultEditor.color || 'slate-500');
+                    } else {
+                        // Render standard clickable text
+                        const safeText = item.text.replace(/</g, "&lt;").replace(/>/g, "&gt;");
+                        
+                        if (item.type === 'note') {
+                            const noteColor = item.color || 'slate-500'; 
+                            itemsHTML += `
+                            <div class="border-l-2 border-${noteColor} pl-6 py-1 mb-6 relative group">
+                                <button onclick="window.deleteVaultEntity('${unit.id}', '${chap.id}', '${item.id}')" class="absolute top-1 -right-4 text-slate-800 hover:text-danger opacity-0 group-hover:opacity-100 transition-opacity bg-black p-1 rounded z-10"><i data-lucide="x" width="16" height="16"></i></button>
+                                <p onclick="window.openInlineEditor('${unit.id}', '${chap.id}', 'note', '${item.id}')" class="text-gray-300 hover:text-white cursor-text text-lg md:text-xl leading-relaxed whitespace-pre-wrap font-medium tracking-wide pr-8 transition-colors">${safeText}</p>
+                            </div>`;
+                        } else if (item.type === 'task') {
+                            itemsHTML += `
+                            <div class="flex items-start gap-5 py-2 mb-4 relative group pr-8">
+                                <button onclick="window.deleteVaultEntity('${unit.id}', '${chap.id}', '${item.id}')" class="absolute top-3 -right-4 text-slate-800 hover:text-danger opacity-0 group-hover:opacity-100 transition-opacity bg-black p-1 rounded z-10"><i data-lucide="x" width="16" height="16"></i></button>
+                                <label class="flex items-center gap-4 cursor-pointer cyber-checkbox pt-1">
+                                    <input type="checkbox" ${item.done ? 'checked' : ''} onchange="window.toggleVaultTask('${unit.id}', '${chap.id}', '${item.id}')">
+                                    <div class="box w-5 h-5 border-2 border-slate-600 bg-black"></div>
+                                </label>
+                                <span onclick="window.openInlineEditor('${unit.id}', '${chap.id}', 'task', '${item.id}')" class="text-xl cursor-text hover:text-white font-medium leading-snug transition-colors duration-300 ${item.done ? 'text-slate-700 line-through' : 'text-gray-200'}">${safeText}</span>
+                            </div>`;
+                        }
                     }
                 });
 
-                let editorHTML = '';
-                let actionButtonsHTML = '';
-
-                if (activeVaultEditor && activeVaultEditor.chapId === chap.id) {
-                    const isNote = activeVaultEditor.type === 'note';
-                    const color = activeVaultEditor.color || 'slate-500';
-
-                    let colorPickerHTML = '';
-                    if (isNote) {
-                        const colors = ['slate-500', 'blue-500', 'emerald-500', 'amber-500', 'red-500', 'purple-500', 'pink-500'];
-                        colorPickerHTML = `
-                        <div class="absolute -top-12 left-0 bg-[#0f172a] border border-slate-700 px-3 py-2 rounded-lg flex gap-3 shadow-xl z-20 transition-all">
-                            ${colors.map(c => `<button onmousedown="window.setGhostColor('${c}'); event.preventDefault();" class="w-4 h-4 rounded-full bg-${c} hover:scale-125 transition-transform"></button>`).join('')}
-                        </div>`;
-                    }
-
-                    editorHTML = `
-                    <div id="ghost-editor-wrapper" class="${isNote ? `border-l-2 border-${color} pl-6` : 'flex items-start gap-5 pr-8'} py-1 mb-6 relative group transition-colors duration-300 z-10">
-                        ${colorPickerHTML}
-                        ${!isNote ? `<div class="w-5 h-5 border-2 border-slate-600 bg-black mt-1 shrink-0"></div>` : ''}
-                        <div class="w-full relative">
-                            <textarea id="ghost-editor-input" placeholder="${isNote ? 'Type your note... (Enter for new line)' : 'Type task...'}" class="w-full bg-transparent text-gray-200 text-lg md:text-xl leading-relaxed whitespace-pre-wrap font-medium tracking-wide outline-none resize-none overflow-hidden placeholder-slate-700 pb-10" rows="1" oninput="this.style.height = 'auto'; this.style.height = this.scrollHeight + 'px';" onblur="setTimeout(() => window.saveInlineEditor(), 150)"></textarea>
-                            
-                            <div class="absolute bottom-0 right-0 flex gap-4">
-                                <button onmousedown="window.closeInlineEditor(); event.preventDefault();" class="text-[10px] uppercase tracking-widest text-gray-500 hover:text-danger font-bold transition px-2 py-1">Cancel</button>
-                                <button onmousedown="window.saveInlineEditor(); event.preventDefault();" class="text-[10px] uppercase tracking-widest text-accent font-black bg-accent/10 hover:bg-accent hover:text-slate-900 px-4 py-1.5 rounded shadow-lg transition">SAVE</button>
-                            </div>
-                        </div>
-                    </div>`;
-                } else {
-                    actionButtonsHTML = `
-                    <div class="flex gap-6 opacity-20 hover:opacity-100 transition-opacity pt-4 border-t border-slate-900/50 mt-4">
-                        <button onclick="window.openInlineEditor('${unit.id}', '${chap.id}', 'note')" class="text-gray-500 hover:text-white text-xs font-bold uppercase tracking-widest transition flex items-center gap-2"><i data-lucide="align-left" width="14" height="14"></i> Add Note</button>
-                        <button onclick="window.openInlineEditor('${unit.id}', '${chap.id}', 'task')" class="text-gray-500 hover:text-white text-xs font-bold uppercase tracking-widest transition flex items-center gap-2"><i data-lucide="check-square" width="14" height="14"></i> Add Task</button>
-                    </div>`;
+                // Check if user is adding a NEW item at the bottom of the chapter
+                let newEditorHTML = '';
+                if (activeVaultEditor && activeVaultEditor.chapId === chap.id && !activeVaultEditor.itemId) {
+                    newEditorHTML = getEditorUI(activeVaultEditor.type === 'note', activeVaultEditor.color || 'slate-500');
                 }
+
+                let actionButtonsHTML = `
+                <div class="flex gap-6 opacity-20 hover:opacity-100 transition-opacity pt-4 border-t border-slate-900/50 mt-4">
+                    <button onclick="window.openInlineEditor('${unit.id}', '${chap.id}', 'note')" class="text-gray-500 hover:text-white text-xs font-bold uppercase tracking-widest transition flex items-center gap-2"><i data-lucide="align-left" width="14" height="14"></i> Add Note</button>
+                    <button onclick="window.openInlineEditor('${unit.id}', '${chap.id}', 'task')" class="text-gray-500 hover:text-white text-xs font-bold uppercase tracking-widest transition flex items-center gap-2"><i data-lucide="check-square" width="14" height="14"></i> Add Task</button>
+                </div>`;
 
                 canvasHtml += `
                 <div class="mb-20 group/chap relative max-w-4xl">
@@ -1685,10 +1725,10 @@
                     
                     <div class="mb-4">
                         ${itemsHTML}
-                        ${editorHTML}
+                        ${newEditorHTML}
                     </div>
                     
-                    ${actionButtonsHTML}
+                    ${!newEditorHTML ? actionButtonsHTML : ''}
                 </div>`;
             });
             
