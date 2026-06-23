@@ -843,6 +843,8 @@
         };
         
         window.switchTab = function(tabName) {
+            // Close the Saves modal automatically if we switch to another tab
+            if (window.closeVault) window.closeVault();
             ['dashboard', 'boards', 'logs'].forEach(t => {
                 document.getElementById(`nav-${t}`).className = (t === tabName) ? 
                     "px-6 py-2.5 rounded-t-lg font-bold text-sm transition-all duration-300 bg-slate-800 text-white border-b-2 border-accent flex items-center gap-2 whitespace-nowrap" : 
