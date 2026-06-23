@@ -94,70 +94,91 @@
     </div>
     <div class="hidden border-slate-500 border-blue-500 border-emerald-500 border-amber-500 border-red-500 border-purple-500 border-pink-500"></div>
 
-    <div class="max-w-7xl mx-auto w-full mb-6 flex flex-col md:flex-row justify-between items-center gap-6">
+    <div class="max-w-7xl mx-auto w-full flex justify-between items-end mb-6 pt-2 border-b border-slate-800 pb-4 mt-4">
         <div>
-            <h1 class="text-4xl md:text-5xl font-black tracking-tight mb-1 flex items-center gap-3">
-                PRIYANSH'S <span class="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-blue-500">RISE</span>
-                <i data-lucide="rocket" class="text-blue-400" width="32" height="32"></i>
+            <h1 class="text-2xl font-black tracking-tight flex items-center gap-2">
+                <i data-lucide="rocket" class="text-accent" width="24" height="24"></i>
+                JEE <span class="text-gray-500">2027</span>
             </h1>
-            <p id="system-status" class="text-gray-400 text-xs tracking-widest uppercase font-bold text-accent">System Online // Target: IIT 2027</p>
+            <p id="system-status" class="text-[9px] text-gray-500 tracking-widest uppercase font-bold mt-1">System Online</p>
         </div>
-        
-        <div class="flex gap-4">
-            <div class="glass-card px-5 py-2.5 rounded-2xl flex items-center gap-3 border-b-2 border-b-yellow-500">
-                <i data-lucide="star" class="text-yellow-400 fill-yellow-400"></i>
-                <div>
-                    <div class="text-[10px] text-gray-400 uppercase font-bold">Rank XP</div>
-                    <div class="font-black text-xl leading-none" id="xp-display">0</div>
-                </div>
+        <div class="flex gap-3">
+            <div class="glass-card px-3 py-1.5 rounded-lg flex items-center gap-2 border-b-2 border-b-yellow-500">
+                <i data-lucide="star" class="text-yellow-400 fill-yellow-400" width="14" height="14"></i>
+                <div class="font-black text-sm" id="xp-display">0</div>
             </div>
-            
-            <div class="glass-card px-5 py-2.5 rounded-2xl flex items-center gap-3 border-b-2 border-b-iit">
-                <i data-lucide="shield" class="text-iit fill-iit/20"></i>
-                <div>
-                    <div class="text-[10px] text-gray-400 uppercase font-bold flex justify-between items-center gap-3">
-                        Shields
-                        <button onclick="window.buyShield()" class="bg-iitDark hover:bg-iit text-white px-1.5 py-0.5 rounded text-[8px] transition font-bold" title="Costs 1000 XP">BUY (-1000)</button>
+            <div class="glass-card px-3 py-1.5 rounded-lg flex items-center gap-2 border-b-2 border-b-iit">
+                <i data-lucide="shield" class="text-iit fill-iit/20" width="14" height="14"></i>
+                <div class="font-black text-sm" id="shield-display">1</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="max-w-7xl mx-auto w-full flex-1 pb-28">
+
+        <div id="tab-home" class="tab-content active">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                <div class="lg:col-span-8 flex flex-col gap-6 lg:border-r lg:border-slate-800 lg:pr-6">
+                    
+                    <div class="bg-[#0f172a] rounded-2xl p-6 border border-slate-700 shadow-2xl relative overflow-hidden" id="directive-container">
+                        <div class="flex justify-between items-center mb-4 border-b border-slate-800 pb-3">
+                            <h2 class="text-xs text-iit uppercase tracking-widest font-black flex items-center gap-2">
+                                <i data-lucide="crosshair" width="16" height="16"></i> The Directive
+                            </h2>
+                            <span id="directive-status" class="text-[10px] font-bold bg-slate-800 text-gray-400 px-2 py-1 rounded">UNLOCKED</span>
+                        </div>
+                        <div id="dir-msg" class="hidden mb-4 p-3 rounded-lg text-[10px] font-black uppercase tracking-widest text-center border"></div>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4" id="directive-inputs">
+                            <div><label class="text-[9px] uppercase text-gray-500 font-bold mb-1.5 block">Target Alpha</label><input type="text" id="dir-1" oninput="window.validateDirective()" class="w-full bg-[#090e17] border border-slate-700 text-gray-300 rounded-lg px-3 py-2 text-xs focus:border-accent transition"></div>
+                            <div><label class="text-[9px] uppercase text-gray-500 font-bold mb-1.5 block">Target Beta</label><input type="text" id="dir-2" oninput="window.validateDirective()" class="w-full bg-[#090e17] border border-slate-700 text-gray-300 rounded-lg px-3 py-2 text-xs focus:border-accent transition"></div>
+                            <div><label class="text-[9px] uppercase text-gray-500 font-bold mb-1.5 block">Target Gamma</label><input type="text" id="dir-3" oninput="window.validateDirective()" class="w-full bg-[#090e17] border border-slate-700 text-gray-300 rounded-lg px-3 py-2 text-xs focus:border-accent transition"></div>
+                        </div>
+                        <div class="hidden flex flex-col gap-3" id="directive-execution"></div>
+                        <button id="btn-lock-directive" disabled class="w-full mt-5 bg-slate-800 text-gray-500 font-black py-3 rounded-lg cursor-not-allowed border border-slate-700 flex justify-center items-center gap-2">
+                            <i data-lucide="lock" width="14" height="14"></i> LOCK TASKS
+                        </button>
                     </div>
-                    <div class="font-black text-xl leading-none" id="shield-display">1</div>
+                    
+                    <div class="glass-card rounded-2xl p-5 relative overflow-hidden">
+                        <div class="flex justify-between items-center mb-4">
+                            <h2 class="text-[11px] text-gray-400 uppercase tracking-widest font-bold flex items-center gap-2">
+                                <i data-lucide="activity" width="14" height="14" class="text-accent"></i> Focus Heatmap
+                            </h2>
+                        </div>
+                        <div class="bg-slate-900/80 p-3 rounded-lg border border-slate-800">
+                            <div id="heatmap-container" class="flex flex-wrap gap-1.5 justify-end"></div>
+                        </div>
+                    </div>
+
+                    <div class="glass-card rounded-2xl p-5">
+                        <h2 class="text-[11px] text-gray-400 uppercase tracking-widest font-bold mb-4 flex items-center gap-2">
+                            <i data-lucide="scale" width="14" height="14" class="text-iit"></i> The Trinity Balance
+                        </h2>
+                        <div id="diagnostics-container" class="mb-4 flex flex-col gap-2"></div>
+                        <div id="trinity-graphs-container" class="space-y-4"></div>
+                    </div>
+                </div>
+
+                <div class="lg:col-span-4 flex flex-col gap-6">
+                    <div class="glass-card rounded-2xl p-5 flex flex-col gap-4 bg-gradient-to-br from-slate-800/40 to-slate-900/60">
+                        <div class="flex gap-3 items-end">
+                            <div class="flex-1"><label class="block text-[10px] text-gray-400 uppercase font-bold mb-2">Deploy Protocol</label><input type="text" id="habit-name" placeholder="New habit..." class="w-full glass-input rounded-lg px-3 py-2 text-xs"></div>
+                            <div class="w-16"><label class="block text-[10px] text-gray-400 uppercase font-bold mb-2">Count</label><input type="number" id="habit-start-count" placeholder="0" class="w-full glass-input rounded-lg px-3 py-2 text-xs"></div>
+                            <button onclick="window.addHabit()" class="bg-white text-slate-900 font-black py-2 px-3 rounded-lg"><i data-lucide="plus" width="16" height="16"></i></button>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-1 gap-4" id="habits-container"></div>
                 </div>
             </div>
         </div>
-    </div>
 
-    <div id="main-nav" class="max-w-7xl mx-auto w-full mb-8 flex justify-center md:justify-start gap-2 border-b border-slate-800 pb-1 overflow-x-auto scrollbar-hide transition-opacity duration-500">
-        <button onclick="window.switchTab('dashboard')" id="nav-dashboard" class="px-6 py-2.5 rounded-t-lg font-bold text-sm transition-all duration-300 bg-slate-800 text-white border-b-2 border-accent flex items-center gap-2 whitespace-nowrap">
-            <i data-lucide="layout-dashboard" width="16" height="16"></i> Command Center
-        </button>
-        <button onclick="window.switchTab('boards')" id="nav-boards" class="px-6 py-2.5 rounded-t-lg font-bold text-sm transition-all duration-300 text-gray-500 hover:text-gray-300 flex items-center gap-2 whitespace-nowrap">
-            <i data-lucide="book-open-check" width="16" height="16"></i> Board Exams
-        </button>
-        <button onclick="window.switchTab('logs')" id="nav-logs" class="px-6 py-2.5 rounded-t-lg font-bold text-sm transition-all duration-300 text-gray-500 hover:text-gray-300 flex items-center gap-2 whitespace-nowrap">
-            <i data-lucide="database" width="16" height="16"></i> Data Vault
-        </button>
-    </div>
-
-    <div class="max-w-7xl mx-auto w-full flex-1">
-
-        <div id="tab-dashboard" class="tab-content active">
-            <div id="matrix-dashboard" class="hidden opacity-0 transition-opacity duration-500 mb-10">
-            <div class="flex justify-between items-center mb-6">
-                <h2 class="text-2xl font-black flex items-center gap-3 text-white">
-                    <i data-lucide="bar-chart-2" class="text-iit"></i> The Deep Dive Matrix
-                </h2>
-                <button onclick="window.toggleMatrix()" class="bg-danger/10 text-danger hover:bg-danger hover:text-white px-4 py-2 rounded-lg text-xs font-black uppercase tracking-wider transition flex items-center gap-2 shadow-[0_0_15px_rgba(239,68,68,0.2)]">
-                    <i data-lucide="layout-dashboard" width="16" height="16"></i> Exit Matrix
-                </button>
-            </div>
-
+        <div id="tab-matrix" class="tab-content">
             <div class="glass-card rounded-2xl p-6 mb-6 relative overflow-hidden border border-slate-700">
-                <div class="absolute -right-10 -top-10 opacity-5"><i data-lucide="flame" width="150" height="150"></i></div>
                 <div class="flex justify-between items-end mb-2 relative z-10">
                     <div>
                         <h3 class="text-[10px] text-gray-400 uppercase tracking-widest font-bold mb-1">Weekly Crucible</h3>
                         <div class="text-3xl font-black text-white flex items-baseline gap-2">
-                            <span id="apex-current">0.0</span>
-                            <span class="text-sm text-gray-500 font-bold uppercase tracking-widest">/ 70 Hrs</span>
+                            <span id="apex-current">0.0</span><span class="text-sm text-gray-500 font-bold uppercase tracking-widest">/ 70 Hrs</span>
                         </div>
                     </div>
                     <div id="apex-status" class="text-xs font-bold uppercase tracking-widest text-emerald-400 bg-emerald-900/30 px-3 py-1 rounded">On Track</div>
@@ -167,128 +188,21 @@
                 </div>
             </div>
 
-            <div class="grid grid-cols-2 gap-4 lg:gap-6 mb-6" id="matrix-macro-hud">
-                </div>
+            <div class="grid grid-cols-2 gap-4 lg:gap-6 mb-6" id="matrix-macro-hud"></div>
 
-            <div class="glass-card rounded-2xl p-6 mb-6 border border-slate-700 shadow-[0_0_20px_rgba(16,185,129,0.05)]">
-                <h3 class="text-[10px] text-emerald-400 uppercase tracking-widest font-bold mb-4 flex items-center gap-2">
-                    <i data-lucide="calendar" width="14" height="14"></i> Active Cycle (Current Week)
-                </h3>
+            <div class="glass-card rounded-2xl p-6 mb-6 border border-slate-700">
+                <h3 class="text-[10px] text-emerald-400 uppercase tracking-widest font-bold mb-4 flex items-center gap-2"><i data-lucide="calendar" width="14" height="14"></i> Active Cycle</h3>
                 <div id="matrix-7day-grid" class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-3"></div>
             </div>
 
-            <div class="glass-card rounded-2xl p-6 border border-slate-800 bg-gradient-to-b from-slate-900/40 to-slate-900/80">
-                <h3 class="text-[10px] text-gray-500 uppercase tracking-widest font-bold mb-4 flex items-center gap-2">
-                    <i data-lucide="ghost" width="14" height="14"></i> Ghost Cycle (Last Week)
-                </h3>
-                <div id="matrix-past-grid" class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-3 opacity-70 hover:opacity-100 transition-opacity duration-300"></div>
+            <div class="glass-card rounded-2xl p-6 border border-slate-800 mb-8 bg-slate-900/40">
+                <h3 class="text-[10px] text-gray-500 uppercase tracking-widest font-bold mb-4 flex items-center gap-2"><i data-lucide="ghost" width="14" height="14"></i> Ghost Cycle</h3>
+                <div id="matrix-past-grid" class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-3 opacity-70 hover:opacity-100 transition"></div>
             </div>
-        </div>
 
-        <div id="command-center-ui" class="transition-opacity duration-500">
-            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 mb-10">
-                
-                <!-- THE MAIN STAGE (70% WIDTH) - Added right border for solid UI separation -->
-                <div class="lg:col-span-8 flex flex-col gap-6 lg:border-r lg:border-slate-800 lg:pr-6">
-                    
-                    <!-- THE NIGHTLY DIRECTIVE (Solid Obsidian Card) -->
-                    <div class="bg-[#0f172a] rounded-2xl p-6 border border-slate-700 shadow-[0_8px_30px_rgb(0,0,0,0.4)] relative overflow-hidden transition-all duration-500" id="directive-container">
-                        
-                        <div class="flex justify-between items-center mb-4 border-b border-slate-800 pb-3">
-                            <h2 class="text-xs text-iit uppercase tracking-widest font-black flex items-center gap-2">
-                                <i data-lucide="crosshair" width="16" height="16"></i> The Directive (Set Tasks and complete them)
-                            </h2>
-                            <span id="directive-status" class="text-[10px] font-bold bg-slate-800 text-gray-400 px-2 py-1 rounded border border-slate-700">UNLOCKED</span>
-                        </div>
-
-                        <div id="dir-msg" class="hidden mb-4 p-3 rounded-lg text-[10px] font-black uppercase tracking-widest text-center border"></div>
-
-                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4" id="directive-inputs">
-                            <div>
-                                <label class="text-[9px] uppercase text-gray-500 font-bold mb-1.5 block">Target Alpha</label>
-                                <input type="text" id="dir-1" oninput="window.validateDirective()" class="w-full bg-[#090e17] border border-slate-700 text-gray-300 rounded-lg px-3 py-2.5 text-xs focus:border-accent focus:ring-1 focus:ring-accent transition shadow-inner" placeholder="e.g., HCV Friction Q1-30">
-                            </div>
-                            <div>
-                                <label class="text-[9px] uppercase text-gray-500 font-bold mb-1.5 block">Target Beta</label>
-                                <input type="text" id="dir-2" oninput="window.validateDirective()" class="w-full bg-[#090e17] border border-slate-700 text-gray-300 rounded-lg px-3 py-2.5 text-xs focus:border-accent focus:ring-1 focus:ring-accent transition shadow-inner" placeholder="e.g., Revise Periodic Table">
-                            </div>
-                            <div>
-                                <label class="text-[9px] uppercase text-gray-500 font-bold mb-1.5 block">Target Gamma</label>
-                                <input type="text" id="dir-3" oninput="window.validateDirective()" class="w-full bg-[#090e17] border border-slate-700 text-gray-300 rounded-lg px-3 py-2.5 text-xs focus:border-accent focus:ring-1 focus:ring-accent transition shadow-inner" placeholder="e.g., Math Mock Test 1hr">
-                            </div>
-                        </div>
-
-                        <div class="hidden flex flex-col gap-3" id="directive-execution"></div>
-
-                        <button id="btn-lock-directive" disabled class="w-full mt-5 bg-slate-800 text-gray-500 font-black py-3 rounded-lg cursor-not-allowed border border-slate-700 flex justify-center items-center gap-2">
-                            <i data-lucide="lock" width="14" height="14"></i> LOCK TASKS
-                        </button>
-
-                        <button onclick="window.openVault()" class="w-full mt-3 bg-gradient-to-b from-slate-800/50 to-slate-900 hover:from-slate-800 hover:to-slate-900 text-gray-400 hover:text-white font-black text-[11px] uppercase tracking-widest py-3.5 rounded-lg border border-slate-700 hover:border-accent/50 transition-all duration-500 shadow-lg hover:shadow-[0_0_25px_rgba(16,185,129,0.2)] flex justify-center items-center gap-2 group relative overflow-hidden">
-                            <div class="absolute inset-0 bg-gradient-to-r from-iit/0 via-accent/5 to-iit/0 opacity-0 group-hover:opacity-100 transition-opacity duration-700"></div>
-                            
-                            <i data-lucide="database" width="16" height="16" class="text-slate-500 group-hover:text-accent transition-colors duration-300 relative z-10"></i> 
-                            <span class="group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-emerald-400 group-hover:to-blue-400 transition-all duration-300 relative z-10">OPEN SYLLABUS VAULT</span>
-                        </button>
-                    </div>
-                    
-                    <div class="glass-card rounded-2xl p-5 relative overflow-hidden">
-                        <div class="absolute -right-4 -top-4 opacity-5"><i data-lucide="brain" width="100" height="100"></i></div>
-                        <div class="flex justify-between items-center mb-4">
-                            <h2 class="text-[11px] text-gray-400 uppercase tracking-widest font-bold flex items-center gap-2">
-                                <i data-lucide="activity" width="14" height="14" class="text-accent"></i> Focus Heatmap
-                            </h2>
-                            <div class="flex gap-2">
-                                <button onclick="window.toggleMatrix()" id="btn-matrix" class="bg-iit/10 text-iit hover:bg-iit hover:text-white px-3 py-1.5 rounded text-[10px] font-black uppercase tracking-wider transition flex items-center gap-1 shadow-[0_0_10px_rgba(59,130,246,0.1)]">
-                                    <i data-lucide="bar-chart-2" width="12" height="12"></i> Analyze
-                                </button>
-                                
-                                <button onclick="window.openTimeMachineModal()" class="bg-slate-800 text-gray-400 hover:bg-slate-700 hover:text-white px-2 py-1.5 rounded transition shadow-[0_0_10px_rgba(255,255,255,0.05)]" title="Backfill Offline Hours">
-                                    <i data-lucide="history" width="14" height="14"></i>
-                                </button>
-                                <button onclick="window.openLogModal()" class="bg-accent/10 text-accent hover:bg-accent hover:text-slate-900 px-3 py-1.5 rounded text-[10px] font-black uppercase tracking-wider transition flex items-center gap-1 shadow-[0_0_10px_rgba(16,185,129,0.1)]">
-                                    <i data-lucide="pencil" width="12" height="12"></i> Log Hours
-                                </button>
-                            </div>
-                        </div>
-                        <div class="bg-slate-900/80 p-3 rounded-lg border border-slate-800">
-                            <div id="heatmap-container" class="flex flex-wrap gap-1.5 justify-end"></div>
-                        </div>
-                    </div>
-
-                    <div class="glass-card rounded-2xl p-5">
-                        <h2 class="text-[11px] text-gray-400 uppercase tracking-widest font-bold mb-4 flex items-center gap-2">
-                            <i data-lucide="scale" width="14" height="14" class="text-iit"></i> The Trinity Balance (7 Days)
-                        </h2>
-                        <div id="diagnostics-container" class="mb-4 flex flex-col gap-2"></div>
-                        <div id="trinity-graphs-container" class="space-y-4"></div>
-                    </div>
-                </div>
-
-                <div class="lg:col-span-4 flex flex-col gap-6">
-                    <div class="glass-card rounded-2xl p-5 flex flex-col sm:flex-row gap-4 items-end bg-gradient-to-br from-slate-800/40 to-slate-900/60">
-                        <div class="flex-1 w-full">
-                            <label class="block text-[10px] text-gray-400 uppercase font-bold mb-2 tracking-wider">Deploy Mission Protocol</label>
-                            <input type="text" id="habit-name" placeholder="e.g., NoFap, Wake up 5AM, Exercise..." class="w-full glass-input rounded-lg px-4 py-3">
-                        </div>
-                        <div class="w-full sm:w-28">
-                            <label class="block text-[10px] text-gray-400 uppercase font-bold mb-2 tracking-wider">Start Count</label>
-                            <input type="number" id="habit-start-count" placeholder="0" min="0" class="w-full glass-input rounded-lg px-4 py-3">
-                        </div>
-                        <button onclick="window.addHabit()" class="w-full sm:w-auto bg-white text-slate-900 hover:bg-gray-200 font-black py-3 px-6 rounded-lg transition shadow-[0_0_15px_rgba(255,255,255,0.2)] flex items-center justify-center gap-2">
-                            <i data-lucide="plus" width="18" height="18"></i> Deploy
-                        </button>
-                    </div>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4" id="habits-container"></div>
-                </div>
-            </div>
-        </div>
-        </div>
-
-        <div id="tab-logs" class="tab-content">
             <div class="glass-card rounded-2xl p-6 md:p-8">
-                <h2 class="text-2xl font-black mb-6 flex items-center gap-3 border-b border-slate-700 pb-4">
-                    <i data-lucide="server" class="text-accent"></i> Execution History
+                <h2 class="text-xl font-black mb-6 flex items-center gap-3 border-b border-slate-700 pb-4">
+                    <i data-lucide="database" class="text-accent"></i> Execution History
                 </h2>
                 <div id="logs-vault-container" class="flex flex-col gap-4"></div>
             </div>
@@ -296,30 +210,43 @@
 
         <div id="tab-boards" class="tab-content">
             <div class="flex justify-between items-center mb-6">
-                <h2 class="text-2xl font-black flex items-center gap-3">
-                    <i data-lucide="book-open-check" class="text-yellow-500"></i> Board Prep Directives
-                </h2>
-                <span class="text-xs font-bold text-gray-500 uppercase tracking-widest"><i data-lucide="lock" width="12" height="12" class="inline"></i> Locked Arsenal</span>
+                <h2 class="text-2xl font-black flex items-center gap-3"><i data-lucide="book-open-check" class="text-yellow-500"></i> Board Prep Directives</h2>
             </div>
-            <div id="boards-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                </div>
+            <div id="boards-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
         </div>
 
     </div>
 
-    <div class="max-w-7xl mx-auto w-full mt-auto py-4 flex justify-between items-center text-[10px] uppercase font-bold tracking-widest text-gray-600 border-t border-slate-800">
-        <span id="db-status" class="flex items-center gap-2">
-            <i data-lucide="loader-2" class="animate-spin" width="14" height="14"></i> Establishing Uplink...
-        </span>
-        <div class="flex items-center gap-6">
-            <button onclick="window.enableNotifications()" id="btn-notify" class="hover:text-accent transition flex items-center gap-1">
-                <i data-lucide="bell" width="12" height="12"></i> Enable Alerts
+    <div class="fixed bottom-24 right-4 md:right-8 z-40 flex flex-col items-end gap-3 pointer-events-none">
+        <div class="pointer-events-auto flex items-center gap-2 bg-[#090e17]/80 backdrop-blur-md px-3 py-1.5 rounded-full border border-slate-800 text-[9px] uppercase tracking-widest font-bold">
+            <span id="db-status" class="flex items-center gap-1"><i data-lucide="loader-2" class="animate-spin" width="10" height="10"></i> Syncing...</span>
+        </div>
+        <div class="pointer-events-auto flex gap-2">
+            <button onclick="window.openTimeMachineModal()" class="bg-slate-800 hover:bg-slate-700 text-gray-400 p-3 rounded-full shadow-lg border border-slate-700 transition" title="Backfill Data"><i data-lucide="history" width="20" height="20"></i></button>
+            <button onclick="window.openLogModal()" class="bg-accent hover:bg-emerald-400 text-slate-900 p-4 rounded-full shadow-[0_0_20px_rgba(16,185,129,0.4)] transition hover:scale-110 flex items-center justify-center"><i data-lucide="plus" width="28" height="28" stroke-width="3"></i></button>
+        </div>
+    </div>
+
+    <div class="fixed bottom-0 left-0 right-0 bg-[#0f172a]/90 backdrop-blur-xl border-t border-slate-800 z-50">
+        <div class="max-w-md mx-auto flex justify-between items-center px-6 py-3">
+            <button onclick="window.switchTab('home')" id="nav-home" class="flex flex-col items-center gap-1 text-accent transition-all scale-110">
+                <i data-lucide="home" width="22" height="22"></i>
+                <span class="text-[9px] font-bold uppercase tracking-widest">Home</span>
             </button>
-            <button onclick="window.clearData()" class="hover:text-danger transition flex items-center gap-1">
-                <i data-lucide="triangle-alert" width="12" height="12"></i> Factory Reset
+            <button onclick="window.switchTab('matrix')" id="nav-matrix" class="flex flex-col items-center gap-1 text-slate-500 hover:text-gray-300 transition-all">
+                <i data-lucide="bar-chart-2" width="22" height="22"></i>
+                <span class="text-[9px] font-bold uppercase tracking-widest">Matrix</span>
+            </button>
+            <button onclick="window.switchTab('boards')" id="nav-boards" class="flex flex-col items-center gap-1 text-slate-500 hover:text-gray-300 transition-all">
+                <i data-lucide="book-open" width="22" height="22"></i>
+                <span class="text-[9px] font-bold uppercase tracking-widest">Boards</span>
+            </button>
+            <button onclick="window.openVault()" id="nav-saves" class="flex flex-col items-center gap-1 text-slate-500 hover:text-gray-300 transition-all">
+                <i data-lucide="sticky-note" width="22" height="22"></i>
+                <span class="text-[9px] font-bold uppercase tracking-widest">Saves</span>
             </button>
         </div>
-     </div>
+    </div>
             
     <div id="study-modal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center hidden opacity-0 transition-opacity duration-300">
         <div class="bg-[#0f172a] p-8 rounded-3xl border border-slate-700 shadow-2xl max-w-lg w-full mx-4 transform scale-95 transition-transform duration-300 flex flex-col" id="study-modal-content">
