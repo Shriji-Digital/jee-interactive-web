@@ -359,7 +359,7 @@
         <div class="w-full md:w-80 lg:w-96 bg-[#090e17] border-r border-slate-800 flex flex-col h-full shrink-0 transition-transform duration-300 z-20 absolute md:relative -translate-x-full md:translate-x-0" id="vault-sidebar">
             <div class="p-6 border-b border-slate-800 flex justify-between items-center bg-[#0f172a]">
                 <h2 class="text-xl font-black text-white flex items-center gap-2 tracking-tight">
-                    <i data-lucide="database" class="text-accent"></i> VAULT
+                    <i data-lucide="sticky-note" class="text-accent"></i> SAVES
                 </h2>
                 <button onclick="window.closeVault()" class="text-gray-500 hover:text-white transition md:hidden"><i data-lucide="x" width="20" height="20"></i></button>
             </div>
@@ -723,7 +723,6 @@
         };
 
         window.renderMatrixData = function() {
-            if (!isMatrixOpen) return;
             
             const currentGrid = document.getElementById('matrix-7day-grid');
             const pastGrid = document.getElementById('matrix-past-grid'); 
@@ -1119,14 +1118,9 @@
                 sumP += p; sumC += c; sumM += m; sum11 += s11; sumTotal += (p+c+m); sumTest += (log.test||0); sumBoard += (log.board||0);
             }
 
-            // --- THE FIX: KILL FLOATING POINT GLITCHES ---
-            sumP = Number(sumP.toFixed(2));
-            sumC = Number(sumC.toFixed(2));
-            sumM = Number(sumM.toFixed(2));
-            sum11 = Number(sum11.toFixed(2));
-            sumTotal = Number(sumTotal.toFixed(2));
-            sumTest = Number(sumTest.toFixed(2));
-            sumBoard = Number(sumBoard.toFixed(2));
+            sumP = Number(sumP.toFixed(2)); sumC = Number(sumC.toFixed(2)); sumM = Number(sumM.toFixed(2));
+            sum11 = Number(sum11.toFixed(2)); sumTotal = Number(sumTotal.toFixed(2));
+            sumTest = Number(sumTest.toFixed(2)); sumBoard = Number(sumBoard.toFixed(2));
 
             const warnings = [];
             if (sumTotal > 0) {
@@ -1141,13 +1135,46 @@
 
             const graphContainer = document.getElementById('trinity-graphs-container');
             if (sumTotal === 0 && sumTest === 0 && sumBoard === 0) { graphContainer.innerHTML = `<div class="text-xs text-gray-500 text-center py-4">No data logged for past 7 days.</div>`; return; }
+            
+            const pctP = sumTotal > 0 ? (sumP / sumTotal) * 100 : 0;
+            const pctC = sumTotal > 0 ? (sumC / sumTotal) * 100 : 0;
+            const pctM = sumTotal > 0 ? (sumM / sumTotal) * 100 : 0;
+            
             graphContainer.innerHTML = `
-                <div><div class="flex justify-between text-[10px] font-bold text-gray-400 mb-1"><span>Physics</span><span>${sumTotal>0?Math.round((sumP/sumTotal)*100):0}% (${sumP}h)</span></div><div class="h-1.5 w-full bg-slate-800 rounded-full overflow-hidden"><div class="h-full bg-subjectP transition-all duration-1000" style="width: ${sumTotal>0?Math.round((sumP/sumTotal)*100):0}%"></div></div></div>
-                <div><div class="flex justify-between text-[10px] font-bold text-gray-400 mb-1"><span>Chemistry</span><span>${sumTotal>0?Math.round((sumC/sumTotal)*100):0}% (${sumC}h)</span></div><div class="h-1.5 w-full bg-slate-800 rounded-full overflow-hidden"><div class="h-full bg-subjectC transition-all duration-1000" style="width: ${sumTotal>0?Math.round((sumC/sumTotal)*100):0}%"></div></div></div>
-                <div><div class="flex justify-between text-[10px] font-bold text-gray-400 mb-1"><span>Mathematics</span><span>${sumTotal>0?Math.round((sumM/sumTotal)*100):0}% (${sumM}h)</span></div><div class="h-1.5 w-full bg-slate-800 rounded-full overflow-hidden"><div class="h-full bg-subjectM transition-all duration-1000" style="width: ${sumTotal>0?Math.round((sumM/sumTotal)*100):0}%"></div></div></div>
-                <div class="mt-4 pt-3 border-t border-slate-800 flex flex-wrap gap-x-3 gap-y-1 justify-between text-[10px] text-gray-400 font-bold uppercase tracking-wider"><span>JEE Study: <span class="text-white text-sm">${sumTotal}h</span></span><span>11th Rev: <span class="text-warning text-sm">${sum11}h</span></span><span>Tests: <span class="text-purple-400 text-sm">${sumTest}h</span></span><span>Boards: <span class="text-yellow-500 text-sm">${sumBoard}h</span></span></div>
+                <div class="flex justify-between text-[10px] font-bold mb-2 uppercase tracking-widest">
+                    <span class="text-subjectP">PHY ${Math.round(pctP)}%</span>
+                    <span class="text-subjectC">CHEM ${Math.round(pctC)}%</span>
+                    <span class="text-subjectM">MATH ${Math.round(pctM)}%</span>
+                </div>
+                <div class="h-5 w-full bg-slate-800 rounded-full overflow-hidden flex shadow-inner">
+                    <div class="h-full bg-subjectP transition-all duration-1000 border-r border-slate-900/50" style="width: ${pctP}%"></div>
+                    <div class="h-full bg-subjectC transition-all duration-1000 border-r border-slate-900/50" style="width: ${pctC}%"></div>
+                    <div class="h-full bg-subjectM transition-all duration-1000" style="width: ${pctM}%"></div>
+                </div>
+                <div class="mt-5 pt-3 border-t border-slate-800 flex flex-wrap gap-x-4 gap-y-2 justify-between text-[10px] text-gray-400 font-bold uppercase tracking-wider">
+                    <span>JEE Core: <span class="text-white text-sm">${sumTotal}h</span></span>
+                    <span>11th Rev: <span class="text-warning text-sm">${sum11}h</span></span>
+                    <span>Mock Tests: <span class="text-purple-400 text-sm">${sumTest}h</span></span>
+                    <span>Board Prep: <span class="text-yellow-500 text-sm">${sumBoard}h</span></span>
+                </div>
             `;
         }
+
+        window.switchTab = function(tabName) {
+            ['home', 'matrix', 'boards'].forEach(t => {
+                const navBtn = document.getElementById(`nav-${t}`);
+                if(navBtn) navBtn.className = (t === tabName) ? 
+                    "flex flex-col items-center gap-1 text-accent transition-all scale-110" : 
+                    "flex flex-col items-center gap-1 text-slate-500 hover:text-gray-300 transition-all";
+                
+                const el = document.getElementById(`tab-${t}`);
+                if(el) {
+                    if (t === tabName) { setTimeout(() => { el.style.display = 'block'; void el.offsetWidth; el.classList.add('active'); }, 50); } 
+                    else { el.classList.remove('active'); el.style.display = 'none'; }
+                }
+            });
+            if (tabName === 'matrix') window.renderMatrixData();
+        };
 
         function renderHabits() {
             const container = document.getElementById('habits-container'); container.innerHTML = '';
