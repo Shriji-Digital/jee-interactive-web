@@ -1441,6 +1441,33 @@
             });
         }
 
+        window.addBoardChapter = function(subId) {
+            const input = document.getElementById(`new-chap-${subId}`); const val = input.value.trim(); if(!val) return;
+            const sub = state.boardData.find(b => b.id === subId); if (!sub.chapters) sub.chapters = [];
+            const tasksList = SUBJECT_TASKS[sub.name] || ['Read Chapter', 'PYQs'];
+            const tasks = tasksList.map((tName, idx) => ({ id: 't'+Date.now()+idx, name: tName, done: false }));
+            sub.chapters.push({ id: 'c'+Date.now(), name: val, tasks: tasks });
+            input.value = ''; saveData();
+        };
+
+        window.toggleTask = function(subId, chapId, taskId) {
+            const chap = state.boardData.find(b => b.id === subId).chapters.find(c => c.id === chapId);
+            const task = chap.tasks.find(t => t.id === taskId);
+            task.done = !task.done;
+            if (chap.tasks.every(t => t.done) && task.done) { state.xp += 20; confetti({ particleCount: 30, spread: 40 }); }
+            saveData();
+        };
+
+        window.deleteChapter = function(subId, chapId) {
+            if(confirm("Delete this chapter?")) { const sub = state.boardData.find(b => b.id === subId); sub.chapters = sub.chapters.filter(c => c.id !== chapId); saveData(); }
+        };
+
+        window.toggleAccordion = function(chapId) {
+            const content = document.getElementById(`acc-${chapId}`), icon = document.getElementById(`icon-${chapId}`);
+            if (content.classList.contains('open')) { content.classList.remove('open'); icon.style.transform = 'rotate(0deg)'; } 
+            else { content.classList.add('open'); icon.style.transform = 'rotate(180deg)'; }
+        };
+
         function renderBoards() {
             const container = document.getElementById('boards-container');
             const openAccs = new Set(Array.from(container.querySelectorAll('.accordion-content.open')).map(el => el.id));
