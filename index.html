@@ -1797,6 +1797,38 @@
             lucide.createIcons();
         }
 
+        // --- AUTOMATED BACKGROUND ENGINE ---
+        setInterval(() => { 
+            if (document.getElementById('db-status').innerText.includes("Uplink Secured")) { updateGlobalUI(); }
+            
+            const now = getISTDateObj(), hours = now.getHours(), minutes = now.getMinutes();
+            
+            if (hours === 21 && minutes === 45 && state.directive && !state.directive.locked) { 
+                window.sendCriticalAlert("⚠️ DIRECTIVE WARNING", "It is 9:45 PM. You have 15 minutes to lock your Nightly Directive!"); 
+            }
+            if (hours === 23 && minutes === 0) { 
+                window.sendCriticalAlert("🔓 PROTOCOL UNLOCKED", "It is 11:00 PM. You may now secure your active habit streaks."); 
+            }
+
+            // CRUCIBLE MORNING AUTO-AUDIT (Runs automatically every minute)
+            if (state.crucible && state.crucible.active && state.crucible.logs) {
+                const todayStr = getTodayStr();
+                let crucibleChanged = false;
+                Object.keys(state.crucible.logs).forEach(dateKey => {
+                    if (dateKey < todayStr) {
+                        const log = state.crucible.logs[dateKey];
+                        if (!log.locked) {
+                            log.locked = true;
+                            log.passed = log.o1 && log.o2 && log.o3 && log.o4 && log.o5;
+                            if (log.passed) state.xp += 200; 
+                            crucibleChanged = true;
+                        }
+                    }
+                });
+                if (crucibleChanged) saveData();
+            }
+        }, 60000);
+
     </script>
 </body>
 
