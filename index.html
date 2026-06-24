@@ -1358,6 +1358,56 @@
             canvasContainer.innerHTML = canvasHtml; lucide.createIcons();
         };
 
+        window.addHabit = function() {
+            const name = document.getElementById('habit-name').value.trim(); 
+            const startCount = parseInt(document.getElementById('habit-start-count').value) || 0;
+            if (!name) return;
+            state.habits.push({ id: Date.now().toString(), name, currentStreak: startCount, maxStreak: startCount, lastCompleted: null });
+            document.getElementById('habit-name').value = ''; 
+            document.getElementById('habit-start-count').value = ''; 
+            saveData();
+        };
+
+        window.markDone = function(id) {
+            if (!isTimeWindowValid()) { alert("STRICT DISCIPLINE PROTOCOL: Secure streaks only between 11:00 PM and Midnight (IST)."); return; }
+            const habit = state.habits.find(h => h.id === id); const today = getTodayStr();
+            if (habit.lastCompleted === today) return;
+            habit.currentStreak++; habit.lastCompleted = today;
+            if (habit.currentStreak > habit.maxStreak) habit.maxStreak = habit.currentStreak;
+            state.xp += 25;
+            if (habit.currentStreak === 14) showMilestone("Concept Master", `14 Days of ${habit.name}`);
+            else if (habit.currentStreak === 45) showMilestone("Mains Ready", `45 Days of ${habit.name}`);
+            else if (habit.currentStreak === 90) showMilestone("Advance Warrior", `90 Days of ${habit.name}`);
+            else if ([7, 21, 30, 60].includes(habit.currentStreak)) confetti({ particleCount: 50 });
+            saveData();
+        };
+
+        window.rescueHabit = function(id) {
+            if (state.xp < 100) return alert("You need 100 Rank XP to initiate a Rescue Mission.");
+            if (confirm("Initiate Rescue Mission? Cost: -100 XP. This bridges the gap for yesterday.")) {
+                state.xp -= 100;
+                const habit = state.habits.find(h => h.id === id);
+                habit.currentStreak++; habit.lastCompleted = getYesterdayStr();
+                if (habit.currentStreak > habit.maxStreak) habit.maxStreak = habit.currentStreak;
+                saveData();
+            }
+        };
+
+        window.resetHabit = function(id) {
+            const habit = state.habits.find(h => h.id === id);
+            if (state.shields > 0 && confirm("Streak endangered! Use 1 Shield to freeze this and prevent reset?")) {
+                state.shields--; habit.lastCompleted = getTodayStr(); saveData(); return;
+            }
+            if (confirm(`CRITICAL WARNING: Resetting "${habit.name}" applies the Relapse Tax.\n\n- UI turns grayscale for 24 hours.\n- You LOSE 250 Rank XP.\n\nProceed?`)) {
+                habit.currentStreak = 0; habit.lastCompleted = null; 
+                state.recoveryUntil = Date.now() + 86400000; state.xp = Math.max(0, state.xp - 250); saveData();
+            }
+        };
+
+        window.deleteHabit = function(id) { 
+            if(confirm("Delete mission?")) { state.habits = state.habits.filter(h => h.id !== id); saveData(); } 
+        };
+
         function renderHabits() {
             const container = document.getElementById('habits-container'); container.innerHTML = '';
             const today = getTodayStr(), isValidTime = isTimeWindowValid();
