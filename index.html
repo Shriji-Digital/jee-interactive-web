@@ -217,8 +217,6 @@
             <div id="boards-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
         </div>
 
-    </div>
-
     <!-- TAB 4: SAVES (The Vault) -->
         <div id="tab-saves" class="tab-content">
             <div class="flex border border-slate-800 rounded-2xl overflow-hidden bg-[#090e17] shadow-2xl" style="position: fixed; top: 24px; bottom: 85px; max-width: 1280px; left: 50%; transform: translateX(-50%); width: calc(100% - 32px); z-index: 40;">
@@ -256,6 +254,68 @@
             </div>
         </div>
 
+        <!-- TAB 5: THE CRUCIBLE (200 HARD) -->
+        <div id="tab-crucible" class="tab-content pt-6" style="display: none;">
+            
+            <!-- WAR ROOM HUD -->
+            <div class="glass-card rounded-2xl p-6 mb-6 border border-red-900/30 shadow-[0_0_30px_rgba(220,38,38,0.1)] relative overflow-hidden">
+                <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-red-600 to-red-900"></div>
+                <div class="flex justify-between items-end">
+                    <div>
+                        <h2 class="text-xs text-red-500 uppercase tracking-widest font-black mb-1 flex items-center gap-2">
+                            <i data-lucide="target" width="14" height="14"></i> Protocol Active
+                        </h2>
+                        <div class="text-3xl font-black text-white tracking-tighter">
+                            DAY <span id="crucible-day-display">1</span> <span class="text-gray-600 text-xl">/ 200</span>
+                        </div>
+                    </div>
+                    <div class="text-right">
+                        <div class="text-[10px] text-gray-500 uppercase font-bold tracking-widest mb-1">Target: Jan 2027</div>
+                        <div class="text-xl font-bold text-red-400">213 DAYS LEFT</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- THE IRON OATH -->
+            <div class="bg-[#090e17] border border-slate-800 rounded-2xl p-6 mb-6">
+                <h3 class="text-sm text-gray-300 font-black uppercase tracking-widest mb-5 border-b border-slate-800 pb-3">The Iron Oath</h3>
+                <div class="flex flex-col gap-4" id="iron-oath-container">
+                    <label class="flex items-center gap-3 cursor-pointer group">
+                        <input type="checkbox" class="w-5 h-5 rounded bg-slate-900 border-slate-700 text-red-500 focus:ring-red-500 focus:ring-offset-slate-900" id="oath-1">
+                        <span class="text-sm font-bold text-gray-400 group-hover:text-gray-200 transition">12:00 AM to 7:00 AM strict sleep cycle</span>
+                    </label>
+                    <label class="flex items-center gap-3 cursor-pointer group">
+                        <input type="checkbox" class="w-5 h-5 rounded bg-slate-900 border-slate-700 text-red-500 focus:ring-red-500 focus:ring-offset-slate-900" id="oath-2">
+                        <span class="text-sm font-bold text-gray-400 group-hover:text-gray-200 transition">Minimum 6 hours total sleep</span>
+                    </label>
+                    <label class="flex items-center gap-3 cursor-pointer group">
+                        <input type="checkbox" class="w-5 h-5 rounded bg-slate-900 border-slate-700 text-red-500 focus:ring-red-500 focus:ring-offset-slate-900" id="oath-3">
+                        <span class="text-sm font-bold text-gray-400 group-hover:text-gray-200 transition">Zero digital distractions in study blocks</span>
+                    </label>
+                    <label class="flex items-center gap-3 cursor-pointer group">
+                        <input type="checkbox" class="w-5 h-5 rounded bg-slate-900 border-slate-700 text-red-500 focus:ring-red-500 focus:ring-offset-slate-900" id="oath-4">
+                        <span class="text-sm font-bold text-gray-400 group-hover:text-gray-200 transition">Physical exercise (Heart rate elevated)</span>
+                    </label>
+                    <label class="flex items-center gap-3 cursor-pointer group">
+                        <input type="checkbox" class="w-5 h-5 rounded bg-slate-900 border-slate-700 text-red-500 focus:ring-red-500 focus:ring-offset-slate-900" id="oath-5">
+                        <span class="text-sm font-bold text-gray-400 group-hover:text-gray-200 transition">70+ PYQs explicitly solved & reviewed</span>
+                    </label>
+                </div>
+                <button id="btn-lock-crucible" class="w-full mt-6 bg-red-900/20 text-red-500 hover:bg-red-600 hover:text-white border border-red-900/50 font-black py-4 rounded-xl uppercase tracking-widest transition duration-300">
+                    Lock In Day
+                </button>
+            </div>
+
+            <!-- TITAN GRID (200 DAYS) -->
+            <div class="glass-card rounded-2xl p-6 border border-slate-800">
+                <h3 class="text-[10px] text-gray-500 uppercase tracking-widest font-bold mb-4">Titan Grid Tracker</h3>
+                <div id="titan-grid" class="flex flex-wrap gap-1.5 justify-start">
+                    <!-- JS will generate 200 boxes here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div class="fixed bottom-24 right-4 md:right-8 z-40 flex flex-col items-end gap-3 pointer-events-none">
         <div class="pointer-events-auto flex items-center gap-2 bg-[#090e17]/80 backdrop-blur-md px-3 py-1.5 rounded-full border border-slate-800 text-[9px] uppercase tracking-widest font-bold">
             <span id="db-status" class="flex items-center gap-1"><i data-lucide="loader-2" class="animate-spin" width="10" height="10"></i> Syncing...</span>
@@ -289,6 +349,10 @@
             <button onclick="window.switchTab('saves')" id="nav-saves" class="flex flex-col items-center gap-1 text-slate-500 hover:text-gray-300 transition-all">
                 <i data-lucide="sticky-note" width="22" height="22"></i>
                 <span class="text-[9px] font-bold uppercase tracking-widest">Saves</span>
+            </button>
+            <button onclick="window.switchTab('crucible')" id="nav-crucible" class="flex flex-col items-center gap-1 text-slate-500 hover:text-red-500 transition-all">
+                <i data-lucide="flame" width="22" height="22"></i>
+                <span class="text-[9px] font-bold uppercase tracking-widest text-red-500/70">Crucible</span>
             </button>
         </div>
     </div>
@@ -839,16 +903,22 @@
         };
         
         window.switchTab = function(tabName) {
-            // Close the Saves modal automatically if we switch to another tab
-            if (window.closeVault) window.closeVault();
-            ['dashboard', 'boards', 'logs'].forEach(t => {
-                document.getElementById(`nav-${t}`).className = (t === tabName) ? 
-                    "px-6 py-2.5 rounded-t-lg font-bold text-sm transition-all duration-300 bg-slate-800 text-white border-b-2 border-accent flex items-center gap-2 whitespace-nowrap" : 
-                    "px-6 py-2.5 rounded-t-lg font-bold text-sm transition-all duration-300 text-gray-500 hover:text-gray-300 flex items-center gap-2 whitespace-nowrap";
+            ['home', 'matrix', 'boards', 'saves', 'crucible'].forEach(t => {
+                const navBtn = document.getElementById(`nav-${t}`);
+                if(navBtn) navBtn.className = (t === tabName) ? 
+                    "flex flex-col items-center gap-1 text-accent transition-all scale-110" : 
+                    "flex flex-col items-center gap-1 text-slate-500 hover:text-gray-300 transition-all";
+                
                 const el = document.getElementById(`tab-${t}`);
-                if (t === tabName) { setTimeout(() => { el.style.display = 'block'; void el.offsetWidth; el.classList.add('active'); }, 50); } 
-                else { el.classList.remove('active'); el.style.display = 'none'; }
+                if(el) {
+                    if (t === tabName) { setTimeout(() => { el.style.display = 'block'; void el.offsetWidth; el.classList.add('active'); }, 50); } 
+                    else { el.classList.remove('active'); el.style.display = 'none'; }
+                }
             });
+            
+            if (tabName === 'matrix') window.renderMatrixData();
+            if (tabName === 'saves') { if (!currentVaultSubject) window.setVaultSubject('phy'); window.renderVaultData(); }
+            if (tabName === 'crucible' && window.renderCrucible) window.renderCrucible();
         };
 
         // --- MAIN LOG HOURS MODAL ---
@@ -1765,6 +1835,7 @@
             document.getElementById('shield-display').innerText = state.shields;
             
             checkLevelUp(); renderDirective(); renderHeatmap(); analyzeDiagnostics(); renderHabits(); renderLogsVault(); renderBoards();
+            if (window.renderCrucible) window.renderCrucible();
             if (isMatrixOpen && window.renderMatrixData) window.renderMatrixData();
             lucide.createIcons();
         }
@@ -1838,6 +1909,91 @@
             }
 
         }, 60000); // 60000ms = 1 minute
+
+        // --- TAB 5: CRUCIBLE ENGINE (200 HARD) ---
+        window.startCrucible = function() {
+            if (confirm("Deploy the 200 Hard Protocol? This will permanently mark today as Day 1. There is no turning back.")) {
+                if (!state.crucible) state.crucible = {};
+                state.crucible.active = true;
+                state.crucible.startDate = getTodayStr();
+                state.crucible.logs = {};
+                saveData(); window.renderCrucible();
+            }
+        };
+
+        window.toggleCrucibleOath = function(oathId) {
+            const todayStr = getTodayStr();
+            if (!state.crucible.logs) state.crucible.logs = {};
+            if (!state.crucible.logs[todayStr]) {
+                state.crucible.logs[todayStr] = { o1:false, o2:false, o3:false, o4:false, o5:false, locked: false, passed: false };
+            }
+            state.crucible.logs[todayStr][oathId] = document.getElementById(`crucible-${oathId}`).checked;
+            saveData(); 
+        };
+
+        window.lockCrucibleDay = function() {
+            if (!isTimeWindowValid()) { alert("STRICT DISCIPLINE PROTOCOL: Secure daily oaths only between 11:00 PM and Midnight (IST)."); return; }
+            
+            const todayStr = getTodayStr();
+            if (!state.crucible.logs) state.crucible.logs = {};
+            if (!state.crucible.logs[todayStr]) state.crucible.logs[todayStr] = { o1:false, o2:false, o3:false, o4:false, o5:false, locked: false, passed: false };
+            
+            const log = state.crucible.logs[todayStr];
+            const passed = log.o1 && log.o2 && log.o3 && log.o4 && log.o5;
+            
+            const msg = passed ? "All 5 Oaths Secured. Lock in a VICTORY for today?" : "WARNING: You missed oaths. Locking now will mark today as a FAILURE in the Titan Grid. Proceed?";
+                
+            if (confirm(msg)) {
+                log.locked = true; log.passed = passed;
+                if (passed) state.xp += 200; // Major XP reward for surviving 200 Hard
+                saveData(); window.renderCrucible();
+            }
+        };
+
+        window.renderCrucible = function() {
+            const container = document.getElementById('tab-crucible');
+            if(!container) return;
+            
+            if (!state.crucible || !state.crucible.active) {
+                container.innerHTML = `<div class="glass-card rounded-2xl p-10 text-center border-red-900/50 mt-10"><i data-lucide="flame" class="text-red-500 mx-auto mb-4" width="48" height="48"></i><h2 class="text-2xl font-black text-white mb-2">200 HARD PROTOCOL</h2><p class="text-gray-400 mb-6">Lock your code, and start the engine.</p><button onclick="window.startCrucible()" class="bg-red-600 hover:bg-red-500 text-white font-black py-3 px-8 rounded-xl shadow-[0_0_20px_rgba(220,38,38,0.4)] transition">INITIATE PROTOCOL</button></div>`;
+                lucide.createIcons(); return;
+            }
+
+            const todayStr = getTodayStr();
+            const currentDayNum = getDaysDiffIST(state.crucible.startDate) + 1;
+            const targetDate = new Date("2027-01-24");
+            const daysLeft = Math.ceil((targetDate - getISTDateObj()) / (1000 * 60 * 60 * 24));
+
+            if (!state.crucible.logs) state.crucible.logs = {};
+            let currentLog = state.crucible.logs[todayStr] || { o1:false, o2:false, o3:false, o4:false, o5:false, locked: false, passed: false };
+
+            let gridHtml = ''; let passedCount = 0;
+            for(let i=1; i<=200; i++) {
+                const d = new Date(state.crucible.startDate); d.setDate(d.getDate() + (i - 1));
+                const dayStr = formatDateStr(d);
+                const dayLog = state.crucible.logs[dayStr];
+                let boxClass = "bg-slate-900 border-slate-800"; 
+                
+                if (i > currentDayNum) { /* Future */ } 
+                else if (i === currentDayNum) {
+                    if (dayLog && dayLog.locked) {
+                        boxClass = dayLog.passed ? "bg-emerald-500 border-emerald-400 shadow-[0_0_10px_rgba(16,185,129,0.5)]" : "bg-red-600 border-red-500 shadow-[0_0_10px_rgba(220,38,38,0.5)]";
+                        if (dayLog.passed) passedCount++;
+                    } else { boxClass = "bg-slate-800 border-red-500/50 animate-pulse"; } // Today pending
+                } else {
+                    if (dayLog && dayLog.locked) {
+                        boxClass = dayLog.passed ? "bg-emerald-500 border-emerald-400" : "bg-red-600 border-red-500";
+                        if (dayLog.passed) passedCount++;
+                    } else { boxClass = "bg-red-900 border-red-800 opacity-50"; } // Missed Day (Failure)
+                }
+                gridHtml += `<div class="w-3 h-3 md:w-4 md:h-4 rounded-[2px] border ${boxClass}" title="Day ${i}: ${dayStr}"></div>`;
+            }
+
+            const winRate = currentDayNum > 1 ? Math.round((passedCount / (currentDayNum - 1)) * 100) : 100;
+
+            container.innerHTML = `<div class="glass-card rounded-2xl p-6 mb-6 border border-red-900/30 relative overflow-hidden"><div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-red-600 to-red-900"></div><div class="flex justify-between items-end"><div><h2 class="text-xs text-red-500 uppercase tracking-widest font-black mb-1 flex items-center gap-2"><i data-lucide="target" width="14" height="14"></i> Protocol Active</h2><div class="text-3xl font-black text-white tracking-tighter">DAY ${currentDayNum} <span class="text-gray-600 text-xl">/ 200</span></div></div><div class="text-right"><div class="text-[10px] text-gray-500 uppercase font-bold tracking-widest mb-1">Target: Jan 2027</div><div class="text-xl font-bold text-red-400">${daysLeft} DAYS LEFT</div></div></div></div><div class="bg-[#090e17] border border-slate-800 rounded-2xl p-6 mb-6"><h3 class="text-sm text-gray-300 font-black uppercase tracking-widest mb-5 border-b border-slate-800 pb-3">The Iron Oath (Day ${currentDayNum})</h3>${currentLog.locked ? `<div class="text-center py-6"><div class="inline-flex items-center justify-center w-16 h-16 rounded-full ${currentLog.passed ? 'bg-emerald-500/20 text-emerald-400' : 'bg-red-500/20 text-red-500'} mb-4"><i data-lucide="${currentLog.passed ? 'check' : 'x'}" width="32" height="32"></i></div><h3 class="text-xl font-black ${currentLog.passed ? 'text-emerald-400' : 'text-red-500'} uppercase tracking-widest mb-2">${currentLog.passed ? 'DAY CONQUERED' : 'DAY FAILED'}</h3><p class="text-gray-500 text-sm">Status locked for ${todayStr}. Awaiting Midnight IST.</p></div>` : `<div class="flex flex-col gap-4 mb-6">${[{id:'o1', text:'12:00 AM to 7:00 AM strict sleep cycle'},{id:'o2', text:'Minimum 6 hours total sleep'},{id:'o3', text:'Zero digital distractions in study blocks'},{id:'o4', text:'Physical exercise (Heart rate elevated)'},{id:'o5', text:'70+ PYQs explicitly solved & reviewed'}].map(o => `<label class="flex items-center gap-3 cursor-pointer group"><input type="checkbox" id="crucible-${o.id}" class="w-5 h-5 rounded bg-slate-900 border-slate-700 text-red-500 focus:ring-red-500" ${currentLog[o.id] ? 'checked' : ''} onchange="window.toggleCrucibleOath('${o.id}')"><span class="text-sm font-bold text-gray-400 group-hover:text-gray-200 transition">${o.text}</span></label>`).join('')}</div><button onclick="window.lockCrucibleDay()" class="w-full bg-red-900/20 text-red-500 hover:bg-red-600 hover:text-white border border-red-900/50 font-black py-4 rounded-xl uppercase tracking-widest transition duration-300">Lock In Day</button>`}</div><div class="glass-card rounded-2xl p-6 border border-slate-800"><div class="flex justify-between items-center mb-4"><h3 class="text-[10px] text-gray-500 uppercase tracking-widest font-bold">Titan Grid (Win Rate: ${winRate}%)</h3></div><div class="flex flex-wrap gap-1.5 justify-start">${gridHtml}</div></div>`;
+            lucide.createIcons();
+        };
         
     </script>
 </body>
