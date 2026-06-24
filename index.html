@@ -1174,8 +1174,17 @@
             graphContainer.innerHTML = `<div class="flex justify-between text-[10px] font-bold mb-2 uppercase tracking-widest"><span class="text-subjectP">PHY ${Math.round(pctP)}%</span><span class="text-subjectC">CHEM ${Math.round(pctC)}%</span><span class="text-subjectM">MATH ${Math.round(pctM)}%</span></div><div class="h-5 w-full bg-slate-800 rounded-full overflow-hidden flex shadow-inner"><div class="h-full bg-subjectP transition-all duration-1000 border-r border-slate-900/50" style="width: ${pctP}%"></div><div class="h-full bg-subjectC transition-all duration-1000 border-r border-slate-900/50" style="width: ${pctC}%"></div><div class="h-full bg-subjectM transition-all duration-1000" style="width: ${pctM}%"></div></div><div class="mt-5 pt-3 border-t border-slate-800 flex flex-wrap gap-x-4 gap-y-2 justify-between text-[10px] text-gray-400 font-bold uppercase tracking-wider"><span>JEE Core: <span class="text-white text-sm">${sumTotal}h</span></span><span>11th Rev: <span class="text-warning text-sm">${sum11}h</span></span><span>Mock Tests: <span class="text-purple-400 text-sm">${sumTest}h</span></span><span>Board Prep: <span class="text-yellow-500 text-sm">${sumBoard}h</span></span></div>`;
         }
 
-        // --- VAULT ENGINE ---
-        let currentVaultSubject = 'Physics'; let currentVaultUnit = null; let activeVaultEditor = null; let vaultInputAction = null; let selectedVaultColor = 'slate-500'; let vaultInputIsMultiline = false;
+        // --- VAULT ENGINE (BUGFIXED) ---
+        let currentVaultSubject = 'phy'; 
+        let currentVaultUnit = null; 
+        let activeVaultEditor = null; 
+        let vaultInputAction = null; 
+        let selectedVaultColor = 'slate-500'; 
+        let vaultInputIsMultiline = false;
+
+        function getVaultKey() {
+            return currentVaultSubject === 'phy' ? 'Physics' : currentVaultSubject === 'chem' ? 'Chemistry' : 'Maths';
+        }
 
         window.setVaultSubject = function (subject) {
             currentVaultSubject = subject; currentVaultUnit = null;
@@ -1230,8 +1239,9 @@
 
         window.openInlineEditor = function (unitId, chapId, type, itemId = null) {
             let existingText = ''; let existingColor = type === 'note' ? 'slate-500' : null;
+            const key = getVaultKey();
             if (itemId) {
-                const item = state.vault[currentVaultSubject].units.find(u => u.id === unitId).chapters.find(c => c.id === chapId).items.find(i => i.id === itemId);
+                const item = state.vault[key].units.find(u => u.id === unitId).chapters.find(c => c.id === chapId).items.find(i => i.id === itemId);
                 if (item) { existingText = item.text; existingColor = item.color || existingColor; }
             }
             activeVaultEditor = { unitId, chapId, type, itemId, color: existingColor }; window.renderVaultData();
@@ -1243,7 +1253,8 @@
         window.saveInlineEditor = function () {
             if (!activeVaultEditor) return;
             const text = document.getElementById('ghost-editor-input') ? document.getElementById('ghost-editor-input').value.trim() : '';
-            const chap = state.vault[currentVaultSubject].units.find(u => u.id === activeVaultEditor.unitId).chapters.find(c => c.id === activeVaultEditor.chapId);
+            const key = getVaultKey();
+            const chap = state.vault[key].units.find(u => u.id === activeVaultEditor.unitId).chapters.find(c => c.id === activeVaultEditor.chapId);
             if (!chap.items) chap.items = [];
             if (text) {
                 if (activeVaultEditor.itemId) {
@@ -1264,39 +1275,44 @@
 
         window.addVaultUnit = function () {
             window.openVaultInput("NEW UNIT", "Define the master topic", "e.g., Mechanics", false, (name) => {
-                if (!state.vault) state.vault = {}; if (!state.vault[currentVaultSubject]) state.vault[currentVaultSubject] = { units: [] };
-                const newId = 'vu_' + Date.now(); state.vault[currentVaultSubject].units.push({ id: newId, name: name, chapters: [] });
+                const key = getVaultKey();
+                if (!state.vault) state.vault = {}; if (!state.vault[key]) state.vault[key] = { units: [] };
+                if (!state.vault[key].units) state.vault[key].units = [];
+                const newId = 'vu_' + Date.now(); state.vault[key].units.push({ id: newId, name: name, chapters: [] });
                 saveData(); window.setVaultUnit(newId);
             }, false);
         };
 
         window.addVaultChapter = function (unitId) {
             window.openVaultInput("NEW CHAPTER", "Define the sub-topic", "e.g., Kinematics 1D", false, (name) => {
-                const unit = state.vault[currentVaultSubject].units.find(u => u.id === unitId); if (!unit.chapters) unit.chapters = [];
+                const key = getVaultKey();
+                const unit = state.vault[key].units.find(u => u.id === unitId); if (!unit.chapters) unit.chapters = [];
                 unit.chapters.push({ id: 'vc_' + Date.now(), name: name, items: [] }); saveData(); window.renderVaultData();
             }, false);
         };
 
         window.toggleVaultTask = function (unitId, chapId, itemId) {
-            state.vault[currentVaultSubject].units.find(u => u.id === unitId).chapters.find(c => c.id === chapId).items.find(i => i.id === itemId).done ^= true;
+            const key = getVaultKey();
+            state.vault[key].units.find(u => u.id === unitId).chapters.find(c => c.id === chapId).items.find(i => i.id === itemId).done ^= true;
             saveData(); window.renderVaultData();
         };
 
         window.deleteVaultEntity = function (unitId, chapId = null, itemId = null) {
             if (!confirm("Erase this data permanently from the Vault?")) return;
-            const units = state.vault[currentVaultSubject].units;
+            const key = getVaultKey();
+            const units = state.vault[key].units;
             if (itemId) {
                 const chap = units.find(u => u.id === unitId).chapters.find(c => c.id === chapId); chap.items = chap.items.filter(i => i.id !== itemId);
             } else if (chapId) {
                 const unit = units.find(u => u.id === unitId); unit.chapters = unit.chapters.filter(c => c.id !== chapId);
             } else {
-                state.vault[currentVaultSubject].units = units.filter(u => u.id !== unitId); currentVaultUnit = null;
+                state.vault[key].units = units.filter(u => u.id !== unitId); currentVaultUnit = null;
             }
             saveData(); window.renderVaultData();
         };
 
         window.renderVaultData = function () {
-            const subjectKey = currentVaultSubject === 'phy' ? 'Physics' : currentVaultSubject === 'chem' ? 'Chemistry' : 'Maths';
+            const subjectKey = getVaultKey();
             if (!state.vault[subjectKey]) state.vault[subjectKey] = { units: [] };
             const units = state.vault[subjectKey].units || [];
 
