@@ -1436,29 +1436,24 @@
                 if (!scoreStr) return alert("⚠️ Protocol Breach: Enter a valid score!");
                 const score = parseInt(scoreStr);
                 
-                const existing = state.mockScores.mains.find(m => m.date === today);
-                if (existing) { existing.score = score; } 
-                else { state.mockScores.mains.push({ date: today, score: score, max: 300 }); }
+                // DATA CLEANER: Wipes any duplicates for today, then pushes the fresh score
+                state.mockScores.mains = state.mockScores.mains.filter(m => m.date !== today);
+                state.mockScores.mains.push({ date: today, score: score, max: 300 });
                 
             } else {
                 const p1Str = document.getElementById('mock-adv-p1').value;
                 const p2Str = document.getElementById('mock-adv-p2').value;
                 
-                // Only Paper 1 is strictly required now
                 if (!p1Str) return alert("⚠️ Protocol Breach: Paper 1 score is mandatory.");
                 
                 const p1 = parseInt(p1Str);
-                // If Paper 2 is left blank, default the score and max marks to 0
                 const p2 = p2Str ? parseInt(p2Str) : 0; 
                 const m1 = parseInt(document.getElementById('mock-adv-max1').value) || 180;
                 const m2 = p2Str ? (parseInt(document.getElementById('mock-adv-max2').value) || 180) : 0;
                 
-                const existing = state.mockScores.adv.find(m => m.date === today);
-                if (existing) {
-                    existing.p1 = p1; existing.p2 = p2; existing.max1 = m1; existing.max2 = m2;
-                } else {
-                    state.mockScores.adv.push({ date: today, p1: p1, p2: p2, max1: m1, max2: m2 });
-                }
+                // DATA CLEANER: Wipes any duplicates for today, then pushes the fresh score
+                state.mockScores.adv = state.mockScores.adv.filter(m => m.date !== today);
+                state.mockScores.adv.push({ date: today, p1: p1, p2: p2, max1: m1, max2: m2 });
             }
             
             saveData(); window.closeMockModal(); window.renderMatrixData();
@@ -1469,15 +1464,26 @@
         window.renderMatrixData = function() {
             if (originalRenderMatrixData) originalRenderMatrixData(); 
             
+            // SORTER ENGINE: Removes database duplicates & Sorts Left-to-Right (Oldest to Newest)
+            const processScores = (arr) => {
+                if (!arr || arr.length === 0) return [];
+                const unique = {};
+                arr.forEach(item => unique[item.date] = item);
+                return Object.values(unique).sort((a, b) => new Date(a.date) - new Date(b.date));
+            };
+
+            const cleanMains = processScores(state.mockScores?.mains);
+            const cleanAdv = processScores(state.mockScores?.adv);
+
             // Plot Mains Chart
             const mainsChart = document.getElementById('mains-chart');
             if (mainsChart) {
-                if (!state.mockScores || !state.mockScores.mains || state.mockScores.mains.length === 0) {
+                if (cleanMains.length === 0) {
                     mainsChart.innerHTML = `<span class="text-xs text-slate-600 font-bold uppercase tracking-widest mt-auto mb-2">No data mapped</span>`;
                 } else {
-                    mainsChart.innerHTML = state.mockScores.mains.map(m => {
+                    mainsChart.innerHTML = cleanMains.map(m => {
                         const h = Math.max(5, (m.score / m.max) * 100);
-                        return `<div class="h-full flex flex-col justify-end items-center gap-1 group w-8">
+                        return `<div class="h-full flex flex-col justify-end items-center gap-1 group w-8 shrink-0">
                             <div class="text-[9px] font-bold text-gray-400 opacity-0 group-hover:opacity-100 transition translate-y-2 group-hover:-translate-y-1">${m.score}</div>
                             <div class="w-full bg-purple-500/80 rounded-t-md hover:bg-purple-400 transition-all shadow-[0_0_15px_rgba(168,85,247,0.3)] relative z-10" style="height: ${h}%;" title="${formatDisplayDate(m.date)}: ${m.score}/300"></div>
                         </div>`;
@@ -1488,16 +1494,15 @@
             // Plot Adv Chart
             const advChart = document.getElementById('adv-chart');
             if (advChart) {
-                if (!state.mockScores || !state.mockScores.adv || state.mockScores.adv.length === 0) {
+                if (cleanAdv.length === 0) {
                     advChart.innerHTML = `<span class="text-xs text-slate-600 font-bold uppercase tracking-widest mt-auto mb-2">No data mapped</span>`;
                 } else {
-                    advChart.innerHTML = state.mockScores.adv.map(m => {
+                    advChart.innerHTML = cleanAdv.map(m => {
                         const h1 = Math.max(5, (m.p1 / m.max1) * 100);
-                        // Calculate Paper 2 height ONLY if max marks > 0
                         const h2 = m.max2 > 0 ? Math.max(5, (m.p2 / m.max2) * 100) : 0;
                         const total = m.p1 + m.p2;
                         
-                        return `<div class="h-full flex flex-col justify-end items-center gap-1 group w-10">
+                        return `<div class="h-full flex flex-col justify-end items-center gap-1 group w-10 shrink-0">
                             <div class="text-[9px] font-bold text-gray-400 opacity-0 group-hover:opacity-100 transition translate-y-2 group-hover:-translate-y-1">${total}</div>
                             <div class="w-full flex gap-0.5 items-end justify-center h-full relative z-10">
                                 <div class="w-4 bg-iit/80 rounded-t-md hover:bg-iit transition-all" style="height: ${h1}%;" title="P1: ${m.p1}"></div>
