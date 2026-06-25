@@ -176,6 +176,35 @@
         .accordion-content.open {
             max-height: 500px;
         }
+
+        /* MATH KEYBOARD STYLES */
+        .math-btn {
+            background: rgba(30, 41, 59, 0.8);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 0.5rem;
+            padding: 0.75rem 0.25rem;
+            font-family: 'Courier New', Courier, monospace;
+            font-weight: 900;
+            font-size: 1.1rem;
+            color: #94a3b8;
+            transition: all 0.1s ease-in-out;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+        .math-btn:active {
+            transform: scale(0.92);
+            background: rgba(16, 185, 129, 0.2);
+            border-color: #10b981;
+            color: #10b981;
+        }
+        .math-btn-primary {
+            background: rgba(16, 185, 129, 0.1);
+            color: #10b981;
+            border-color: rgba(16, 185, 129, 0.3);
+        }
     </style>
 </head>
 
@@ -735,6 +764,69 @@
         </div>
     </div>
 
+    <div id="math-keyboard-overlay" class="fixed bottom-0 left-0 right-0 z-[80] transform translate-y-full transition-transform duration-300 ease-out flex justify-center pointer-events-none">
+        <div class="w-full max-w-3xl bg-[#0f172a]/95 backdrop-blur-xl border-t border-x border-slate-700 rounded-t-2xl shadow-[0_-20px_50px_rgba(0,0,0,0.5)] p-4 pointer-events-auto flex flex-col h-[320px]">
+            
+            <div class="flex justify-between items-center mb-4 border-b border-slate-800 pb-2">
+                <div class="flex gap-4 text-[10px] font-black uppercase tracking-widest">
+                    <button onclick="window.switchMathTab('alg')" id="mtab-alg" class="text-accent border-b-2 border-accent pb-1">Algebra</button>
+                    <button onclick="window.switchMathTab('calc')" id="mtab-calc" class="text-slate-500 hover:text-white pb-1">Calculus</button>
+                    <button onclick="window.switchMathTab('sym')" id="mtab-sym" class="text-slate-500 hover:text-white pb-1">Physics</button>
+                </div>
+                <button onclick="window.toggleMathKeyboard()" class="text-gray-500 hover:text-danger p-1 bg-slate-900 rounded"><i data-lucide="chevron-down" width="16" height="16"></i></button>
+            </div>
+
+            <div id="mgrid-alg" class="grid grid-cols-5 gap-2 flex-1">
+                <button class="math-btn" onclick="window.insertMath('$$  $$')">$$</button>
+                <button class="math-btn" onclick="window.insertMath('\\frac{}{} ')">x/y</button>
+                <button class="math-btn" onclick="window.insertMath('^{} ')">x²</button>
+                <button class="math-btn" onclick="window.insertMath('_{} ')">x₂</button>
+                <button class="math-btn" onclick="window.insertMath('\\sqrt{} ')">√x</button>
+                <button class="math-btn" onclick="window.insertMath('\\pm ')">±</button>
+                <button class="math-btn" onclick="window.insertMath('\\neq ')">≠</button>
+                <button class="math-btn" onclick="window.insertMath('\\approx ')">≈</button>
+                <button class="math-btn" onclick="window.insertMath('\\propto ')">∝</button>
+                <button class="math-btn" onclick="window.insertMath('\\Delta ')">Δ</button>
+                <button class="math-btn" onclick="window.insertMath('(')">(</button>
+                <button class="math-btn" onclick="window.insertMath(')')">)</button>
+                <button class="math-btn" onclick="window.insertMath('[')">[</button>
+                <button class="math-btn" onclick="window.insertMath(']')">]</button>
+                <button class="math-btn math-btn-primary" onclick="window.insertMath('\\rightarrow ')">→</button>
+            </div>
+
+            <div id="mgrid-calc" class="grid grid-cols-5 gap-2 flex-1 hidden">
+                <button class="math-btn" onclick="window.insertMath('\\int_{}^{} ')">∫</button>
+                <button class="math-btn" onclick="window.insertMath('\\oint ')">∮</button>
+                <button class="math-btn" onclick="window.insertMath('\\sum_{}^{} ')">Σ</button>
+                <button class="math-btn" onclick="window.insertMath('\\lim_{{x \\to \\infty}} ')">lim</button>
+                <button class="math-btn" onclick="window.insertMath('\\infty ')">∞</button>
+                <button class="math-btn" onclick="window.insertMath('\\frac{d}{dx} ')">d/dx</button>
+                <button class="math-btn" onclick="window.insertMath('\\partial ')">∂</button>
+                <button class="math-btn" onclick="window.insertMath('\\nabla ')">∇</button>
+                <button class="math-btn" onclick="window.insertMath('\\ln() ')">ln</button>
+                <button class="math-btn" onclick="window.insertMath('e^{} ')">eˣ</button>
+            </div>
+
+            <div id="mgrid-sym" class="grid grid-cols-5 gap-2 flex-1 hidden">
+                <button class="math-btn" onclick="window.insertMath('\\theta ')">θ</button>
+                <button class="math-btn" onclick="window.insertMath('\\alpha ')">α</button>
+                <button class="math-btn" onclick="window.insertMath('\\beta ')">β</button>
+                <button class="math-btn" onclick="window.insertMath('\\omega ')">ω</button>
+                <button class="math-btn" onclick="window.insertMath('\\pi ')">π</button>
+                <button class="math-btn" onclick="window.insertMath('\\mu ')">μ</button>
+                <button class="math-btn" onclick="window.insertMath('\\rho ')">ρ</button>
+                <button class="math-btn" onclick="window.insertMath('\\lambda ')">λ</button>
+                <button class="math-btn" onclick="window.insertMath('\\epsilon_{0} ')">ε₀</button>
+                <button class="math-btn" onclick="window.insertMath('\\times ')">×</button>
+                <button class="math-btn" onclick="window.insertMath('\\hat{i} ')">î</button>
+                <button class="math-btn" onclick="window.insertMath('\\hat{j} ')">ĵ</button>
+                <button class="math-btn" onclick="window.insertMath('\\hat{k} ')">k̂</button>
+                <button class="math-btn" onclick="window.insertMath('\\vec{} ')">v⃗</button>
+                <button class="math-btn" onclick="window.insertMath('^{\\circ} ')">°</button>
+            </div>
+        </div>
+    </div>
+
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
@@ -1269,6 +1361,71 @@
             activeVaultEditor = null; window.renderVaultData();
         };
 
+            // --- MATH KEYBOARD LOGIC ---
+        window.toggleMathKeyboard = function() {
+            const kb = document.getElementById('math-keyboard-overlay');
+            if (kb.classList.contains('translate-y-full')) {
+                kb.classList.remove('translate-y-full');
+            } else {
+                kb.classList.add('translate-y-full');
+            }
+        };
+
+        window.switchMathTab = function(tab) {
+            ['alg', 'calc', 'sym'].forEach(t => {
+                document.getElementById(`mgrid-${t}`).classList.add('hidden');
+                document.getElementById(`mtab-${t}`).className = "text-slate-500 hover:text-white pb-1 transition-colors";
+            });
+            document.getElementById(`mgrid-${tab}`).classList.remove('hidden');
+            document.getElementById(`mtab-${tab}`).className = "text-accent border-b-2 border-accent pb-1 transition-colors";
+        };
+
+        window.insertMath = function(tex) {
+            const input = document.getElementById('ghost-editor-input');
+            if (!input) return;
+            
+            const start = input.selectionStart;
+            const end = input.selectionEnd;
+            const text = input.value;
+            
+            // Inject math at cursor
+            const before = text.substring(0, start);
+            const after = text.substring(end, text.length);
+            input.value = before + tex + after;
+            
+            // Smart cursor placement (puts cursor inside empty brackets if they exist)
+            let offset = tex.indexOf('{}');
+            if (offset !== -1) {
+                input.selectionStart = input.selectionEnd = start + offset + 1;
+            } else {
+                input.selectionStart = input.selectionEnd = start + tex.length;
+            }
+            
+            input.focus();
+            input.style.height = 'auto'; 
+            input.style.height = input.scrollHeight + 'px';
+            if(window.updateLivePreview) window.updateLivePreview(input.value);
+        };
+
+        window.updateLivePreview = function(text) {
+            const previewBox = document.getElementById('math-live-preview');
+            if (!previewBox) return;
+            if (text.includes('$$') || text.includes('\\(')) {
+                previewBox.classList.remove('hidden');
+                previewBox.innerHTML = text;
+                if (window.renderMathInElement) {
+                    window.renderMathInElement(previewBox, {
+                        delimiters: [
+                            {left: '$$', right: '$$', display: true},
+                            {left: '\\(', right: '\\)', display: false}
+                        ], throwOnError: false
+                    });
+                }
+            } else {
+                previewBox.classList.add('hidden');
+            }
+        };
+
         window.setGhostColor = function (color) {
             if (activeVaultEditor) activeVaultEditor.color = color;
             const editorDiv = document.getElementById('ghost-editor-wrapper');
@@ -1351,7 +1508,23 @@
                     const colors = ['slate-500', 'blue-500', 'emerald-500', 'amber-500', 'red-500', 'purple-500', 'pink-500'];
                     colorPickerHTML = `<div class="absolute -top-12 left-0 bg-[#0f172a] border border-slate-700 px-3 py-2 rounded-lg flex gap-3 shadow-xl z-20 transition-all">${colors.map(c => `<button onmousedown="window.setGhostColor('${c}'); event.preventDefault();" class="w-4 h-4 rounded-full bg-${c} hover:scale-125 transition-transform"></button>`).join('')}</div>`;
                 }
-                return `<div id="ghost-editor-wrapper" class="${isNote ? `border-l-2 border-${color} pl-6` : 'flex items-start gap-5 pr-8'} py-1 mb-6 relative group transition-colors duration-300 z-10">${colorPickerHTML}${!isNote ? `<div class="w-5 h-5 border-2 border-slate-600 bg-black mt-1 shrink-0"></div>` : ''}<div class="w-full relative"><textarea id="ghost-editor-input" placeholder="${isNote ? 'Type your note... (Enter for new line)' : 'Type task...'}" class="w-full bg-transparent text-gray-200 text-lg md:text-xl leading-relaxed whitespace-pre-wrap font-medium tracking-wide outline-none resize-none overflow-hidden placeholder-slate-700 pb-10" rows="1" oninput="this.style.height = 'auto'; this.style.height = this.scrollHeight + 'px';" onblur="setTimeout(() => window.saveInlineEditor(), 150)"></textarea><div class="absolute bottom-0 right-0 flex gap-4"><button onmousedown="window.closeInlineEditor(); event.preventDefault();" class="text-[10px] uppercase tracking-widest text-gray-500 hover:text-danger font-bold transition px-2 py-1">Cancel</button><button onmousedown="window.saveInlineEditor(); event.preventDefault();" class="text-[10px] uppercase tracking-widest text-accent font-black bg-accent/10 hover:bg-accent hover:text-slate-900 px-4 py-1.5 rounded shadow-lg transition">SAVE</button></div></div></div>`;
+                return `<div id="ghost-editor-wrapper" class="${isNote ? `border-l-2 border-${color} pl-6` : 'flex items-start gap-5 pr-8'} py-1 mb-6 relative group transition-colors duration-300 z-10">
+                    ${colorPickerHTML}
+                    ${!isNote ? `<div class="w-5 h-5 border-2 border-slate-600 bg-black mt-1 shrink-0"></div>` : ''}
+                    <div class="w-full relative">
+                        <div id="math-live-preview" class="hidden w-full mb-3 p-4 bg-slate-900/50 backdrop-blur-md rounded-lg border border-iit/30 shadow-[0_0_15px_rgba(59,130,246,0.1)] text-white overflow-x-auto min-h-[60px]"></div>
+                        
+                        <textarea id="ghost-editor-input" placeholder="${isNote ? 'Type your note... (Use $$ for math)' : 'Type task...'}" class="w-full bg-transparent text-gray-200 text-lg md:text-xl leading-relaxed whitespace-pre-wrap font-medium tracking-wide outline-none resize-none overflow-hidden placeholder-slate-700 pb-12" rows="1" oninput="this.style.height = 'auto'; this.style.height = this.scrollHeight + 'px'; window.updateLivePreview(this.value);" onblur="setTimeout(() => window.saveInlineEditor(), 200)"></textarea>
+                        
+                        <div class="absolute bottom-0 left-0">
+                            <button onmousedown="window.toggleMathKeyboard(); event.preventDefault();" class="text-[10px] uppercase tracking-widest text-iit font-black bg-iit/10 hover:bg-iit hover:text-white border border-iit/30 px-3 py-1.5 rounded-lg shadow-lg transition flex items-center gap-1"><i data-lucide="calculator" width="12" height="12"></i> fx</button>
+                        </div>
+                        <div class="absolute bottom-0 right-0 flex gap-4">
+                            <button onmousedown="window.closeInlineEditor(); event.preventDefault();" class="text-[10px] uppercase tracking-widest text-gray-500 hover:text-danger font-bold transition px-2 py-1">Cancel</button>
+                            <button onmousedown="window.saveInlineEditor(); event.preventDefault();" class="text-[10px] uppercase tracking-widest text-accent font-black bg-accent/10 hover:bg-accent hover:text-slate-900 px-4 py-1.5 rounded shadow-lg transition">SAVE</button>
+                        </div>
+                    </div>
+                </div>`;
             };
 
             chapters.forEach(chap => {
