@@ -2008,7 +2008,10 @@
             }
 
             const todayStr = getTodayStr(), currentDayNum = getDaysDiffIST(state.crucible.startDate) + 1;
-            const daysLeft = Math.ceil((new Date("2027-01-24") - getISTDateObj()) / (1000 * 60 * 60 * 24));
+            
+            // FIXED: Now accurately counts down from the 200 Hard limit
+            const daysLeft = Math.max(0, 200 - currentDayNum); 
+            
             if (!state.crucible.logs) state.crucible.logs = {};
             let currentLog = state.crucible.logs[todayStr] || { o1:false, o2:false, o3:false, o4:false, o5:false, locked: false, passed: false };
 
@@ -2050,7 +2053,7 @@
                         </div>
                         <div class="text-right flex flex-col items-end">
                             <div class="text-[10px] text-gray-500 uppercase font-bold tracking-widest mb-1">
-                                Target: Jan 2027
+                                Protocol End
                             </div>
                             <div class="text-xl font-bold text-red-400 mb-2">
                                 ${daysLeft} DAYS LEFT
@@ -2121,8 +2124,15 @@
             const todayStr = getTodayStr();
             if (!state.crucible.logs) state.crucible.logs = {};
             if (!state.crucible.logs[todayStr]) state.crucible.logs[todayStr] = { o1:false, o2:false, o3:false, o4:false, o5:false, locked: false, passed: false };
+            
+            // Instantly update the state
             state.crucible.logs[todayStr][oathId] = document.getElementById(`crucible-${oathId}`).checked;
-            saveData(); 
+            
+            // Save to local device memory instantly (Zero Lag)
+            localStorage.setItem('jee_ghost_backup', JSON.stringify(state));
+            
+            // Note: Firebase cloud sync is intentionally skipped here.
+            // It will push to the cloud automatically when you hit "Lock In Day".
         };
 
         window.lockCrucibleDay = function() {
