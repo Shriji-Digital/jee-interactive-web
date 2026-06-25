@@ -776,61 +776,108 @@
                 <button onmousedown="window.toggleMathKeyboard(); event.preventDefault();" class="text-gray-500 hover:text-danger p-1 bg-slate-900 rounded transition"><i data-lucide="chevron-down" width="16" height="16"></i></button>
             </div>
 
-            <div id="mgrid-alg" class="grid grid-cols-5 gap-2 flex-1">
-                <button class="math-btn" onmousedown="window.insertMath('\\left| {} \\right| '); event.preventDefault();">|x|</button>
+            <div id="mgrid-alg" class="grid grid-cols-5 gap-2 flex-1 overflow-y-auto custom-scrollbar content-start pb-4 pr-1">
                 <button class="math-btn" onmousedown="window.insertMath('\\frac{}{} '); event.preventDefault();">x/y</button>
                 <button class="math-btn" onmousedown="window.insertMath('^{} '); event.preventDefault();">x²</button>
                 <button class="math-btn" onmousedown="window.insertMath('_{} '); event.preventDefault();">x₂</button>
                 <button class="math-btn" onmousedown="window.insertMath('\\sqrt{} '); event.preventDefault();">√x</button>
-                <button class="math-btn" onmousedown="window.insertMath('\\pm '); event.preventDefault();">±</button>
-                <button class="math-btn" onmousedown="window.insertMath('\\neq '); event.preventDefault();">≠</button>
-                <button class="math-btn" onmousedown="window.insertMath('\\approx '); event.preventDefault();">≈</button>
-                <button class="math-btn" onmousedown="window.insertMath('\\propto '); event.preventDefault();">∝</button>
-                <button class="math-btn" onmousedown="window.insertMath('\\Delta '); event.preventDefault();">Δ</button>
+                <button class="math-btn" onmousedown="window.insertMath('\\sqrt[{}]{} '); event.preventDefault();">ⁿ√x</button>
+                
+                <button class="math-btn" onmousedown="window.insertMath('\\log_{} '); event.preventDefault();">log_x</button>
+                <button class="math-btn" onmousedown="window.insertMath('\\ln() '); event.preventDefault();">ln()</button>
+                <button class="math-btn" onmousedown="window.insertMath('e^{} '); event.preventDefault();">eˣ</button>
+                <button class="math-btn" onmousedown="window.insertMath('\\left| {} \\right| '); event.preventDefault();">|x|</button>
+                <button class="math-btn" onmousedown="window.insertMath('! '); event.preventDefault();">!</button>
+                
+                <button class="math-btn" onmousedown="window.insertMath('\\binom{}{} '); event.preventDefault();">nCr</button>
+                <button class="math-btn" onmousedown="window.insertMath('\\cup '); event.preventDefault();">∪</button>
+                <button class="math-btn" onmousedown="window.insertMath('\\cap '); event.preventDefault();">∩</button>
+                <button class="math-btn" onmousedown="window.insertMath('\\in '); event.preventDefault();">∈</button>
+                <button class="math-btn" onmousedown="window.insertMath('\\subset '); event.preventDefault();">⊂</button>
+                
                 <button class="math-btn" onmousedown="window.insertMath('('); event.preventDefault();">(</button>
                 <button class="math-btn" onmousedown="window.insertMath(')'); event.preventDefault();">)</button>
                 <button class="math-btn" onmousedown="window.insertMath('['); event.preventDefault();">[</button>
                 <button class="math-btn" onmousedown="window.insertMath(']'); event.preventDefault();">]</button>
-                <button class="math-btn" onmousedown="window.insertMath('= '); event.preventDefault();">=</button>
+                <button class="math-btn" onmousedown="window.insertMath('\\{ {} \\} '); event.preventDefault();">{ }</button>
+
+                <button class="math-btn" onmousedown="window.insertMath('\\pm '); event.preventDefault();">±</button>
+                <button class="math-btn" onmousedown="window.insertMath('\\neq '); event.preventDefault();">≠</button>
+                <button class="math-btn" onmousedown="window.insertMath('\\leq '); event.preventDefault();">≤</button>
+                <button class="math-btn" onmousedown="window.insertMath('\\geq '); event.preventDefault();">≥</button>
+                <button class="math-btn" onmousedown="window.insertMath('\\approx '); event.preventDefault();">≈</button>
+
+                <button class="math-btn" onmousedown="window.insertMath('\\infty '); event.preventDefault();">∞</button>
+                <button class="math-btn" onmousedown="window.insertMath('\\emptyset '); event.preventDefault();">∅</button>
+                <button class="math-btn" onmousedown="window.insertMath('\\mathbb{R} '); event.preventDefault();">ℝ</button>
+                <button class="math-btn" onmousedown="window.insertMath('\\mathbb{Z} '); event.preventDefault();">ℤ</button>
+                <button class="math-btn" onmousedown="window.insertMath('\\Delta '); event.preventDefault();">Δ</button>
             </div>
 
-            <div id="mgrid-calc" class="grid grid-cols-5 gap-2 flex-1 hidden">
-                <button class="math-btn" onmousedown="window.insertMath('\\int_{}^{} '); event.preventDefault();">∫</button>
+            <div id="mgrid-calc" class="grid grid-cols-5 gap-2 flex-1 overflow-y-auto custom-scrollbar content-start pb-4 pr-1 hidden">
+                <button class="math-btn" onmousedown="window.insertMath('\\int '); event.preventDefault();">∫</button>
+                <button class="math-btn" onmousedown="window.insertMath('\\int_{}^{} '); event.preventDefault();">∫_a^b</button>
+                <button class="math-btn" onmousedown="window.insertMath('\\iint '); event.preventDefault();">∬</button>
                 <button class="math-btn" onmousedown="window.insertMath('\\oint '); event.preventDefault();">∮</button>
                 <button class="math-btn" onmousedown="window.insertMath('\\sum_{}^{} '); event.preventDefault();">Σ</button>
-                <button class="math-btn" onmousedown="window.insertMath('\\lim_{{x \\to \\infty}} '); event.preventDefault();">lim</button>
-                <button class="math-btn" onmousedown="window.insertMath('\\infty '); event.preventDefault();">∞</button>
+
+                <button class="math-btn" onmousedown="window.insertMath('\\lim_{{x \\to {}}} '); event.preventDefault();">lim</button>
                 <button class="math-btn" onmousedown="window.insertMath('\\frac{d}{dx} '); event.preventDefault();">d/dx</button>
-                <button class="math-btn" onmousedown="window.insertMath('\\partial '); event.preventDefault();">∂</button>
+                <button class="math-btn" onmousedown="window.insertMath('\\frac{d^2}{dx^2} '); event.preventDefault();">d²/dx²</button>
+                <button class="math-btn" onmousedown="window.insertMath('\\frac{\\partial}{\\partial {}} '); event.preventDefault();">∂/∂x</button>
                 <button class="math-btn" onmousedown="window.insertMath('\\nabla '); event.preventDefault();">∇</button>
-                <button class="math-btn" onmousedown="window.insertMath('\\ln() '); event.preventDefault();">ln</button>
-                <button class="math-btn" onmousedown="window.insertMath('e^{} '); event.preventDefault();">eˣ</button>
+
+                <button class="math-btn" onmousedown="window.insertMath('\\sin() '); event.preventDefault();">sin</button>
+                <button class="math-btn" onmousedown="window.insertMath('\\cos() '); event.preventDefault();">cos</button>
+                <button class="math-btn" onmousedown="window.insertMath('\\tan() '); event.preventDefault();">tan</button>
+                <button class="math-btn" onmousedown="window.insertMath('\\sec() '); event.preventDefault();">sec</button>
+                <button class="math-btn" onmousedown="window.insertMath('\\csc() '); event.preventDefault();">csc</button>
+                
+                <button class="math-btn" onmousedown="window.insertMath('\\sin^{-1}() '); event.preventDefault();">sin⁻¹</button>
+                <button class="math-btn" onmousedown="window.insertMath('\\cos^{-1}() '); event.preventDefault();">cos⁻¹</button>
+                <button class="math-btn" onmousedown="window.insertMath('\\tan^{-1}() '); event.preventDefault();">tan⁻¹</button>
+                <button class="math-btn" onmousedown="window.insertMath('\\cot() '); event.preventDefault();">cot</button>
+                <button class="math-btn" onmousedown="window.insertMath('\\prod_{}^{} '); event.preventDefault();">Π</button>
             </div>
 
-            <div id="mgrid-sym" class="grid grid-cols-5 gap-2 flex-1 hidden">
-                <button class="math-btn" onmousedown="window.insertMath('\\theta '); event.preventDefault();">θ</button>
-                <button class="math-btn" onmousedown="window.insertMath('\\alpha '); event.preventDefault();">α</button>
-                <button class="math-btn" onmousedown="window.insertMath('\\beta '); event.preventDefault();">β</button>
-                <button class="math-btn" onmousedown="window.insertMath('\\omega '); event.preventDefault();">ω</button>
-                <button class="math-btn" onmousedown="window.insertMath('\\pi '); event.preventDefault();">π</button>
-                <button class="math-btn" onmousedown="window.insertMath('\\mu '); event.preventDefault();">μ</button>
-                <button class="math-btn" onmousedown="window.insertMath('\\rho '); event.preventDefault();">ρ</button>
-                <button class="math-btn" onmousedown="window.insertMath('\\lambda '); event.preventDefault();">λ</button>
-                <button class="math-btn" onmousedown="window.insertMath('\\epsilon_{0} '); event.preventDefault();">ε₀</button>
-                <button class="math-btn" onmousedown="window.insertMath('\\times '); event.preventDefault();">×</button>
+            <div id="mgrid-sym" class="grid grid-cols-5 gap-2 flex-1 overflow-y-auto custom-scrollbar content-start pb-4 pr-1 hidden">
+                <button class="math-btn" onmousedown="window.insertMath('\\vec{} '); event.preventDefault();">v⃗</button>
                 <button class="math-btn" onmousedown="window.insertMath('\\hat{i} '); event.preventDefault();">î</button>
                 <button class="math-btn" onmousedown="window.insertMath('\\hat{j} '); event.preventDefault();">ĵ</button>
                 <button class="math-btn" onmousedown="window.insertMath('\\hat{k} '); event.preventDefault();">k̂</button>
-                <button class="math-btn" onmousedown="window.insertMath('\\vec{} '); event.preventDefault();">v⃗</button>
-                <button class="math-btn" onmousedown="window.insertMath('^{\\circ} '); event.preventDefault();">°</button>
+                <button class="math-btn" onmousedown="window.insertMath('\\cdot '); event.preventDefault();">•</button>
+
+                <button class="math-btn" onmousedown="window.insertMath('\\theta '); event.preventDefault();">θ</button>
+                <button class="math-btn" onmousedown="window.insertMath('\\alpha '); event.preventDefault();">α</button>
+                <button class="math-btn" onmousedown="window.insertMath('\\beta '); event.preventDefault();">β</button>
+                <button class="math-btn" onmousedown="window.insertMath('\\gamma '); event.preventDefault();">γ</button>
+                <button class="math-btn" onmousedown="window.insertMath('\\lambda '); event.preventDefault();">λ</button>
+
+                <button class="math-btn" onmousedown="window.insertMath('\\mu '); event.preventDefault();">μ</button>
+                <button class="math-btn" onmousedown="window.insertMath('\\omega '); event.preventDefault();">ω</button>
+                <button class="math-btn" onmousedown="window.insertMath('\\rho '); event.preventDefault();">ρ</button>
+                <button class="math-btn" onmousedown="window.insertMath('\\sigma '); event.preventDefault();">σ</button>
+                <button class="math-btn" onmousedown="window.insertMath('\\Phi '); event.preventDefault();">Φ</button>
+
+                <button class="math-btn" onmousedown="window.insertMath('\\pi '); event.preventDefault();">π</button>
+                <button class="math-btn" onmousedown="window.insertMath('\\epsilon_{0} '); event.preventDefault();">ε₀</button>
+                <button class="math-btn" onmousedown="window.insertMath('\\mu_{0} '); event.preventDefault();">μ₀</button>
+                <button class="math-btn" onmousedown="window.insertMath('h '); event.preventDefault();">h</button>
+                <button class="math-btn" onmousedown="window.insertMath('\\hbar '); event.preventDefault();">ℏ</button>
+
+                <button class="math-btn" onmousedown="window.insertMath('\\times '); event.preventDefault();">×</button>
+                <button class="math-btn" onmousedown="window.insertMath('\\xrightarrow{} '); event.preventDefault();">→</button>
+                <button class="math-btn" onmousedown="window.insertMath('\\rightleftharpoons '); event.preventDefault();">⇌</button>
+                <button class="math-btn" onmousedown="window.insertMath('^{\\circ}\\text{C} '); event.preventDefault();">°C</button>
+                <button class="math-btn" onmousedown="window.insertMath('\\Delta H '); event.preventDefault();">ΔH</button>
             </div>
 
-            <div class="mt-2 pt-3 border-t border-slate-800 flex gap-3">
+            <div class="mt-2 pt-3 border-t border-slate-800 flex gap-3 shrink-0">
                 <button onmousedown="window.stepForwardMath(); event.preventDefault();" class="flex-1 bg-slate-800 hover:bg-slate-700 text-gray-400 font-bold uppercase tracking-widest text-xs py-2.5 rounded-lg transition shadow-inner">
                     → Step Out
                 </button>
                 <button onmousedown="window.finishMathBlock(); event.preventDefault();" class="flex-1 bg-emerald-500/20 hover:bg-emerald-500 hover:text-slate-900 text-emerald-400 border border-emerald-500/30 font-black uppercase tracking-widest text-xs py-2.5 rounded-lg transition shadow-[0_0_15px_rgba(16,185,129,0.2)] flex items-center justify-center gap-2">
-                    <i data-lucide="check-check" width="16" height="16"></i> Complete Formula
+                    <i data-lucide="check-check" width="16" height="16"></i> Complete
                 </button>
             </div>
 
