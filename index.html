@@ -929,9 +929,8 @@
             return Math.floor((today - past) / (1000 * 60 * 60 * 24));
         }
         function getDirectiveCycle() {
-            const d = getISTDateObj();
-            if (d.getHours() >= 22) d.setDate(d.getDate() + 1);
-            return formatDateStr(d);
+            // Unlocked to Midnight: Cycle only pushes forward at 00:00 natively.
+            return formatDateStr(getISTDateObj());
         }
 
         // --- FIREBASE SYNC ---
@@ -1263,17 +1262,34 @@
             } else { msgBox.classList.add('hidden'); }
 
             const inputsDiv = document.getElementById('directive-inputs'), execDiv = document.getElementById('directive-execution'), lockBtn = document.getElementById('btn-lock-directive'), statusSpan = document.getElementById('directive-status');
+            const container = document.getElementById('directive-container');
+            
+            const now = getISTDateObj();
+            const isRedZone = now.getHours() === 23 && !state.directive.locked;
+
+            // Midnight Judgement Protocol: Neon Pulse Trigger
+            if (isRedZone) {
+                container.className = "bg-[#0f172a] rounded-2xl p-6 border-2 border-danger shadow-[0_0_30px_rgba(220,38,38,0.3)] relative overflow-hidden transition-all duration-500";
+            } else {
+                container.className = "bg-[#0f172a] rounded-2xl p-6 border border-slate-700 shadow-2xl relative overflow-hidden transition-all duration-500";
+            }
+
             if (state.directive.locked) {
                 inputsDiv.classList.add('hidden'); lockBtn.classList.add('hidden'); execDiv.classList.remove('hidden');
-                statusSpan.innerText = "LOCKED"; statusSpan.className = "text-[10px] font-bold bg-danger/20 text-danger px-2 py-1 rounded border border-danger/30";
+                statusSpan.innerText = "LOCKED"; statusSpan.className = "text-[10px] font-bold bg-emerald-900/40 text-emerald-400 px-2 py-1 rounded border border-emerald-500/30";
                 execDiv.innerHTML = state.directive.tasks.map(t => `<div class="flex items-start gap-3 py-3 px-4 bg-slate-900/50 rounded-lg border border-slate-700/50"><label class="flex items-center gap-3 cursor-pointer cyber-checkbox pt-0.5"><input type="checkbox" ${t.done ? 'checked' : ''} onchange="window.toggleDirectiveTask('${t.id}')"><div class="box"></div></label><span class="text-sm font-medium leading-snug transition-colors duration-300 ${t.done ? 'text-slate-500 line-through' : 'text-gray-200'}">${t.text}</span></div>`).join('');
             } else {
                 inputsDiv.classList.remove('hidden'); lockBtn.classList.remove('hidden'); execDiv.classList.add('hidden');
-                statusSpan.innerText = "UNLOCKED"; statusSpan.className = "text-[10px] font-bold bg-slate-800 text-gray-400 px-2 py-1 rounded border border-slate-700";
+                if (isRedZone) {
+                    statusSpan.innerHTML = `<span id="directive-countdown" class="flex items-center gap-1 font-mono tracking-widest"><i data-lucide="timer" width="10" height="10" class="animate-pulse"></i> 59:59</span>`; 
+                    statusSpan.className = "text-[10px] font-black bg-danger/20 text-danger px-2 py-1 rounded border border-danger animate-pulse shadow-inner";
+                } else {
+                    statusSpan.innerText = "UNLOCKED"; statusSpan.className = "text-[10px] font-bold bg-slate-800 text-gray-400 px-2 py-1 rounded border border-slate-700";
+                }
                 window.validateDirective();
             }
             lucide.createIcons();
-        }
+    }
 
         function renderHeatmap() {
             const container = document.getElementById('heatmap-container'); container.innerHTML = ''; const istDate = getISTDateObj();
@@ -1975,6 +1991,14 @@
             setTimeout(() => { overlay.classList.add('hidden'); overlay.classList.remove('flex', 'flex-col'); }, 1000);
         };
 
+        window.resetCrucibleTest = function() {
+            if (confirm("⚠️ TEST PURGE INITIATED. This will delete all 200 Hard Crucible data and return you to the War Cry Manifesto. Proceed?")) {
+                delete state.crucible;
+                saveData();
+                window.renderCrucible();
+            }
+        };
+        
         window.renderCrucible = function() {
             const container = document.getElementById('tab-crucible'); if(!container) return;
             
@@ -2011,7 +2035,85 @@
 
             const winRate = currentDayNum > 1 ? Math.round((passedCount / (currentDayNum - 1)) * 100) : 100;
 
-            container.innerHTML = `<div class="glass-card rounded-2xl p-6 mb-6 border border-red-900/30 relative overflow-hidden"><div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-red-600 to-red-900"></div><div class="flex justify-between items-end"><div><h2 class="text-xs text-red-500 uppercase tracking-widest font-black mb-1 flex items-center gap-2"><i data-lucide="target" width="14" height="14"></i> Protocol Active</h2><div class="text-3xl font-black text-white tracking-tighter">DAY ${currentDayNum} <span class="text-gray-600 text-xl">/ 200</span></div></div><div class="text-right flex flex-col items-end"><div class="text-[10px] text-gray-500 uppercase font-bold tracking-widest mb-1">Target: Jan 2027</div><div class="text-xl font-bold text-red-400 mb-2">${daysLeft} DAYS LEFT</div><button onclick="window.triggerEmergency()" class="bg-red-900/40 hover:bg-red-600 text-red-500 hover:text-white border border-red-500/30 px-3 py-1 rounded text-[9px] font-black uppercase tracking-widest transition flex items-center gap-1 shadow-[0_0_10px_rgba(220,38,38,0.2)]"><i data-lucide="skull" width="12" height="12"></i> SHATTER GLASS</button></div></div></div><div class="bg-[#090e17] border border-slate-800 rounded-2xl p-6 mb-6"><h3 class="text-sm text-gray-300 font-black uppercase tracking-widest mb-5 border-b border-slate-800 pb-3">The Iron Oath (Day ${currentDayNum})</h3>${currentLog.locked ? `<div class="text-center py-6"><div class="inline-flex items-center justify-center w-16 h-16 rounded-full ${currentLog.passed ? 'bg-emerald-500/20 text-emerald-400' : 'bg-red-500/20 text-red-500'} mb-4"><i data-lucide="${currentLog.passed ? 'check' : 'x'}" width="32" height="32"></i></div><h3 class="text-xl font-black ${currentLog.passed ? 'text-emerald-400' : 'text-red-500'} uppercase tracking-widest mb-2">${currentLog.passed ? 'DAY CONQUERED' : 'DAY FAILED'}</h3><p class="text-gray-500 text-sm">Status locked for ${todayStr}.</p></div>` : `<div class="flex flex-col gap-4 mb-6">${[{id:'o1', text:'12:00 AM to 7:00 AM strict sleep cycle'},{id:'o2', text:'Minimum 6 hours total sleep'},{id:'o3', text:'Zero digital distractions in study blocks'},{id:'o4', text:'Physical exercise (Heart rate elevated)'},{id:'o5', text:'70+ PYQs explicitly solved & reviewed'}].map(o => `<label class="flex items-center gap-3 cursor-pointer group"><input type="checkbox" id="crucible-${o.id}" class="w-5 h-5 rounded bg-slate-900 border-slate-700 text-red-500 focus:ring-red-500" ${currentLog[o.id] ? 'checked' : ''} onchange="window.toggleCrucibleOath('${o.id}')"><span class="text-sm font-bold text-gray-400 group-hover:text-gray-200 transition">${o.text}</span></label>`).join('')}</div><button onclick="window.lockCrucibleDay()" class="w-full bg-red-900/20 text-red-500 hover:bg-red-600 hover:text-white border border-red-900/50 font-black py-4 rounded-xl uppercase tracking-widest transition duration-300">Lock In Day</button>`}</div><div class="glass-card rounded-2xl p-6 border border-slate-800"><div class="flex justify-between items-center mb-4"><h3 class="text-[10px] text-gray-500 uppercase tracking-widest font-bold">Titan Grid (Win Rate: ${winRate}%)</h3></div><div class="flex flex-wrap gap-1.5 justify-start">${gridHtml}</div></div>`;
+            container.innerHTML = `
+                <div class="glass-card rounded-2xl p-6 mb-6 border border-red-900/30 relative overflow-hidden">
+                    <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-red-600 to-red-900"></div>
+                    <div class="flex justify-between items-end">
+                        <div> 
+                            <h2 class="text-xs text-red-500 uppercase tracking-widest font-black mb-1 flex items-center gap-2">
+                                <i data-lucide="target" width="14" height="14"></i> Protocol Active
+                            </h2>
+                            <div class="text-3xl font-black text-white tracking-tighter">
+                                DAY ${currentDayNum} 
+                                <span class="text-gray-600 text-xl">/ 200</span>
+                            </div>
+                        </div>
+                        <div class="text-right flex flex-col items-end">
+                            <div class="text-[10px] text-gray-500 uppercase font-bold tracking-widest mb-1">
+                                Target: Jan 2027
+                            </div>
+                            <div class="text-xl font-bold text-red-400 mb-2">
+                                ${daysLeft} DAYS LEFT
+                            </div>
+                            <div class="flex gap-2">
+                                <button onclick="window.triggerEmergency()" class="bg-red-900/40 hover:bg-red-600 text-red-500 hover:text-white border border-red-500/30 px-3 py-1 rounded text-[9px] font-black uppercase tracking-widest transition flex items-center gap-1 shadow-[0_0_10px_rgba(220,38,38,0.2)]">
+                                    <i data-lucide="skull" width="12" height="12"></i> SHATTER GLASS
+                                </button>
+                                <button onclick="window.resetCrucibleTest()" class="bg-slate-800 hover:bg-danger text-gray-400 hover:text-white border border-slate-700 px-3 py-1 rounded text-[9px] font-black uppercase tracking-widest transition flex items-center gap-1 shadow-[0_0_10px_rgba(0,0,0,0.5)]">
+                                    <i data-lucide="trash-2" width="12" height="12"></i> TEST PURGE
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-[#090e17] border border-slate-800 rounded-2xl p-6 mb-6">
+                    <h3 class="text-sm text-gray-300 font-black uppercase tracking-widest mb-5 border-b border-slate-800 pb-3">
+                        The Iron Oath (Day ${currentDayNum})
+                    </h3>
+                    
+                    ${currentLog.locked ? `
+                        <div class="text-center py-6">
+                            <div class="inline-flex items-center justify-center w-16 h-16 rounded-full ${currentLog.passed ? 'bg-emerald-500/20 text-emerald-400' : 'bg-red-500/20 text-red-500'} mb-4">
+                                <i data-lucide="${currentLog.passed ? 'check' : 'x'}" width="32" height="32"></i>
+                            </div>
+                            <h3 class="text-xl font-black ${currentLog.passed ? 'text-emerald-400' : 'text-red-500'} uppercase tracking-widest mb-2">
+                                ${currentLog.passed ? 'DAY CONQUERED' : 'DAY FAILED'}
+                            </h3>
+                            <p class="text-gray-500 text-sm">Status locked for ${todayStr}.</p>
+                        </div>
+                    ` : `
+                        <div class="flex flex-col gap-4 mb-6">
+                            ${[
+                                { id: 'o1', text: '12:00 AM to 7:00 AM strict sleep cycle' },
+                                { id: 'o2', text: 'Minimum 6 hours total sleep' },
+                                { id: 'o3', text: 'Zero digital distractions in study blocks' },
+                                { id: 'o4', text: 'Physical exercise (Heart rate elevated)' },
+                                { id: 'o5', text: '70+ PYQs explicitly solved & reviewed' }
+                            ].map(o => `
+                                <label class="flex items-center gap-3 cursor-pointer group">
+                                    <input type="checkbox" id="crucible-${o.id}" class="w-5 h-5 rounded bg-slate-900 border-slate-700 text-red-500 focus:ring-red-500" ${currentLog[o.id] ? 'checked' : ''} onchange="window.toggleCrucibleOath('${o.id}')">
+                                    <span class="text-sm font-bold text-gray-400 group-hover:text-gray-200 transition">${o.text}</span>
+                                </label>
+                            `).join('')}
+                        </div>
+                        <button onclick="window.lockCrucibleDay()" class="w-full bg-red-900/20 text-red-500 hover:bg-red-600 hover:text-white border border-red-900/50 font-black py-4 rounded-xl uppercase tracking-widest transition duration-300">
+                            Lock In Day
+                        </button>
+                    `}
+                </div>
+
+                <div class="glass-card rounded-2xl p-6 border border-slate-800">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-[10px] text-gray-500 uppercase tracking-widest font-bold">
+                            Titan Grid (Win Rate: ${winRate}%)
+                        </h3>
+                    </div>
+                    <div class="flex flex-wrap gap-1.5 justify-start">
+                        ${gridHtml}
+                    </div>
+                </div>
+            `;
             lucide.createIcons();
         };
 
@@ -2115,17 +2217,32 @@
             lucide.createIcons();
         }
 
+       // --- LIVE T-MINUS ENGINE (JUDGEMENT PROTOCOL) ---
+        setInterval(() => {
+            const countdownEl = document.getElementById('directive-countdown');
+            if (countdownEl) {
+                const now = getISTDateObj();
+                if (now.getHours() === 23) {
+                    const mins = String(59 - now.getMinutes()).padStart(2, '0');
+                    const secs = String(59 - now.getSeconds()).padStart(2, '0');
+                    countdownEl.innerHTML = `<i data-lucide="timer" width="10" height="10" class="animate-pulse"></i> T-MINUS ${mins}:${secs}`;
+                    lucide.createIcons();
+                }
+            }
+        }, 1000);
+        
         // --- AUTOMATED BACKGROUND ENGINE ---
         setInterval(() => { 
             if (document.getElementById('db-status').innerText.includes("Uplink Secured")) { updateGlobalUI(); }
             
             const now = getISTDateObj(), hours = now.getHours(), minutes = now.getMinutes();
             
-            if (hours === 21 && minutes === 45 && state.directive && !state.directive.locked) { 
-                window.sendCriticalAlert("⚠️ DIRECTIVE WARNING", "It is 9:45 PM. You have 15 minutes to lock your Nightly Directive!"); 
-            }
             if (hours === 23 && minutes === 0) { 
-                window.sendCriticalAlert("🔓 PROTOCOL UNLOCKED", "It is 11:00 PM. You may now secure your active habit streaks."); 
+                if (state.directive && !state.directive.locked) {
+                    window.sendCriticalAlert("⚠️ JUDGEMENT HOUR", "It is 11:00 PM. The Red Zone is active. Secure your Directive before Midnight!"); 
+                } else {
+                    window.sendCriticalAlert("🔓 PROTOCOL UNLOCKED", "It is 11:00 PM. You may now secure your active habit streaks and Oaths."); 
+                }
             }
 
             // CRUCIBLE MORNING AUTO-AUDIT (Runs automatically every minute)
