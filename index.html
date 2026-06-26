@@ -884,6 +884,37 @@
         </div>
     </div>
 
+    <div id="grid-modal-overlay" class="fixed inset-0 z-[100] flex items-center justify-center bg-[#090e17]/80 backdrop-blur-md hidden opacity-0 transition-opacity duration-300">
+        <div class="glass-card w-full max-w-sm mx-4 rounded-2xl p-6 border border-slate-700 shadow-[0_0_50px_rgba(0,0,0,0.8)] relative transform scale-95 transition-transform duration-300" id="grid-modal-content">
+            
+            <button onclick="window.closeGridDetails()" class="absolute top-4 right-4 text-gray-500 hover:text-white transition">
+                <i data-lucide="x" width="20" height="20"></i>
+            </button>
+            
+            <div class="flex items-center gap-2 mb-1">
+                <i data-lucide="database" width="14" height="14" class="text-accent"></i>
+                <h3 class="text-[10px] text-accent font-black uppercase tracking-widest">Titan Grid Archive</h3>
+            </div>
+            
+            <div class="text-3xl font-black text-white tracking-tighter mb-1" id="gmodal-day">DAY 0 / 200</div>
+            <div class="text-xs text-gray-400 font-bold uppercase tracking-widest mb-6" id="gmodal-date">Monday, Jan 1, 2026</div>
+            
+            <div class="mb-5">
+                <div class="text-[9px] text-gray-500 uppercase tracking-widest font-bold mb-1.5">Node Status</div>
+                <div id="gmodal-status" class="text-xs font-black px-3 py-1.5 rounded inline-block uppercase tracking-widest">STATUS HERE</div>
+            </div>
+            
+            <div class="pt-4 border-t border-slate-800">
+                <div class="text-[9px] text-gray-500 uppercase tracking-widest font-bold mb-1 flex items-center gap-1">
+                    <i data-lucide="terminal" width="10" height="10"></i> War Room Log
+                </div>
+                <div class="text-sm text-gray-400 font-medium italic" id="gmodal-log">
+                    (Debrief terminal deploying in Phase 2...)
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
@@ -2021,23 +2052,69 @@
 
         window.showGridDetails = function(dayNum, dateStr) {
             const log = state.crucible.logs ? state.crucible.logs[dateStr] : null;
+            
+            // Format the date beautifully (e.g., "Wednesday, July 12, 2026")
             const dateObj = new Date(dateStr);
             const days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
-            const dayName = days[dateObj.getDay()];
+            const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+            const dateFormatted = `${days[dateObj.getDay()]}, ${months[dateObj.getMonth()]} ${dateObj.getDate()}, ${dateObj.getFullYear()}`;
             
             const currentDayNum = getDaysDiffIST(state.crucible.startDate) + 1;
             
-            let status = "AWAITING DEPLOYMENT";
+            let statusText = "AWAITING DEPLOYMENT";
+            let statusClass = "bg-slate-800 text-gray-400 border border-slate-700";
+            
+            // Determine exact status and apply styling
             if (log && log.locked) {
-                status = log.passed ? "DAY CONQUERED" : "DAY FAILED";
+                if (log.passed) {
+                    statusText = "DAY CONQUERED";
+                    statusClass = "bg-emerald-900/40 text-emerald-400 border border-emerald-500/50 shadow-[0_0_15px_rgba(16,185,129,0.2)]";
+                } else {
+                    statusText = "DAY FAILED";
+                    statusClass = "bg-red-900/40 text-red-500 border border-red-500/50 shadow-[0_0_15px_rgba(220,38,38,0.2)]";
+                }
             } else if (dayNum === currentDayNum) {
-                status = "PROTOCOL ACTIVE (IN PROGRESS)";
+                statusText = "PROTOCOL ACTIVE";
+                statusClass = "bg-blue-900/40 text-blue-400 border border-blue-500/50 animate-pulse";
             } else if (dayNum < currentDayNum) {
-                status = "DATA MISSING / SKIPPED";
+                statusText = "DATA MISSING";
+                statusClass = "bg-slate-800 text-slate-500 border border-slate-700";
             }
 
-            // Phase 1 Alert (Will be upgraded to a glassmorphism modal in Phase 2)
-            alert(`TITAN GRID ARCHIVE\n\nDAY ${dayNum} / 200\nDate: ${dayName}, ${dateStr}\nStatus: ${status}\n\n(War Room Debrief UI deploying in Phase 2)`);
+            // Inject data into the modal HTML
+            document.getElementById('gmodal-day').innerText = `DAY ${dayNum} / 200`;
+            document.getElementById('gmodal-date').innerText = dateFormatted;
+            
+            const statusEl = document.getElementById('gmodal-status');
+            statusEl.innerText = statusText;
+            statusEl.className = `text-xs font-black px-3 py-1.5 rounded inline-block uppercase tracking-widest ${statusClass}`;
+            
+            // Animate the modal into view
+            const overlay = document.getElementById('grid-modal-overlay');
+            const content = document.getElementById('grid-modal-content');
+            overlay.classList.remove('hidden');
+            
+            // Small delay to trigger the CSS transition
+            setTimeout(() => {
+                overlay.classList.remove('opacity-0');
+                content.classList.remove('scale-95');
+            }, 10);
+            
+            lucide.createIcons();
+        };
+
+        window.closeGridDetails = function() {
+            const overlay = document.getElementById('grid-modal-overlay');
+            const content = document.getElementById('grid-modal-content');
+            
+            // Animate out
+            overlay.classList.add('opacity-0');
+            content.classList.add('scale-95');
+            
+            // Hide completely after animation finishes
+            setTimeout(() => {
+                overlay.classList.add('hidden');
+            }, 300);
         };
         
         window.renderCrucible = function() {
