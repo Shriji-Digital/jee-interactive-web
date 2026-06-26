@@ -1239,7 +1239,7 @@
         window.lockDirective = function () {
             const t1 = document.getElementById('dir-1').value.trim(), t2 = document.getElementById('dir-2').value.trim(), t3 = document.getElementById('dir-3').value.trim();
             if (t1.length < 20 || t2.length < 20 || t3.length < 20) return;
-            if (confirm("Lock Directive? This CANNOT be changed until the 10 PM reset. Proceed?")) {
+            if (confirm("Lock Directive? This CANNOT be changed until Midnight. Proceed?")) {
                 state.directive.locked = true;
                 state.directive.tasks = [{ id: 'dt1', text: t1, done: false }, { id: 'dt2', text: t2, done: false }, { id: 'dt3', text: t3, done: false }];
                 saveData(); renderDirective();
@@ -1248,7 +1248,12 @@
 
         window.toggleDirectiveTask = function (taskId) {
             const t = state.directive.tasks.find(x => x.id === taskId);
-            if (t) { t.done = !t.done; if (state.directive.tasks.every(x => x.done)) confetti({ particleCount: 80, spread: 60 }); saveData(); renderDirective(); }
+            if (t) { 
+                t.done = !t.done; 
+                if (state.directive.tasks.every(x => x.done)) confetti({ particleCount: 80, spread: 60 }); 
+                saveData(); 
+                renderDirective(); // Instantly update UI when box is clicked
+            }
         };
 
         function renderDirective() {
@@ -1265,9 +1270,13 @@
             const container = document.getElementById('directive-container');
             
             const now = getISTDateObj();
-            const isRedZone = now.getHours() === 23 && !state.directive.locked;
+            
+            // BUGFIX 1: Check if tasks are BOTH defined AND 100% completed.
+            const allTasksDone = state.directive.locked && state.directive.tasks && state.directive.tasks.length === 3 && state.directive.tasks.every(t => t.done);
+            
+            // BUGFIX 2: Red Zone triggers at 11 PM if you haven't finished everything!
+            const isRedZone = now.getHours() === 23 && !allTasksDone;
 
-            // Midnight Judgement Protocol: Neon Pulse Trigger
             if (isRedZone) {
                 container.className = "bg-[#0f172a] rounded-2xl p-6 border-2 border-danger shadow-[0_0_30px_rgba(220,38,38,0.3)] relative overflow-hidden transition-all duration-500";
             } else {
@@ -1276,12 +1285,23 @@
 
             if (state.directive.locked) {
                 inputsDiv.classList.add('hidden'); lockBtn.classList.add('hidden'); execDiv.classList.remove('hidden');
-                statusSpan.innerText = "LOCKED"; statusSpan.className = "text-[10px] font-bold bg-emerald-900/40 text-emerald-400 px-2 py-1 rounded border border-emerald-500/30";
+                
+                if (isRedZone) {
+                    statusSpan.innerHTML = `<span id="directive-countdown" class="flex items-center gap-1 font-mono tracking-widest text-danger"><i data-lucide="timer" width="10" height="10" class="animate-pulse"></i> 59:59</span>`; 
+                    statusSpan.className = "text-[10px] font-black bg-danger/20 text-danger px-2 py-1 rounded border border-danger animate-pulse shadow-inner";
+                } else {
+                    if (allTasksDone) {
+                        statusSpan.innerText = "SECURED"; statusSpan.className = "text-[10px] font-bold bg-emerald-900/40 text-emerald-400 px-2 py-1 rounded border border-emerald-500/30 shadow-[0_0_10px_rgba(16,185,129,0.2)]";
+                    } else {
+                        statusSpan.innerText = "LOCKED"; statusSpan.className = "text-[10px] font-bold bg-slate-800 text-gray-400 px-2 py-1 rounded border border-slate-700";
+                    }
+                }
+                
                 execDiv.innerHTML = state.directive.tasks.map(t => `<div class="flex items-start gap-3 py-3 px-4 bg-slate-900/50 rounded-lg border border-slate-700/50"><label class="flex items-center gap-3 cursor-pointer cyber-checkbox pt-0.5"><input type="checkbox" ${t.done ? 'checked' : ''} onchange="window.toggleDirectiveTask('${t.id}')"><div class="box"></div></label><span class="text-sm font-medium leading-snug transition-colors duration-300 ${t.done ? 'text-slate-500 line-through' : 'text-gray-200'}">${t.text}</span></div>`).join('');
             } else {
                 inputsDiv.classList.remove('hidden'); lockBtn.classList.remove('hidden'); execDiv.classList.add('hidden');
                 if (isRedZone) {
-                    statusSpan.innerHTML = `<span id="directive-countdown" class="flex items-center gap-1 font-mono tracking-widest"><i data-lucide="timer" width="10" height="10" class="animate-pulse"></i> 59:59</span>`; 
+                    statusSpan.innerHTML = `<span id="directive-countdown" class="flex items-center gap-1 font-mono tracking-widest text-danger"><i data-lucide="timer" width="10" height="10" class="animate-pulse"></i> 59:59</span>`; 
                     statusSpan.className = "text-[10px] font-black bg-danger/20 text-danger px-2 py-1 rounded border border-danger animate-pulse shadow-inner";
                 } else {
                     statusSpan.innerText = "UNLOCKED"; statusSpan.className = "text-[10px] font-bold bg-slate-800 text-gray-400 px-2 py-1 rounded border border-slate-700";
@@ -1289,7 +1309,7 @@
                 window.validateDirective();
             }
             lucide.createIcons();
-    }
+        }
 
         function renderHeatmap() {
             const container = document.getElementById('heatmap-container'); container.innerHTML = ''; const istDate = getISTDateObj();
@@ -2245,20 +2265,30 @@
         }, 1000);
         
         // --- AUTOMATED BACKGROUND ENGINE ---
+        // 1. The 60-Second Master Check (Handles Alerts, Data Audits, and Midnight Rollover)
         setInterval(() => { 
             if (document.getElementById('db-status').innerText.includes("Uplink Secured")) { updateGlobalUI(); }
             
             const now = getISTDateObj(), hours = now.getHours(), minutes = now.getMinutes();
             
-            if (hours === 23 && minutes === 0) { 
-                if (state.directive && !state.directive.locked) {
-                    window.sendCriticalAlert("⚠️ JUDGEMENT HOUR", "It is 11:00 PM. The Red Zone is active. Secure your Directive before Midnight!"); 
-                } else {
-                    window.sendCriticalAlert("🔓 PROTOCOL UNLOCKED", "It is 11:00 PM. You may now secure your active habit streaks and Oaths."); 
-                }
+            // DIRECTIVE LIVE MIDNIGHT RESET
+            const currentCycle = getDirectiveCycle();
+            if (state.directive && state.directive.cycleKey < currentCycle) {
+                let msgText = ""; let msgType = ""; let xpChange = 0;
+                if (state.directive.locked) {
+                    const allDone = state.directive.tasks.length === 3 && state.directive.tasks.every(t => t.done);
+                    if (allDone) { xpChange = 50; msgText = "DIRECTIVE SECURED: +50 XP"; msgType = "success"; }
+                    else { xpChange = -100; msgText = "DIRECTIVE BREACHED (Incomplete): -100 XP"; msgType = "danger"; }
+                } else { xpChange = -50; msgText = "DIRECTIVE MISSED (Not Locked): -50 XP"; msgType = "warning"; }
+
+                state.xp = Math.max(0, state.xp + xpChange);
+                const [y, m, d] = state.directive.cycleKey.split('-');
+                const expiryTs = new Date(`${y}-${m}-${d}T23:00:00+05:30`).getTime();
+                state.directive = { cycleKey: currentCycle, locked: false, tasks: [], message: { text: msgText, type: msgType, expiresAt: expiryTs } };
+                saveData(); renderDirective();
             }
 
-            // CRUCIBLE MORNING AUTO-AUDIT (Runs automatically every minute)
+            // CRUCIBLE MORNING AUTO-AUDIT
             if (state.crucible && state.crucible.active && state.crucible.logs) {
                 const todayStr = getTodayStr();
                 let crucibleChanged = false;
@@ -2275,9 +2305,32 @@
                 });
                 if (crucibleChanged) saveData();
             }
+
+            // SMART ALERTS
+            if (hours === 23 && minutes === 0) { 
+                const allDone = state.directive && state.directive.locked && state.directive.tasks.length === 3 && state.directive.tasks.every(t => t.done);
+                if (!allDone) {
+                    window.sendCriticalAlert("⚠️ JUDGEMENT HOUR", "It is 11:00 PM. The Red Zone is active. Secure your Directive before Midnight!"); 
+                } else {
+                    window.sendCriticalAlert("🔓 PROTOCOL UNLOCKED", "It is 11:00 PM. You may now secure your active habit streaks and Oaths."); 
+                }
+            }
         }, 60000);
+
+        // 2. The 1-Second Live Countdown (Only handles the T-Minus display)
+        setInterval(() => {
+            const countdownEl = document.getElementById('directive-countdown');
+            if (countdownEl) {
+                const now = getISTDateObj();
+                if (now.getHours() === 23) {
+                    const mins = String(59 - now.getMinutes()).padStart(2, '0');
+                    const secs = String(59 - now.getSeconds()).padStart(2, '0');
+                    countdownEl.innerHTML = `<i data-lucide="timer" width="10" height="10" class="animate-pulse"></i> T-MINUS ${mins}:${secs}`;
+                    lucide.createIcons();
+                }
+            }
+        }, 1000);
 
     </script>
 </body>
-
 </html>
