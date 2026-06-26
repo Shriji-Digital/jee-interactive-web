@@ -2018,6 +2018,27 @@
                 window.renderCrucible();
             }
         };
+
+        window.showGridDetails = function(dayNum, dateStr) {
+            const log = state.crucible.logs ? state.crucible.logs[dateStr] : null;
+            const dateObj = new Date(dateStr);
+            const days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+            const dayName = days[dateObj.getDay()];
+            
+            const currentDayNum = getDaysDiffIST(state.crucible.startDate) + 1;
+            
+            let status = "AWAITING DEPLOYMENT";
+            if (log && log.locked) {
+                status = log.passed ? "DAY CONQUERED" : "DAY FAILED";
+            } else if (dayNum === currentDayNum) {
+                status = "PROTOCOL ACTIVE (IN PROGRESS)";
+            } else if (dayNum < currentDayNum) {
+                status = "DATA MISSING / SKIPPED";
+            }
+
+            // Phase 1 Alert (Will be upgraded to a glassmorphism modal in Phase 2)
+            alert(`TITAN GRID ARCHIVE\n\nDAY ${dayNum} / 200\nDate: ${dayName}, ${dateStr}\nStatus: ${status}\n\n(War Room Debrief UI deploying in Phase 2)`);
+        };
         
         window.renderCrucible = function() {
             const container = document.getElementById('tab-crucible'); if(!container) return;
@@ -2039,23 +2060,35 @@
             const startParts = state.crucible.startDate.split('-'); // IST Safe Split
 
             for(let i=1; i<=200; i++) {
-                const d = new Date(startParts[0], startParts[1] - 1, startParts[2]); 
+                const d = new Date(startParts[0], startParts[1] - 1, startParts[2]);
                 d.setDate(d.getDate() + (i - 1));
-                const dayStr = formatDateStr(d); 
+                const dayStr = formatDateStr(d);
                 const dayLog = state.crucible.logs[dayStr];
-                
-                let boxClass = "bg-slate-900 border-slate-800"; 
-                if (i > currentDayNum) { /* Future */ } 
-                else if (i === currentDayNum) {
-                    if (dayLog && dayLog.locked) { boxClass = dayLog.passed ? "bg-emerald-500 border-emerald-400 shadow-[0_0_10px_rgba(16,185,129,0.5)]" : "bg-red-600 border-red-500 shadow-[0_0_10px_rgba(220,38,38,0.5)]"; if (dayLog.passed) passedCount++; } 
-                    else { boxClass = "bg-slate-800 border-red-500/50 animate-pulse"; } 
-                } else {
-                    if (dayLog && dayLog.locked) { boxClass = dayLog.passed ? "bg-emerald-500 border-emerald-400" : "bg-red-600 border-red-500"; if (dayLog.passed) passedCount++; } 
-                    else { boxClass = "bg-red-900 border-red-800 opacity-50"; } // Failed Day
-                }
-                gridHtml += `<div class="w-3 h-3 md:w-4 md:h-4 rounded-[2px] border ${boxClass}" title="Day ${i}: ${dayStr}"></div>`;
-            }
 
+                // UI UPGRADE: Larger boxes, interactive hover scaling, and pointer cursor
+                let boxClass = "w-4 h-4 md:w-5 md:h-5 rounded-[2px] border transition-all duration-300 hover:scale-125 cursor-pointer ";
+
+                if (i > currentDayNum) {
+                    boxClass += "bg-transparent border-slate-800";
+                } else if (i === currentDayNum) {
+                    if (dayLog && dayLog.locked) {
+                        if (dayLog.passed) { boxClass += "bg-emerald-500/20 border-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]"; passedCount++; }
+                        else { boxClass += "bg-red-500/20 border-red-500"; }
+                    } else {
+                        boxClass += "bg-slate-800 border-slate-500 animate-pulse";
+                    }
+                } else {
+                    if (dayLog && dayLog.locked) {
+                        if (dayLog.passed) { boxClass += "bg-emerald-900/40 border-emerald-700 hover:bg-emerald-500/50"; passedCount++; }
+                        else { boxClass += "bg-red-900/20 border-red-900 hover:bg-red-500/50"; }
+                    } else {
+                        boxClass += "bg-slate-900 border-slate-800"; // Missed/Skipped days
+                    }
+                }
+
+                // Converted <div> to <button> and injected the window.showGridDetails trigger
+                gridHtml += `<button onclick="window.showGridDetails(${i}, '${dayStr}')" class="${boxClass}" title="Day ${i}"></button>`;
+            }
             const winRate = currentDayNum > 1 ? Math.round((passedCount / (currentDayNum - 1)) * 100) : 100;
 
             container.innerHTML = `
@@ -2172,7 +2205,7 @@
                 
             if (confirm(msg)) {
                 log.locked = true; log.passed = passed;
-                if (passed) state.xp += 200; 
+                if (passed) state.xp += 25; 
                 saveData(); window.renderCrucible();
             }
         };
@@ -2298,7 +2331,7 @@
                         if (!log.locked) {
                             log.locked = true;
                             log.passed = log.o1 && log.o2 && log.o3 && log.o4 && log.o5;
-                            if (log.passed) state.xp += 200; 
+                            if (log.passed) state.xp += 25; 
                             crucibleChanged = true;
                         }
                     }
