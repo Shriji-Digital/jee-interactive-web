@@ -2398,6 +2398,12 @@
         window.sealCrucibleDay = function() {
             const debrief = document.getElementById('war-room-input').value.trim();
             const todayStr = getTodayStr();
+            
+            // BUGFIX: If memory for today is completely blank (e.g., locking a failed day), initialize it first.
+            if (!state.crucible.logs[todayStr]) {
+                state.crucible.logs[todayStr] = { o1:false, o2:false, o3:false, o4:false, o5:false, locked: false, passed: false };
+            }
+            
             const log = state.crucible.logs[todayStr];
             
             log.debrief = debrief || "No debrief recorded."; // Save the journal entry
@@ -2406,7 +2412,7 @@
             
             if (log.passed) {
                 state.xp += 25; // Phase 1 Calibrated Grind
-                confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
+                if (typeof confetti === 'function') confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
             }
             
             saveData();
