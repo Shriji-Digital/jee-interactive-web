@@ -2225,7 +2225,8 @@
                                 { id: 'o2', text: 'Minimum 6 hours total sleep' },
                                 { id: 'o3', text: 'Zero digital distractions in study blocks' },
                                 { id: 'o4', text: 'Physical exercise (Heart rate elevated)' },
-                                { id: 'o5', text: '70+ PYQs explicitly solved & reviewed' }
+                                { id: 'o5', text: '70+ PYQs explicitly solved & reviewed' },
+                                { id: 'o6', text: 'Hard Grind to secure IIT Seat' }
                             ].map(o => `
                                 <label class="flex items-center gap-3 cursor-pointer group">
                                     <input type="checkbox" id="crucible-${o.id}" class="w-5 h-5 rounded bg-slate-900 border-slate-700 text-red-500 focus:ring-red-500" ${currentLog[o.id] ? 'checked' : ''} onchange="window.toggleCrucibleOath('${o.id}')">
