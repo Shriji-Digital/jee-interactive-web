@@ -2191,7 +2191,8 @@
                 // Converted <div> to <button> and injected the window.showGridDetails trigger
                 gridHtml += `<button onclick="window.showGridDetails(${i}, '${dayStr}')" class="${boxClass}" title="Day ${i}"></button>`;
             }
-            const winRate = currentDayNum > 1 ? Math.round((passedCount / (currentDayNum - 1)) * 100) : 100;
+            const totalAttempted = (currentLog && currentLog.locked) ? currentDayNum : Math.max(0, currentDayNum - 1);
+            const winRate = totalAttempted > 0 ? Math.round((passedCount / totalAttempted) * 100) : 100;
 
             // --- STREAK ENGINE & AESTHETIC EVOLUTION ---
             let currentStreak = 0;
