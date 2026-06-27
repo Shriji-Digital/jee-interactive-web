@@ -909,7 +909,7 @@
                     <i data-lucide="terminal" width="10" height="10"></i> War Room Log
                 </div>
                 <div class="text-sm text-gray-400 font-medium italic" id="gmodal-log">
-                    (Debrief terminal deploying in Phase 2...)
+                    Retrieving encrypted log...
                 </div>
             </div>
         </div>
@@ -2193,17 +2193,57 @@
             }
             const winRate = currentDayNum > 1 ? Math.round((passedCount / (currentDayNum - 1)) * 100) : 100;
 
+            // --- STREAK ENGINE & AESTHETIC EVOLUTION ---
+            let currentStreak = 0;
+            const startPartsStr = state.crucible.startDate.split('-');
+            for (let i = currentDayNum; i >= 1; i--) {
+                const d = new Date(startPartsStr[0], startPartsStr[1] - 1, startPartsStr[2]);
+                d.setDate(d.getDate() + (i - 1));
+                const dLog = state.crucible.logs[formatDateStr(d)];
+                
+                // If checking today, only count it if it's already locked and passed
+                if (i === currentDayNum) {
+                    if (dLog && dLog.locked && dLog.passed) currentStreak++;
+                } else {
+                    if (dLog && dLog.locked && dLog.passed) currentStreak++;
+                    else break; // Streak broken!
+                }
+            }
+
+            // Determine UI Glow based on Streak Tier
+            let glowClass = "from-red-600 to-red-900"; 
+            let textGlow = "text-red-500";
+            let activeText = "Protocol Active";
+            
+            if (currentStreak >= 50) {
+                glowClass = "from-orange-400 to-red-600 shadow-[0_0_20px_rgba(249,115,22,0.6)]";
+                textGlow = "text-orange-400 text-shadow-glow";
+                activeText = "Protocol Ignited (50+ Streak)";
+            } else if (currentStreak >= 30) {
+                glowClass = "from-purple-500 to-purple-900 shadow-[0_0_20px_rgba(168,85,247,0.5)]";
+                textGlow = "text-purple-400";
+                activeText = "Matrix Locked (30+ Streak)";
+            } else if (currentStreak >= 14) {
+                glowClass = "from-blue-400 to-blue-800 shadow-[0_0_20px_rgba(96,165,250,0.5)]";
+                textGlow = "text-blue-400";
+                activeText = "Plasma State (14+ Streak)";
+            }
+
             container.innerHTML = `
-                <div class="glass-card rounded-2xl p-6 mb-6 border border-red-900/30 relative overflow-hidden">
-                    <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-red-600 to-red-900"></div>
+                <!-- TOP HEADER CARD (PROTOCOL ACTIVE) -->
+                <div class="glass-card rounded-2xl p-6 mb-6 border border-slate-800 relative overflow-hidden transition-all duration-1000">
+                    <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r ${glowClass} transition-all duration-1000"></div>
                     <div class="flex justify-between items-end">
                         <div> 
-                            <h2 class="text-xs text-red-500 uppercase tracking-widest font-black mb-1 flex items-center gap-2">
-                                <i data-lucide="target" width="14" height="14"></i> Protocol Active
+                            <h2 class="text-xs ${textGlow} uppercase tracking-widest font-black mb-1 flex items-center gap-2 transition-colors duration-1000">
+                                <i data-lucide="target" width="14" height="14"></i> ${activeText}
                             </h2>
-                            <div class="text-3xl font-black text-white tracking-tighter">
+                            <div class="text-3xl font-black text-white tracking-tighter flex items-baseline gap-2">
                                 DAY ${currentDayNum} 
                                 <span class="text-gray-600 text-xl">/ 200</span>
+                            </div>
+                            <div class="text-[10px] text-gray-400 font-bold tracking-widest mt-1">
+                                CURRENT STREAK: <span class="text-white">${currentStreak} DAYS</span>
                             </div>
                         </div>
                         <div class="text-right flex flex-col items-end">
