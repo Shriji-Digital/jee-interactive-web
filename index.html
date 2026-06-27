@@ -915,6 +915,29 @@
         </div>
     </div>
 
+    <div id="war-room-overlay" class="fixed inset-0 z-[110] flex items-center justify-center bg-[#090e17]/90 backdrop-blur-xl hidden opacity-0 transition-opacity duration-300">
+        <div class="glass-card w-full max-w-lg mx-4 rounded-2xl p-6 border border-slate-700 shadow-[0_0_50px_rgba(0,0,0,0.9)] relative transform scale-95 transition-transform duration-300" id="war-room-content">
+            
+            <div class="flex items-center gap-2 mb-4 border-b border-slate-800 pb-3">
+                <i data-lucide="terminal" width="16" height="16" class="text-accent"></i>
+                <h3 class="text-xs text-accent font-black uppercase tracking-widest">War Room Interrogation</h3>
+            </div>
+            
+            <div class="text-xl font-black text-white tracking-tight mb-4" id="war-room-q">
+                What concept broke your focus today?
+            </div>
+            
+            <textarea id="war-room-input" rows="3" placeholder="Log your debrief here... (Be brutally honest)" class="w-full bg-[#0f172a] text-gray-200 text-sm p-4 rounded-xl border border-slate-700 outline-none focus:border-accent shadow-inner resize-none transition-colors mb-4"></textarea>
+            
+            <div class="flex justify-end gap-3">
+                <button onclick="window.closeWarRoom()" class="text-[10px] uppercase tracking-widest text-gray-500 hover:text-white font-bold transition px-4 py-2">Cancel</button>
+                <button onclick="window.sealCrucibleDay()" class="bg-red-900/20 hover:bg-red-600 text-red-500 hover:text-white border border-red-900/50 px-6 py-2 rounded-lg text-[10px] font-black uppercase tracking-widest transition flex items-center gap-2 shadow-[0_0_15px_rgba(220,38,38,0.2)]">
+                    <i data-lucide="database" width="14" height="14"></i> Seal Database
+                </button>
+            </div>
+        </div>
+    </div>
+
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
@@ -2269,23 +2292,49 @@
             // It will push to the cloud automatically when you hit "Lock In Day".
         };
 
+        window.closeWarRoom = function() {
+            document.getElementById('war-room-overlay').classList.add('opacity-0');
+            document.getElementById('war-room-content').classList.add('scale-95');
+            setTimeout(() => document.getElementById('war-room-overlay').classList.add('hidden'), 300);
+        };
+
         window.lockCrucibleDay = function() {
-            // Allows manual lock only between 11 PM and midnight, but fallback auto-audit covers you if you sleep early.
-            if (!isTimeWindowValid()) { alert("STRICT DISCIPLINE PROTOCOL: Secure daily oaths only between 11:00 PM and Midnight (IST)."); return; }
+            const questions = [
+                "Where did your focus break today?",
+                "What concept exposed your weakness?",
+                "Did you leave any effort on the table?",
+                "What was your biggest distraction today?"
+            ];
+            document.getElementById('war-room-q').innerText = questions[Math.floor(Math.random() * questions.length)];
+            document.getElementById('war-room-input').value = '';
             
+            const overlay = document.getElementById('war-room-overlay');
+            const content = document.getElementById('war-room-content');
+            overlay.classList.remove('hidden');
+            setTimeout(() => {
+                overlay.classList.remove('opacity-0');
+                content.classList.remove('scale-95');
+                document.getElementById('war-room-input').focus();
+            }, 10);
+        };
+
+        window.sealCrucibleDay = function() {
+            const debrief = document.getElementById('war-room-input').value.trim();
             const todayStr = getTodayStr();
-            if (!state.crucible.logs) state.crucible.logs = {};
-            if (!state.crucible.logs[todayStr]) state.crucible.logs[todayStr] = { o1:false, o2:false, o3:false, o4:false, o5:false, locked: false, passed: false };
-            
             const log = state.crucible.logs[todayStr];
-            const passed = log.o1 && log.o2 && log.o3 && log.o4 && log.o5;
-            const msg = passed ? "All 5 Oaths Secured. Lock in a VICTORY for today?" : "WARNING: You missed oaths. Locking now will mark today as a FAILURE in the Titan Grid. Proceed?";
-                
-            if (confirm(msg)) {
-                log.locked = true; log.passed = passed;
-                if (passed) state.xp += 25; 
-                saveData(); window.renderCrucible();
+            
+            log.debrief = debrief || "No debrief recorded."; // Save the journal entry
+            log.locked = true;
+            log.passed = log.o1 && log.o2 && log.o3 && log.o4 && log.o5;
+            
+            if (log.passed) {
+                state.xp += 25; // Phase 1 Calibrated Grind
+                confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
             }
+            
+            saveData();
+            window.closeWarRoom();
+            setTimeout(() => window.renderCrucible(), 300);
         };
 
         window.buyShield = function() {
