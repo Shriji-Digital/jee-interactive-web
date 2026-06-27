@@ -2115,6 +2115,8 @@
             // Animate the modal into view
             const overlay = document.getElementById('grid-modal-overlay');
             const content = document.getElementById('grid-modal-content');
+            // Inject War Room Debrief
+            document.getElementById('gmodal-log').innerText = (log && log.debrief) ? log.debrief : "No debrief recorded for this cycle.";
             overlay.classList.remove('hidden');
             
             // Small delay to trigger the CSS transition
@@ -2226,41 +2228,76 @@
                     </div>
                 </div>
 
-                <div class="bg-[#090e17] border border-slate-800 rounded-2xl p-6 mb-6">
-                    <h3 class="text-sm text-gray-300 font-black uppercase tracking-widest mb-5 border-b border-slate-800 pb-3">
-                        The Iron Oath (Day ${currentDayNum})
-                    </h3>
+                <div class="bg-[#090e17] border border-slate-800 rounded-2xl p-6 mb-6 relative">
                     
-                    ${currentLog.locked ? `
-                        <div class="text-center py-6">
-                            <div class="inline-flex items-center justify-center w-16 h-16 rounded-full ${currentLog.passed ? 'bg-emerald-500/20 text-emerald-400' : 'bg-red-500/20 text-red-500'} mb-4">
-                                <i data-lucide="${currentLog.passed ? 'check' : 'x'}" width="32" height="32"></i>
-                            </div>
-                            <h3 class="text-xl font-black ${currentLog.passed ? 'text-emerald-400' : 'text-red-500'} uppercase tracking-widest mb-2">
-                                ${currentLog.passed ? 'DAY CONQUERED' : 'DAY FAILED'}
+                    ${(() => {
+                        // Relapse Tax Logic
+                        let taxActive = false;
+                        if (currentDayNum > 1 && !currentLog.locked) {
+                            const yesterdayDate = new Date(state.crucible.startDate);
+                            yesterdayDate.setDate(yesterdayDate.getDate() + (currentDayNum - 2));
+                            const yLog = state.crucible.logs[formatDateStr(yesterdayDate)];
+                            if (yLog && yLog.locked && !yLog.passed) { taxActive = true; }
+                        }
+                        const isTaxPaid = currentLog.taxPaid || false;
+                        const blockOaths = taxActive && !isTaxPaid;
+
+                        window.payTax = function() {
+                            state.crucible.logs[getTodayStr()].taxPaid = true;
+                            localStorage.setItem('jee_ghost_backup', JSON.stringify(state)); // Instant local save
+                            window.renderCrucible(); // Unlock UI
+                        };
+
+                        return `
+                            <h3 class="text-sm text-gray-300 font-black uppercase tracking-widest mb-5 border-b border-slate-800 pb-3">
+                                The Iron Oath (Day ${currentDayNum})
                             </h3>
-                            <p class="text-gray-500 text-sm">Status locked for ${todayStr}.</p>
-                        </div>
-                    ` : `
-                        <div class="flex flex-col gap-4 mb-6">
-                            ${[
-                                { id: 'o1', text: '12:00 AM to 7:00 AM strict sleep cycle' },
-                                { id: 'o2', text: 'Minimum 6 hours total sleep' },
-                                { id: 'o3', text: 'Zero digital distractions in study blocks' },
-                                { id: 'o4', text: 'Physical exercise (Heart rate elevated)' },
-                                { id: 'o5', text: '70+ PYQs explicitly solved & reviewed' },
-                                { id: 'o6', text: 'Hard Grind to secure IIT Seat' }
-                            ].map(o => `
-                                <label class="flex items-center gap-3 cursor-pointer group">
-                                    <input type="checkbox" id="crucible-${o.id}" class="w-5 h-5 rounded bg-slate-900 border-slate-700 text-red-500 focus:ring-red-500" ${currentLog[o.id] ? 'checked' : ''} onchange="window.toggleCrucibleOath('${o.id}')">
-                                    <span class="text-sm font-bold text-gray-400 group-hover:text-gray-200 transition">${o.text}</span>
-                                </label>
-                            `).join('')}
-                        </div>
-                        <button onclick="window.lockCrucibleDay()" class="w-full bg-red-900/20 text-red-500 hover:bg-red-600 hover:text-white border border-red-900/50 font-black py-4 rounded-xl uppercase tracking-widest transition duration-300">
-                            Lock In Day
-                        </button>
-                    `}
+                            
+                            ${taxActive && !isTaxPaid ? `
+                                <div class="bg-red-900/20 border-l-4 border-red-500 p-4 mb-6 rounded-r-lg">
+                                    <div class="text-red-500 text-[10px] font-black uppercase tracking-widest mb-2 flex items-center gap-2">
+                                        <i data-lucide="alert-triangle" width="14" height="14"></i> Relapse Tax Active
+                                    </div>
+                                    <p class="text-sm text-gray-300 mb-3 font-medium">You failed yesterday's Directive. The current cycle is locked until you pay the toll.</p>
+                                    <label class="flex items-center gap-3 cursor-pointer group bg-[#0f172a] p-3 rounded border border-red-900/50">
+                                        <input type="checkbox" onchange="window.payTax()" class="w-5 h-5 rounded bg-slate-900 border-red-700 text-red-500 focus:ring-red-500">
+                                        <span class="text-sm font-bold text-red-400 group-hover:text-red-300 transition">Solve 15 extra Physics PYQs</span>
+                                    </label>
+                                </div>
+                            ` : ''}
+
+                            ${currentLog.locked ? `
+                                <div class="text-center py-6">
+                                    <div class="inline-flex items-center justify-center w-16 h-16 rounded-full ${currentLog.passed ? 'bg-emerald-500/20 text-emerald-400' : 'bg-red-500/20 text-red-500'} mb-4">
+                                        <i data-lucide="${currentLog.passed ? 'check' : 'x'}" width="32" height="32"></i>
+                                    </div>
+                                    <h3 class="text-xl font-black ${currentLog.passed ? 'text-emerald-400' : 'text-red-500'} uppercase tracking-widest mb-2">
+                                        ${currentLog.passed ? 'DAY CONQUERED' : 'DAY FAILED'}
+                                    </h3>
+                                    <p class="text-gray-500 text-sm">Status locked for ${todayStr}.</p>
+                                </div>
+                            ` : `
+                                <div class="flex flex-col gap-4 mb-6 ${blockOaths ? 'opacity-30 pointer-events-none grayscale' : ''} transition-all duration-300">
+                                    ${[
+                                        { id: 'o1', text: '12:00 AM to 7:00 AM strict sleep cycle' },
+                                        { id: 'o2', text: 'Minimum 6 hours total sleep' },
+                                        { id: 'o3', text: 'Zero digital distractions in study blocks' },
+                                        { id: 'o4', text: 'Physical exercise (Heart rate elevated)' },
+                                        { id: 'o5', text: '70+ PYQs explicitly solved & reviewed' },
+                                        { id: 'o6', text: 'Hard Grind to secure IIT Seat' }
+                                    ].map(o => `
+                                        <label class="flex items-center gap-3 cursor-pointer group">
+                                            <input type="checkbox" id="crucible-${o.id}" class="w-5 h-5 rounded bg-slate-900 border-slate-700 text-red-500 focus:ring-red-500" ${currentLog[o.id] ? 'checked' : ''} onchange="window.toggleCrucibleOath('${o.id}')">
+                                            <span class="text-sm font-bold text-gray-400 group-hover:text-gray-200 transition">${o.text}</span>
+                                        </label>
+                                    `).join('')}
+                                </div>
+                                <button onclick="window.lockCrucibleDay()" class="w-full ${blockOaths ? 'bg-slate-900 text-slate-700 border border-slate-800 pointer-events-none' : 'bg-red-900/20 text-red-500 hover:bg-red-600 hover:text-white border border-red-900/50'} font-black py-4 rounded-xl uppercase tracking-widest transition duration-300">
+                                    ${blockOaths ? 'OATHS LOCKED' : 'Lock In Day'}
+                                </button>
+                            `}
+                        `;
+                    })()}
                 </div>
 
                 <div class="glass-card rounded-2xl p-6 border border-slate-800">
