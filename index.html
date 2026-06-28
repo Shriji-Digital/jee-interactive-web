@@ -2269,6 +2269,7 @@
                     </div>
                 </div>
 
+                <!-- MIDDLE CARD (THE IRON OATHS & RELAPSE TAX) -->
                 <div class="bg-[#090e17] border border-slate-800 rounded-2xl p-6 mb-6 relative">
                     
                     ${(() => {
@@ -2283,10 +2284,25 @@
                         const isTaxPaid = currentLog.taxPaid || false;
                         const blockOaths = taxActive && !isTaxPaid;
 
+                        // UPGRADE: Dynamic Tax Generator
+                        const penalties = [
+                            "Solve 15 extra Physics PYQs",
+                            "30 mins deep Class 11 Revision",
+                            "Derive 5 complex formulas from scratch",
+                            "Solve 10 Advanced Math problems",
+                            "Read NCERT Chemistry for 30 minutes"
+                        ];
+                        // Automatically selects a different punishment based on the day number
+                        const penaltyTask = penalties[currentDayNum % penalties.length];
+
+                        // CRASH FIX: Ensure today's log memory exists before saving tax status
                         window.payTax = function() {
-                            state.crucible.logs[getTodayStr()].taxPaid = true;
-                            localStorage.setItem('jee_ghost_backup', JSON.stringify(state)); // Instant local save
-                            window.renderCrucible(); // Unlock UI
+                            if (!state.crucible.logs[todayStr]) {
+                                state.crucible.logs[todayStr] = { o1:false, o2:false, o3:false, o4:false, o5:false, locked: false, passed: false };
+                            }
+                            state.crucible.logs[todayStr].taxPaid = true;
+                            if (typeof saveData === 'function') saveData(); 
+                            window.renderCrucible(); // Instantly unlocks the UI
                         };
 
                         return `
@@ -2295,6 +2311,7 @@
                             </h3>
                             
                             ${taxActive && !isTaxPaid ? `
+                                <!-- RELAPSE TAX WARNING -->
                                 <div class="bg-red-900/20 border-l-4 border-red-500 p-4 mb-6 rounded-r-lg">
                                     <div class="text-red-500 text-[10px] font-black uppercase tracking-widest mb-2 flex items-center gap-2">
                                         <i data-lucide="alert-triangle" width="14" height="14"></i> Relapse Tax Active
@@ -2302,7 +2319,7 @@
                                     <p class="text-sm text-gray-300 mb-3 font-medium">You failed yesterday's Directive. The current cycle is locked until you pay the toll.</p>
                                     <label class="flex items-center gap-3 cursor-pointer group bg-[#0f172a] p-3 rounded border border-red-900/50">
                                         <input type="checkbox" onchange="window.payTax()" class="w-5 h-5 rounded bg-slate-900 border-red-700 text-red-500 focus:ring-red-500">
-                                        <span class="text-sm font-bold text-red-400 group-hover:text-red-300 transition">Solve 15 extra Physics PYQs</span>
+                                        <span class="text-sm font-bold text-red-400 group-hover:text-red-300 transition">${penaltyTask}</span>
                                     </label>
                                 </div>
                             ` : ''}
@@ -2318,22 +2335,22 @@
                                     <p class="text-gray-500 text-sm">Status locked for ${todayStr}.</p>
                                 </div>
                             ` : `
-                                <div class="flex flex-col gap-4 mb-6 ${blockOaths ? 'opacity-30 pointer-events-none grayscale' : ''} transition-all duration-300">
+                                <div class="flex flex-col gap-4 mb-6 ${blockOaths ? 'opacity-30 grayscale' : ''} transition-all duration-300">
                                     ${[
                                         { id: 'o1', text: '12:00 AM to 7:00 AM strict sleep cycle' },
                                         { id: 'o2', text: 'Minimum 6 hours total sleep' },
                                         { id: 'o3', text: 'Zero digital distractions in study blocks' },
                                         { id: 'o4', text: 'Physical exercise (Heart rate elevated)' },
                                         { id: 'o5', text: '70+ PYQs explicitly solved & reviewed' },
-                                        { id: 'o6', text: 'Hard Grind to secure IIT Seat' }
+                                        { id: 'o6', text: 'Hard grind to get seat in IIT Bombay' }
                                     ].map(o => `
                                         <label class="flex items-center gap-3 cursor-pointer group">
-                                            <input type="checkbox" id="crucible-${o.id}" class="w-5 h-5 rounded bg-slate-900 border-slate-700 text-red-500 focus:ring-red-500" ${currentLog[o.id] ? 'checked' : ''} onchange="window.toggleCrucibleOath('${o.id}')">
+                                            <input type="checkbox" id="crucible-${o.id}" class="w-5 h-5 rounded bg-slate-900 border-slate-700 text-red-500 focus:ring-red-500" ${currentLog[o.id] ? 'checked' : ''} onchange="window.toggleCrucibleOath('${o.id}')" ${blockOaths ? 'disabled' : ''}>
                                             <span class="text-sm font-bold text-gray-400 group-hover:text-gray-200 transition">${o.text}</span>
                                         </label>
                                     `).join('')}
                                 </div>
-                                <button onclick="window.lockCrucibleDay()" class="w-full ${blockOaths ? 'bg-slate-900 text-slate-700 border border-slate-800 pointer-events-none' : 'bg-red-900/20 text-red-500 hover:bg-red-600 hover:text-white border border-red-900/50'} font-black py-4 rounded-xl uppercase tracking-widest transition duration-300">
+                                <button onclick="window.lockCrucibleDay()" class="w-full ${blockOaths ? 'bg-slate-900 text-slate-700 border border-slate-800 cursor-not-allowed' : 'bg-red-900/20 text-red-500 hover:bg-red-600 hover:text-white border border-red-900/50'} font-black py-4 rounded-xl uppercase tracking-widest transition duration-300" ${blockOaths ? 'disabled' : ''}>
                                     ${blockOaths ? 'OATHS LOCKED' : 'Lock In Day'}
                                 </button>
                             `}
