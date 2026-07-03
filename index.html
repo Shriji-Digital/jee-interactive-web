@@ -445,6 +445,8 @@
                             class="flex-1 py-3 text-slate-600 hover:text-subjectC hover:bg-slate-800/30 border-b-2 border-transparent transition">CHEM</button>
                         <button onclick="window.setVaultSubject('math')" id="vault-tab-math"
                             class="flex-1 py-3 text-slate-600 hover:text-subjectM hover:bg-slate-800/30 border-b-2 border-transparent transition">MATH</button>
+                        <button onclick="window.setVaultSubject('dump')" id="vault-tab-dump"
+                            class="flex-1 py-3 text-slate-600 hover:text-white hover:bg-slate-800/30 border-b-2 border-transparent transition">DUMP</button>
                     </div>
 
                     <div class="flex-1 overflow-y-auto custom-scrollbar p-2" id="vault-sidebar-units"></div>
@@ -912,6 +914,71 @@
                     Retrieving encrypted log...
                 </div>
             </div>
+        </div>
+    </div>
+
+    <!-- DAILY DUMP ARCHIVE MODAL -->
+    <div id="dump-modal-overlay" class="fixed inset-0 z-[120] flex items-center justify-center bg-[#090e17]/95 backdrop-blur-xl hidden opacity-0 transition-opacity duration-300 p-4">
+        <div class="glass-card w-full max-w-4xl mx-auto rounded-2xl border border-slate-700 shadow-2xl relative transform scale-95 transition-transform duration-300 flex flex-col max-h-[90vh]" id="dump-modal-content">
+             
+             <!-- Header -->
+             <div class="p-5 md:p-6 border-b border-slate-800 flex justify-between items-center bg-slate-900/50 rounded-t-2xl shrink-0">
+                 <h2 class="text-lg md:text-2xl font-black text-white uppercase tracking-widest flex items-center gap-3"><i data-lucide="book-open" class="text-accent"></i> Daily Dump Archive</h2>
+                 <button onclick="window.closeDailyDump()" class="text-gray-500 hover:text-white transition"><i data-lucide="x" width="24" height="24"></i></button>
+             </div>
+             
+             <!-- Body (Scrollable) -->
+             <div class="p-5 md:p-8 overflow-y-auto custom-scrollbar flex-1">
+                 <input type="hidden" id="dump-date-key">
+                 
+                 <!-- Accountability Intercept (1% Delta) -->
+                 <div id="dump-intercept-box" class="hidden mb-8 bg-red-900/20 border-l-4 border-red-500 p-5 rounded-r-lg shadow-inner">
+                     <div class="text-red-500 text-[10px] font-black uppercase tracking-widest mb-2 flex items-center gap-2"><i data-lucide="alert-triangle" width="14" height="14"></i> Yesterday's 1% Delta</div>
+                     <label class="flex items-center gap-4 cursor-pointer group bg-[#090e17] p-3 rounded border border-red-900/50">
+                         <input type="checkbox" id="dump-delta-check" onchange="window.validateDumpForm()" class="w-6 h-6 rounded bg-slate-900 border-red-700 text-red-500 focus:ring-red-500">
+                         <span class="text-sm md:text-base font-bold text-red-400 group-hover:text-red-300 transition" id="dump-intercept-text"></span>
+                     </label>
+                 </div>
+
+                 <!-- Autopsy Tags -->
+                 <div class="mb-8">
+                     <h3 class="text-[10px] text-gray-500 font-bold uppercase tracking-widest mb-3">Autopsy Tags (Select all that apply)</h3>
+                     <div class="space-y-3">
+                         <div id="tags-green" class="flex flex-wrap gap-2"></div>
+                         <div id="tags-yellow" class="flex flex-wrap gap-2"></div>
+                         <div id="tags-red" class="flex flex-wrap gap-2"></div>
+                     </div>
+                 </div>
+
+                 <!-- Block 1: Timeline -->
+                 <div class="mb-8">
+                     <h3 class="text-[10px] text-blue-400 font-bold uppercase tracking-widest mb-2 flex items-center gap-2"><i data-lucide="clock" width="14" height="14"></i> The Raw Timeline</h3>
+                     <textarea id="dump-timeline" rows="5" class="w-full bg-[#05080f] border border-slate-700 rounded-xl p-4 text-gray-200 text-sm font-medium outline-none focus:border-blue-500 transition shadow-inner custom-scrollbar resize-none" placeholder="9:00 AM - 12:00 PM: Coaching..."></textarea>
+                 </div>
+
+                 <!-- Block 2: The Splitter -->
+                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                     <div>
+                         <h3 class="text-[10px] text-emerald-400 font-bold uppercase tracking-widest mb-2 flex items-center gap-2"><i data-lucide="trending-up" width="14" height="14"></i> Panel A: The Momentum</h3>
+                         <textarea id="dump-wins" rows="4" class="w-full bg-emerald-900/10 border border-emerald-900/50 rounded-xl p-4 text-emerald-100 text-sm font-medium outline-none focus:border-emerald-500 transition shadow-inner custom-scrollbar resize-none" placeholder="What went flawlessly today?"></textarea>
+                     </div>
+                     <div>
+                         <h3 class="text-[10px] text-red-400 font-bold uppercase tracking-widest mb-2 flex items-center gap-2"><i data-lucide="trending-down" width="14" height="14"></i> Panel B: The Leaks</h3>
+                         <textarea id="dump-leaks" rows="4" class="w-full bg-red-900/10 border border-red-900/50 rounded-xl p-4 text-red-100 text-sm font-medium outline-none focus:border-red-500 transition shadow-inner custom-scrollbar resize-none" placeholder="Where did your discipline break down?"></textarea>
+                     </div>
+                 </div>
+
+                 <!-- Block 3: The 1% Delta -->
+                 <div>
+                     <h3 class="text-[10px] text-warning font-bold uppercase tracking-widest mb-2 flex items-center gap-2"><i data-lucide="target" width="14" height="14"></i> The 1% Correction</h3>
+                     <input type="text" id="dump-delta" class="w-full bg-amber-900/10 border border-amber-900/50 rounded-xl p-4 text-amber-100 text-sm font-bold outline-none focus:border-amber-500 transition shadow-inner" placeholder="Tomorrow, I will change exactly ONE thing: ...">
+                 </div>
+             </div>
+             
+             <!-- Footer -->
+             <div class="p-5 md:p-6 border-t border-slate-800 bg-slate-900/50 rounded-b-2xl flex justify-end shrink-0">
+                 <button id="btn-save-dump" onclick="window.saveDailyDump()" class="bg-accent hover:bg-emerald-400 text-slate-900 font-black px-8 py-3 rounded-xl uppercase tracking-widest transition shadow-[0_0_15px_rgba(16,185,129,0.3)] disabled:opacity-30 disabled:cursor-not-allowed">Seal Archive</button>
+             </div>
         </div>
     </div>
 
@@ -1430,14 +1497,15 @@
 
         window.setVaultSubject = function (subject) {
             currentVaultSubject = subject; currentVaultUnit = null;
-            ['phy', 'chem', 'math'].forEach(sub => {
+            ['phy', 'chem', 'math', 'dump'].forEach(sub => {
                 const btn = document.getElementById(`vault-tab-${sub}`);
                 if (!btn) return;
                 if (sub === subject) {
                     btn.classList.add('text-white', `border-subject${sub === 'phy' ? 'P' : sub === 'chem' ? 'C' : 'M'}`, 'bg-slate-800/50');
+                    if (sub === 'dump') btn.classList.replace('border-subjectM', 'border-accent');
                     btn.classList.remove('text-slate-600', 'border-transparent');
                 } else {
-                    btn.classList.remove('text-white', 'border-subjectP', 'border-subjectC', 'border-subjectM', 'bg-slate-800/50');
+                    btn.classList.remove('text-white', 'border-subjectP', 'border-subjectC', 'border-subjectM', 'border-accent', 'bg-slate-800/50');
                     btn.classList.add('text-slate-600', 'border-transparent');
                 }
             });
@@ -1674,6 +1742,11 @@
         };
 
         window.renderVaultData = function () {
+            // HIJACK: If Dump Tab is selected, route to the Daily Dump Engine instead of standard Vault
+            if (currentVaultSubject === 'dump') {
+                if (window.renderDailyDumpFeed) window.renderDailyDumpFeed();
+                return;
+            }
             const subjectKey = getVaultKey();
             if (!state.vault[subjectKey]) state.vault[subjectKey] = { units: [] };
             const units = state.vault[subjectKey].units || [];
@@ -1765,6 +1838,130 @@
                 });
             }
         };
+
+        // --- THE DAILY DUMP ENGINE ---
+        const DUMP_TAGS = {
+            green: ['Deep Flow State', 'Zero Distractions', '100% PYQ Target', 'Math Breakthrough', 'Physics Mastered', 'Perfect Sleep Cycle', 'Coaching Fully Grasped', 'Early Start', 'High Energy', 'Target Crushed'],
+            yellow: ['Mild Fatigue', 'Slow Calculation', 'Lingering Doubts', 'Slipping Schedule', 'Extended Breaks', 'Phone Temptation', 'Late Wakeup', 'Over-Planning', 'Daydreaming', 'Minor Burnout'],
+            red: ['Doomscrolling', 'Skipped PYQs', 'Sleep Cycle Broken', 'Concept Surrender', 'Zero Focus', 'Heavy Procrastination', 'Junk Food Crash', 'Total Burnout', 'Anxiety Spike', 'Wasted Block']
+        };
+        let activeDumpTags = [];
+
+        window.renderDailyDumpFeed = function() {
+            if (!state.dailyDumps) state.dailyDumps = {};
+            const sidebarContainer = document.getElementById('vault-sidebar-units');
+            const canvasContainer = document.getElementById('vault-canvas-content');
+            
+            sidebarContainer.innerHTML = `<div class="p-4"><button onclick="window.openDailyDump('${getTodayStr()}')" class="w-full bg-accent hover:bg-emerald-400 text-slate-900 py-4 rounded-xl text-xs font-black uppercase tracking-widest transition shadow-[0_0_20px_rgba(16,185,129,0.3)] flex items-center justify-center gap-2"><i data-lucide="plus-circle" width="16" height="16"></i> Log Today</button></div>`;
+            
+            const dumpDates = Object.keys(state.dailyDumps).sort((a, b) => new Date(b) - new Date(a));
+            let html = `<div class="mb-10 flex items-center gap-3"><i data-lucide="book-open" class="text-accent" width="32" height="32"></i><h1 class="text-3xl md:text-5xl font-black text-white uppercase tracking-tighter">Daily Dumps</h1></div>`;
+            
+            if (dumpDates.length === 0) {
+                html += `<div class="text-slate-600 italic mt-10 font-medium tracking-wide">No daily dumps recorded. Start your autopsy today.</div>`;
+            } else {
+                html += `<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">`;
+                dumpDates.forEach(d => {
+                    const dump = state.dailyDumps[d];
+                    const dateObj = new Date(d);
+                    const dayName = dateObj.toLocaleDateString('en-US', { weekday: 'long' });
+                    const previewTags = (dump.tags || []).slice(0, 3).map(tag => {
+                        let colorClass = 'bg-slate-800 text-slate-400';
+                        if (DUMP_TAGS.green.includes(tag)) colorClass = 'bg-emerald-900/30 text-emerald-400 border border-emerald-500/20';
+                        if (DUMP_TAGS.yellow.includes(tag)) colorClass = 'bg-amber-900/30 text-amber-400 border border-amber-500/20';
+                        if (DUMP_TAGS.red.includes(tag)) colorClass = 'bg-red-900/30 text-red-400 border border-red-500/20';
+                        return `<span class="text-[9px] px-2 py-0.5 rounded font-bold uppercase ${colorClass}">${tag}</span>`;
+                    }).join('');
+                    const extraTags = (dump.tags || []).length > 3 ? `<span class="text-[9px] text-gray-500 font-bold">+${dump.tags.length - 3}</span>` : '';
+
+                    html += `<div onclick="window.openDailyDump('${d}')" class="glass-card rounded-2xl p-6 cursor-pointer hover:bg-slate-800/60 transition group border border-slate-700/50 hover:border-slate-500 relative overflow-hidden">
+                        ${d === getTodayStr() ? `<div class="absolute top-0 left-0 w-full h-1 bg-accent"></div>` : ''}
+                        <div class="text-xs text-accent font-black uppercase tracking-widest mb-1">${dayName}</div>
+                        <div class="text-2xl font-black text-white mb-4 tracking-tight">${formatDisplayDate(d)}</div>
+                        <div class="flex flex-wrap gap-1.5 items-center">${previewTags} ${extraTags}</div>
+                    </div>`;
+                });
+                html += `</div>`;
+            }
+            canvasContainer.innerHTML = html; lucide.createIcons();
+        };
+
+        window.openDailyDump = function(dateStr) {
+            if (!state.dailyDumps) state.dailyDumps = {};
+            const dump = state.dailyDumps[dateStr] || { tags: [], timeline: "", wins: "", leaks: "", delta: "", deltaChecked: false };
+            
+            document.getElementById('dump-date-key').value = dateStr;
+            activeDumpTags = [...(dump.tags || [])];
+            window.renderDumpTags();
+            
+            document.getElementById('dump-timeline').value = dump.timeline || "";
+            document.getElementById('dump-wins').value = dump.wins || "";
+            document.getElementById('dump-leaks').value = dump.leaks || "";
+            document.getElementById('dump-delta').value = dump.delta || "";
+            
+            // DELTA INTERCEPT LOGIC
+            const yesterday = getYesterdayStr();
+            const yLog = state.dailyDumps[yesterday];
+            const interceptBox = document.getElementById('dump-intercept-box');
+            const check = document.getElementById('dump-delta-check');
+            
+            if (dateStr === getTodayStr() && yLog && yLog.delta && !yLog.deltaChecked) {
+                interceptBox.classList.remove('hidden');
+                document.getElementById('dump-intercept-text').innerText = yLog.delta;
+                check.checked = false;
+            } else {
+                interceptBox.classList.add('hidden');
+                check.checked = true; // safe default
+            }
+
+            window.validateDumpForm();
+            const modal = document.getElementById('dump-modal-overlay'), content = document.getElementById('dump-modal-content');
+            modal.classList.remove('hidden'); setTimeout(() => { modal.classList.remove('opacity-0'); content.classList.remove('scale-95'); }, 10);
+        };
+
+        window.renderDumpTags = function() {
+            const render = (theme, arr, containerId, activeClass, inactiveClass) => {
+                document.getElementById(containerId).innerHTML = arr.map(t => `<button onclick="window.toggleDumpTag('${t}')" class="text-[10px] font-bold uppercase px-3 py-1.5 rounded-lg transition-all duration-300 border ${activeDumpTags.includes(t) ? activeClass : inactiveClass}">${t}</button>`).join('');
+            };
+            render('green', DUMP_TAGS.green, 'tags-green', 'bg-emerald-500/20 text-emerald-400 border-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.3)]', 'bg-slate-900/50 text-slate-500 border-slate-700 hover:border-emerald-500/50');
+            render('yellow', DUMP_TAGS.yellow, 'tags-yellow', 'bg-amber-500/20 text-amber-400 border-amber-500 shadow-[0_0_10px_rgba(245,158,11,0.3)]', 'bg-slate-900/50 text-slate-500 border-slate-700 hover:border-amber-500/50');
+            render('red', DUMP_TAGS.red, 'tags-red', 'bg-red-500/20 text-red-400 border-red-500 shadow-[0_0_10px_rgba(239,68,68,0.3)]', 'bg-slate-900/50 text-slate-500 border-slate-700 hover:border-red-500/50');
+        };
+
+        window.toggleDumpTag = function(tag) {
+            if (activeDumpTags.includes(tag)) activeDumpTags = activeDumpTags.filter(t => t !== tag);
+            else activeDumpTags.push(tag);
+            window.renderDumpTags();
+        };
+
+        window.validateDumpForm = function() {
+            const btn = document.getElementById('btn-save-dump'), box = document.getElementById('dump-intercept-box'), check = document.getElementById('dump-delta-check');
+            btn.disabled = (!box.classList.contains('hidden') && !check.checked);
+        };
+
+        window.saveDailyDump = function() {
+            const dateStr = document.getElementById('dump-date-key').value;
+            const timeline = document.getElementById('dump-timeline').value.trim();
+            const wins = document.getElementById('dump-wins').value.trim();
+            const leaks = document.getElementById('dump-leaks').value.trim();
+            const delta = document.getElementById('dump-delta').value.trim();
+            
+            const box = document.getElementById('dump-intercept-box'), check = document.getElementById('dump-delta-check');
+            if (!box.classList.contains('hidden') && check.checked) state.dailyDumps[getYesterdayStr()].deltaChecked = true;
+
+            if (activeDumpTags.length > 0 || timeline || wins || leaks || delta) {
+                state.dailyDumps[dateStr] = { tags: activeDumpTags, timeline, wins, leaks, delta, deltaChecked: state.dailyDumps[dateStr] ? state.dailyDumps[dateStr].deltaChecked : false };
+            }
+            
+            saveData(); window.closeDailyDump(); if (currentVaultSubject === 'dump') window.renderDailyDumpFeed();
+        };
+
+        window.closeDailyDump = function() {
+            const modal = document.getElementById('dump-modal-overlay'), content = document.getElementById('dump-modal-content');
+            modal.classList.add('opacity-0'); content.classList.add('scale-95');
+            setTimeout(() => modal.classList.add('hidden'), 300);
+        };
+        // --- END OF DAILY DUMP ENGINE ---
 
         window.addHabit = function() {
             const name = document.getElementById('habit-name').value.trim(); 
