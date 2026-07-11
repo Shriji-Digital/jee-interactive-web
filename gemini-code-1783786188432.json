@@ -1,0 +1,2051 @@
+{
+  "boardData": [
+    {
+      "chapters": [
+        {
+          "id": "c1780237381032",
+          "name": "The Third Level",
+          "tasks": [
+            {
+              "done": true,
+              "id": "t17802373810310",
+              "name": "Chapter Reading"
+            },
+            {
+              "done": true,
+              "id": "t17802373810321",
+              "name": "Understanding true meaning and proper knowledge"
+            },
+            {
+              "done": true,
+              "id": "t17802373810322",
+              "name": "Remember keywords for answer writing"
+            },
+            {
+              "done": true,
+              "id": "t17802373810323",
+              "name": "Read and try to learn specific answer types"
+            }
+          ]
+        },
+        {
+          "id": "c1780237394880",
+          "name": "The Tiger King",
+          "tasks": [
+            {
+              "done": true,
+              "id": "t17802373948800",
+              "name": "Chapter Reading"
+            },
+            {
+              "done": true,
+              "id": "t17802373948801",
+              "name": "Understanding true meaning and proper knowledge"
+            },
+            {
+              "done": true,
+              "id": "t17802373948802",
+              "name": "Remember keywords for answer writing"
+            },
+            {
+              "done": true,
+              "id": "t17802373948803",
+              "name": "Read and try to learn specific answer types"
+            }
+          ]
+        },
+        {
+          "id": "c1780237419556",
+          "name": "The Enemy",
+          "tasks": [
+            {
+              "done": false,
+              "id": "t17802374195560",
+              "name": "Chapter Reading"
+            },
+            {
+              "done": false,
+              "id": "t17802374195561",
+              "name": "Understanding true meaning and proper knowledge"
+            },
+            {
+              "done": false,
+              "id": "t17802374195562",
+              "name": "Remember keywords for answer writing"
+            },
+            {
+              "done": false,
+              "id": "t17802374195563",
+              "name": "Read and try to learn specific answer types"
+            }
+          ]
+        },
+        {
+          "id": "c1780237428690",
+          "name": "On the Face of It",
+          "tasks": [
+            {
+              "done": false,
+              "id": "t17802374286900",
+              "name": "Chapter Reading"
+            },
+            {
+              "done": false,
+              "id": "t17802374286901",
+              "name": "Understanding true meaning and proper knowledge"
+            },
+            {
+              "done": false,
+              "id": "t17802374286902",
+              "name": "Remember keywords for answer writing"
+            },
+            {
+              "done": false,
+              "id": "t17802374286903",
+              "name": "Read and try to learn specific answer types"
+            }
+          ]
+        },
+        {
+          "id": "c1780237485052",
+          "name": "The Cutting of My Long Hair",
+          "tasks": [
+            {
+              "done": false,
+              "id": "t17802374850520",
+              "name": "Chapter Reading"
+            },
+            {
+              "done": false,
+              "id": "t17802374850521",
+              "name": "Understanding true meaning and proper knowledge"
+            },
+            {
+              "done": false,
+              "id": "t17802374850522",
+              "name": "Remember keywords for answer writing"
+            },
+            {
+              "done": false,
+              "id": "t17802374850523",
+              "name": "Read and try to learn specific answer types"
+            }
+          ]
+        },
+        {
+          "id": "c1780237493316",
+          "name": "Journey to the End of the Earth",
+          "tasks": [
+            {
+              "done": true,
+              "id": "t17802374933160",
+              "name": "Chapter Reading"
+            },
+            {
+              "done": false,
+              "id": "t17802374933161",
+              "name": "Understanding true meaning and proper knowledge"
+            },
+            {
+              "done": false,
+              "id": "t17802374933162",
+              "name": "Remember keywords for answer writing"
+            },
+            {
+              "done": false,
+              "id": "t17802374933163",
+              "name": "Read and try to learn specific answer types"
+            }
+          ]
+        },
+        {
+          "id": "c1780237503543",
+          "name": "We Too are Human Beings",
+          "tasks": [
+            {
+              "done": false,
+              "id": "t17802375035430",
+              "name": "Chapter Reading"
+            },
+            {
+              "done": false,
+              "id": "t17802375035431",
+              "name": "Understanding true meaning and proper knowledge"
+            },
+            {
+              "done": false,
+              "id": "t17802375035432",
+              "name": "Remember keywords for answer writing"
+            },
+            {
+              "done": false,
+              "id": "t17802375035433",
+              "name": "Read and try to learn specific answer types"
+            }
+          ]
+        },
+        {
+          "id": "c1780237566815",
+          "name": "My Mother at Sixty-Six",
+          "tasks": [
+            {
+              "done": false,
+              "id": "t17802375668150",
+              "name": "Chapter Reading"
+            },
+            {
+              "done": false,
+              "id": "t17802375668151",
+              "name": "Understanding true meaning and proper knowledge"
+            },
+            {
+              "done": false,
+              "id": "t17802375668152",
+              "name": "Remember keywords for answer writing"
+            },
+            {
+              "done": false,
+              "id": "t17802375668153",
+              "name": "Read and try to learn specific answer types"
+            }
+          ]
+        },
+        {
+          "id": "c1780237581472",
+          "name": "Keeping Quiet",
+          "tasks": [
+            {
+              "done": false,
+              "id": "t17802375814720",
+              "name": "Chapter Reading"
+            },
+            {
+              "done": false,
+              "id": "t17802375814721",
+              "name": "Understanding true meaning and proper knowledge"
+            },
+            {
+              "done": false,
+              "id": "t17802375814722",
+              "name": "Remember keywords for answer writing"
+            },
+            {
+              "done": false,
+              "id": "t17802375814723",
+              "name": "Read and try to learn specific answer types"
+            }
+          ]
+        },
+        {
+          "id": "c1780237595084",
+          "name": "A Thing of Beauty",
+          "tasks": [
+            {
+              "done": false,
+              "id": "t17802375950840",
+              "name": "Chapter Reading"
+            },
+            {
+              "done": false,
+              "id": "t17802375950841",
+              "name": "Understanding true meaning and proper knowledge"
+            },
+            {
+              "done": false,
+              "id": "t17802375950842",
+              "name": "Remember keywords for answer writing"
+            },
+            {
+              "done": false,
+              "id": "t17802375950843",
+              "name": "Read and try to learn specific answer types"
+            }
+          ]
+        },
+        {
+          "id": "c1780237617772",
+          "name": "A Roadside Stand",
+          "tasks": [
+            {
+              "done": false,
+              "id": "t17802376177720",
+              "name": "Chapter Reading"
+            },
+            {
+              "done": false,
+              "id": "t17802376177721",
+              "name": "Understanding true meaning and proper knowledge"
+            },
+            {
+              "done": false,
+              "id": "t17802376177722",
+              "name": "Remember keywords for answer writing"
+            },
+            {
+              "done": false,
+              "id": "t17802376177723",
+              "name": "Read and try to learn specific answer types"
+            }
+          ]
+        },
+        {
+          "id": "c1780237628490",
+          "name": "Aunt Jennifer’s Tigers",
+          "tasks": [
+            {
+              "done": false,
+              "id": "t17802376284900",
+              "name": "Chapter Reading"
+            },
+            {
+              "done": false,
+              "id": "t17802376284901",
+              "name": "Understanding true meaning and proper knowledge"
+            },
+            {
+              "done": false,
+              "id": "t17802376284902",
+              "name": "Remember keywords for answer writing"
+            },
+            {
+              "done": false,
+              "id": "t17802376284903",
+              "name": "Read and try to learn specific answer types"
+            }
+          ]
+        },
+        {
+          "id": "c1780237739253",
+          "name": "The Last Lesson",
+          "tasks": [
+            {
+              "done": true,
+              "id": "t17802377392520",
+              "name": "Chapter Reading"
+            },
+            {
+              "done": true,
+              "id": "t17802377392521",
+              "name": "Understanding true meaning and proper knowledge"
+            },
+            {
+              "done": true,
+              "id": "t17802377392522",
+              "name": "Remember keywords for answer writing"
+            },
+            {
+              "done": true,
+              "id": "t17802377392533",
+              "name": "Read and try to learn specific answer types"
+            }
+          ]
+        },
+        {
+          "id": "c1780237748535",
+          "name": "Lost Spring",
+          "tasks": [
+            {
+              "done": false,
+              "id": "t17802377485350",
+              "name": "Chapter Reading"
+            },
+            {
+              "done": false,
+              "id": "t17802377485351",
+              "name": "Understanding true meaning and proper knowledge"
+            },
+            {
+              "done": false,
+              "id": "t17802377485352",
+              "name": "Remember keywords for answer writing"
+            },
+            {
+              "done": false,
+              "id": "t17802377485353",
+              "name": "Read and try to learn specific answer types"
+            }
+          ]
+        },
+        {
+          "id": "c1780237756712",
+          "name": "Deep Water",
+          "tasks": [
+            {
+              "done": false,
+              "id": "t17802377567120",
+              "name": "Chapter Reading"
+            },
+            {
+              "done": false,
+              "id": "t17802377567121",
+              "name": "Understanding true meaning and proper knowledge"
+            },
+            {
+              "done": false,
+              "id": "t17802377567122",
+              "name": "Remember keywords for answer writing"
+            },
+            {
+              "done": false,
+              "id": "t17802377567123",
+              "name": "Read and try to learn specific answer types"
+            }
+          ]
+        },
+        {
+          "id": "c1780237769615",
+          "name": "The Rattrap",
+          "tasks": [
+            {
+              "done": false,
+              "id": "t17802377696150",
+              "name": "Chapter Reading"
+            },
+            {
+              "done": false,
+              "id": "t17802377696151",
+              "name": "Understanding true meaning and proper knowledge"
+            },
+            {
+              "done": false,
+              "id": "t17802377696152",
+              "name": "Remember keywords for answer writing"
+            },
+            {
+              "done": false,
+              "id": "t17802377696153",
+              "name": "Read and try to learn specific answer types"
+            }
+          ]
+        },
+        {
+          "id": "c1780237776464",
+          "name": "Indigo",
+          "tasks": [
+            {
+              "done": false,
+              "id": "t17802377764640",
+              "name": "Chapter Reading"
+            },
+            {
+              "done": false,
+              "id": "t17802377764641",
+              "name": "Understanding true meaning and proper knowledge"
+            },
+            {
+              "done": false,
+              "id": "t17802377764642",
+              "name": "Remember keywords for answer writing"
+            },
+            {
+              "done": false,
+              "id": "t17802377764643",
+              "name": "Read and try to learn specific answer types"
+            }
+          ]
+        },
+        {
+          "id": "c1780237785262",
+          "name": "Poets and Pancakes",
+          "tasks": [
+            {
+              "done": false,
+              "id": "t17802377852620",
+              "name": "Chapter Reading"
+            },
+            {
+              "done": false,
+              "id": "t17802377852621",
+              "name": "Understanding true meaning and proper knowledge"
+            },
+            {
+              "done": false,
+              "id": "t17802377852622",
+              "name": "Remember keywords for answer writing"
+            },
+            {
+              "done": false,
+              "id": "t17802377852623",
+              "name": "Read and try to learn specific answer types"
+            }
+          ]
+        },
+        {
+          "id": "c1780237793461",
+          "name": "The Interview",
+          "tasks": [
+            {
+              "done": false,
+              "id": "t17802377934610",
+              "name": "Chapter Reading"
+            },
+            {
+              "done": false,
+              "id": "t17802377934611",
+              "name": "Understanding true meaning and proper knowledge"
+            },
+            {
+              "done": false,
+              "id": "t17802377934612",
+              "name": "Remember keywords for answer writing"
+            },
+            {
+              "done": false,
+              "id": "t17802377934613",
+              "name": "Read and try to learn specific answer types"
+            }
+          ]
+        },
+        {
+          "id": "c1780237804162",
+          "name": "Going Places",
+          "tasks": [
+            {
+              "done": false,
+              "id": "t17802378041620",
+              "name": "Chapter Reading"
+            },
+            {
+              "done": false,
+              "id": "t17802378041621",
+              "name": "Understanding true meaning and proper knowledge"
+            },
+            {
+              "done": false,
+              "id": "t17802378041622",
+              "name": "Remember keywords for answer writing"
+            },
+            {
+              "done": false,
+              "id": "t17802378041623",
+              "name": "Read and try to learn specific answer types"
+            }
+          ]
+        }
+      ],
+      "id": "sub_English",
+      "name": "English"
+    },
+    {
+      "chapters": [
+        {
+          "id": "c1780238707678",
+          "name": "Electric Charges and Fields",
+          "tasks": [
+            {
+              "done": true,
+              "id": "t17802387076780",
+              "name": "Read NCERT"
+            },
+            {
+              "done": true,
+              "id": "t17802387076781",
+              "name": "Watch one shot lecture with notes (if required)"
+            },
+            {
+              "done": false,
+              "id": "t17802387076782",
+              "name": "Solve NCERT questions and memorise derivations"
+            },
+            {
+              "done": false,
+              "id": "t17802387076783",
+              "name": "Board PYQs"
+            }
+          ]
+        },
+        {
+          "id": "c1780238741590",
+          "name": "Electrostatic Potential and Capacitance",
+          "tasks": [
+            {
+              "done": false,
+              "id": "t17802387415900",
+              "name": "Read NCERT"
+            },
+            {
+              "done": false,
+              "id": "t17802387415901",
+              "name": "Watch one shot lecture with notes (if required)"
+            },
+            {
+              "done": false,
+              "id": "t17802387415902",
+              "name": "Solve NCERT questions and memorise derivations"
+            },
+            {
+              "done": false,
+              "id": "t17802387415903",
+              "name": "Board PYQs"
+            }
+          ]
+        },
+        {
+          "id": "c1780238753368",
+          "name": "Current Electricity",
+          "tasks": [
+            {
+              "done": true,
+              "id": "t17802387533680",
+              "name": "Read NCERT"
+            },
+            {
+              "done": true,
+              "id": "t17802387533681",
+              "name": "Watch one shot lecture with notes (if required)"
+            },
+            {
+              "done": true,
+              "id": "t17802387533682",
+              "name": "Solve NCERT questions and memorise derivations"
+            },
+            {
+              "done": true,
+              "id": "t17802387533683",
+              "name": "Board PYQs"
+            }
+          ]
+        },
+        {
+          "id": "c1780238771862",
+          "name": "Moving Charges and Magnetism",
+          "tasks": [
+            {
+              "done": true,
+              "id": "t17802387718620",
+              "name": "Read NCERT"
+            },
+            {
+              "done": true,
+              "id": "t17802387718621",
+              "name": "Watch one shot lecture with notes (if required)"
+            },
+            {
+              "done": true,
+              "id": "t17802387718622",
+              "name": "Solve NCERT questions and memorise derivations"
+            },
+            {
+              "done": true,
+              "id": "t17802387718623",
+              "name": "Board PYQs"
+            }
+          ]
+        },
+        {
+          "id": "c1780238784502",
+          "name": "Magnetism and Matter",
+          "tasks": [
+            {
+              "done": false,
+              "id": "t17802387845020",
+              "name": "Read NCERT"
+            },
+            {
+              "done": false,
+              "id": "t17802387845021",
+              "name": "Watch one shot lecture with notes (if required)"
+            },
+            {
+              "done": false,
+              "id": "t17802387845022",
+              "name": "Solve NCERT questions and memorise derivations"
+            },
+            {
+              "done": false,
+              "id": "t17802387845023",
+              "name": "Board PYQs"
+            }
+          ]
+        },
+        {
+          "id": "c1780238801312",
+          "name": "Electromagnetic Induction",
+          "tasks": [
+            {
+              "done": false,
+              "id": "t17802388013120",
+              "name": "Read NCERT"
+            },
+            {
+              "done": false,
+              "id": "t17802388013121",
+              "name": "Watch one shot lecture with notes (if required)"
+            },
+            {
+              "done": false,
+              "id": "t17802388013122",
+              "name": "Solve NCERT questions and memorise derivations"
+            },
+            {
+              "done": false,
+              "id": "t17802388013123",
+              "name": "Board PYQs"
+            }
+          ]
+        },
+        {
+          "id": "c1780238817951",
+          "name": "Alternating Current",
+          "tasks": [
+            {
+              "done": false,
+              "id": "t17802388179500",
+              "name": "Read NCERT"
+            },
+            {
+              "done": false,
+              "id": "t17802388179511",
+              "name": "Watch one shot lecture with notes (if required)"
+            },
+            {
+              "done": false,
+              "id": "t17802388179512",
+              "name": "Solve NCERT questions and memorise derivations"
+            },
+            {
+              "done": false,
+              "id": "t17802388179513",
+              "name": "Board PYQs"
+            }
+          ]
+        },
+        {
+          "id": "c1780238829700",
+          "name": "EM Waves",
+          "tasks": [
+            {
+              "done": false,
+              "id": "t17802388297000",
+              "name": "Read NCERT"
+            },
+            {
+              "done": false,
+              "id": "t17802388297001",
+              "name": "Watch one shot lecture with notes (if required)"
+            },
+            {
+              "done": false,
+              "id": "t17802388297002",
+              "name": "Solve NCERT questions and memorise derivations"
+            },
+            {
+              "done": false,
+              "id": "t17802388297003",
+              "name": "Board PYQs"
+            }
+          ]
+        },
+        {
+          "id": "c1780238900841",
+          "name": "Ray optics and Optical Instruments",
+          "tasks": [
+            {
+              "done": false,
+              "id": "t17802389008410",
+              "name": "Read NCERT"
+            },
+            {
+              "done": false,
+              "id": "t17802389008411",
+              "name": "Watch one shot lecture with notes (if required)"
+            },
+            {
+              "done": false,
+              "id": "t17802389008412",
+              "name": "Solve NCERT questions and memorise derivations"
+            },
+            {
+              "done": false,
+              "id": "t17802389008413",
+              "name": "Board PYQs"
+            }
+          ]
+        },
+        {
+          "id": "c1780238910762",
+          "name": "Wave Optics",
+          "tasks": [
+            {
+              "done": false,
+              "id": "t17802389107620",
+              "name": "Read NCERT"
+            },
+            {
+              "done": false,
+              "id": "t17802389107621",
+              "name": "Watch one shot lecture with notes (if required)"
+            },
+            {
+              "done": false,
+              "id": "t17802389107622",
+              "name": "Solve NCERT questions and memorise derivations"
+            },
+            {
+              "done": false,
+              "id": "t17802389107623",
+              "name": "Board PYQs"
+            }
+          ]
+        },
+        {
+          "id": "c1780238926881",
+          "name": "Dual nature of Radiation and Matter",
+          "tasks": [
+            {
+              "done": false,
+              "id": "t17802389268810",
+              "name": "Read NCERT"
+            },
+            {
+              "done": false,
+              "id": "t17802389268811",
+              "name": "Watch one shot lecture with notes (if required)"
+            },
+            {
+              "done": false,
+              "id": "t17802389268812",
+              "name": "Solve NCERT questions and memorise derivations"
+            },
+            {
+              "done": false,
+              "id": "t17802389268813",
+              "name": "Board PYQs"
+            }
+          ]
+        },
+        {
+          "id": "c1780238941478",
+          "name": "Atoms",
+          "tasks": [
+            {
+              "done": false,
+              "id": "t17802389414780",
+              "name": "Read NCERT"
+            },
+            {
+              "done": false,
+              "id": "t17802389414781",
+              "name": "Watch one shot lecture with notes (if required)"
+            },
+            {
+              "done": false,
+              "id": "t17802389414782",
+              "name": "Solve NCERT questions and memorise derivations"
+            },
+            {
+              "done": false,
+              "id": "t17802389414783",
+              "name": "Board PYQs"
+            }
+          ]
+        },
+        {
+          "id": "c1780238950063",
+          "name": "Nuclei",
+          "tasks": [
+            {
+              "done": false,
+              "id": "t17802389500630",
+              "name": "Read NCERT"
+            },
+            {
+              "done": false,
+              "id": "t17802389500631",
+              "name": "Watch one shot lecture with notes (if required)"
+            },
+            {
+              "done": false,
+              "id": "t17802389500632",
+              "name": "Solve NCERT questions and memorise derivations"
+            },
+            {
+              "done": false,
+              "id": "t17802389500633",
+              "name": "Board PYQs"
+            }
+          ]
+        },
+        {
+          "id": "c1780238961228",
+          "name": "Semiconductor Electronics",
+          "tasks": [
+            {
+              "done": false,
+              "id": "t17802389612280",
+              "name": "Read NCERT"
+            },
+            {
+              "done": false,
+              "id": "t17802389612281",
+              "name": "Watch one shot lecture with notes (if required)"
+            },
+            {
+              "done": false,
+              "id": "t17802389612282",
+              "name": "Solve NCERT questions and memorise derivations"
+            },
+            {
+              "done": false,
+              "id": "t17802389612283",
+              "name": "Board PYQs"
+            }
+          ]
+        }
+      ],
+      "id": "sub_Physics",
+      "name": "Physics"
+    },
+    {
+      "chapters": [
+        {
+          "id": "c1780239026560",
+          "name": "Relations and Functions",
+          "tasks": [
+            {
+              "done": true,
+              "id": "t17802390265590",
+              "name": "Solve NCERT exercises"
+            },
+            {
+              "done": false,
+              "id": "t17802390265601",
+              "name": "See proper stepwise solving as per CBSE exam"
+            },
+            {
+              "done": false,
+              "id": "t17802390265602",
+              "name": "Board PYQs"
+            }
+          ]
+        },
+        {
+          "id": "c1780239041037",
+          "name": "Inverse Trigonometric Functions",
+          "tasks": [
+            {
+              "done": true,
+              "id": "t17802390410370",
+              "name": "Solve NCERT exercises"
+            },
+            {
+              "done": false,
+              "id": "t17802390410371",
+              "name": "See proper stepwise solving as per CBSE exam"
+            },
+            {
+              "done": false,
+              "id": "t17802390410372",
+              "name": "Board PYQs"
+            }
+          ]
+        },
+        {
+          "id": "c1780239048995",
+          "name": "Matrices",
+          "tasks": [
+            {
+              "done": true,
+              "id": "t17802390489950",
+              "name": "Solve NCERT exercises"
+            },
+            {
+              "done": true,
+              "id": "t17802390489951",
+              "name": "See proper stepwise solving as per CBSE exam"
+            },
+            {
+              "done": false,
+              "id": "t17802390489952",
+              "name": "Board PYQs"
+            }
+          ]
+        },
+        {
+          "id": "c1780239055417",
+          "name": "Determinants",
+          "tasks": [
+            {
+              "done": true,
+              "id": "t17802390554170",
+              "name": "Solve NCERT exercises"
+            },
+            {
+              "done": false,
+              "id": "t17802390554171",
+              "name": "See proper stepwise solving as per CBSE exam"
+            },
+            {
+              "done": false,
+              "id": "t17802390554172",
+              "name": "Board PYQs"
+            }
+          ]
+        },
+        {
+          "id": "c1780239073622",
+          "name": "Continuity and Differentiability",
+          "tasks": [
+            {
+              "done": false,
+              "id": "t17802390736220",
+              "name": "Solve NCERT exercises"
+            },
+            {
+              "done": false,
+              "id": "t17802390736221",
+              "name": "See proper stepwise solving as per CBSE exam"
+            },
+            {
+              "done": false,
+              "id": "t17802390736222",
+              "name": "Board PYQs"
+            }
+          ]
+        },
+        {
+          "id": "c1780239090075",
+          "name": "Application of Derivatives",
+          "tasks": [
+            {
+              "done": false,
+              "id": "t17802390900750",
+              "name": "Solve NCERT exercises"
+            },
+            {
+              "done": false,
+              "id": "t17802390900751",
+              "name": "See proper stepwise solving as per CBSE exam"
+            },
+            {
+              "done": false,
+              "id": "t17802390900752",
+              "name": "Board PYQs"
+            }
+          ]
+        },
+        {
+          "id": "c1780239132881",
+          "name": "Integrals",
+          "tasks": [
+            {
+              "done": false,
+              "id": "t17802391328810",
+              "name": "Solve NCERT exercises"
+            },
+            {
+              "done": false,
+              "id": "t17802391328811",
+              "name": "See proper stepwise solving as per CBSE exam"
+            },
+            {
+              "done": false,
+              "id": "t17802391328812",
+              "name": "Board PYQs"
+            }
+          ]
+        },
+        {
+          "id": "c1780239154001",
+          "name": "Application of Integrals",
+          "tasks": [
+            {
+              "done": false,
+              "id": "t17802391540010",
+              "name": "Solve NCERT exercises"
+            },
+            {
+              "done": false,
+              "id": "t17802391540011",
+              "name": "See proper stepwise solving as per CBSE exam"
+            },
+            {
+              "done": false,
+              "id": "t17802391540012",
+              "name": "Board PYQs"
+            }
+          ]
+        },
+        {
+          "id": "c1780239168176",
+          "name": "Differential Equations",
+          "tasks": [
+            {
+              "done": false,
+              "id": "t17802391681760",
+              "name": "Solve NCERT exercises"
+            },
+            {
+              "done": false,
+              "id": "t17802391681761",
+              "name": "See proper stepwise solving as per CBSE exam"
+            },
+            {
+              "done": false,
+              "id": "t17802391681762",
+              "name": "Board PYQs"
+            }
+          ]
+        },
+        {
+          "id": "c1780239177842",
+          "name": "Vector Algebra",
+          "tasks": [
+            {
+              "done": false,
+              "id": "t17802391778420",
+              "name": "Solve NCERT exercises"
+            },
+            {
+              "done": false,
+              "id": "t17802391778421",
+              "name": "See proper stepwise solving as per CBSE exam"
+            },
+            {
+              "done": false,
+              "id": "t17802391778422",
+              "name": "Board PYQs"
+            }
+          ]
+        },
+        {
+          "id": "c1780239193248",
+          "name": "Three Dimensional Geometry",
+          "tasks": [
+            {
+              "done": false,
+              "id": "t17802391932480",
+              "name": "Solve NCERT exercises"
+            },
+            {
+              "done": false,
+              "id": "t17802391932481",
+              "name": "See proper stepwise solving as per CBSE exam"
+            },
+            {
+              "done": false,
+              "id": "t17802391932482",
+              "name": "Board PYQs"
+            }
+          ]
+        },
+        {
+          "id": "c1780239204676",
+          "name": "Linear Programming",
+          "tasks": [
+            {
+              "done": false,
+              "id": "t17802392046760",
+              "name": "Solve NCERT exercises"
+            },
+            {
+              "done": false,
+              "id": "t17802392046761",
+              "name": "See proper stepwise solving as per CBSE exam"
+            },
+            {
+              "done": false,
+              "id": "t17802392046762",
+              "name": "Board PYQs"
+            }
+          ]
+        },
+        {
+          "id": "c1780239211678",
+          "name": "Probability",
+          "tasks": [
+            {
+              "done": false,
+              "id": "t17802392116780",
+              "name": "Solve NCERT exercises"
+            },
+            {
+              "done": false,
+              "id": "t17802392116781",
+              "name": "See proper stepwise solving as per CBSE exam"
+            },
+            {
+              "done": false,
+              "id": "t17802392116782",
+              "name": "Board PYQs"
+            }
+          ]
+        }
+      ],
+      "id": "sub_Maths",
+      "name": "Maths"
+    },
+    {
+      "id": "sub_Chemistry",
+      "name": "Chemistry"
+    },
+    {
+      "id": "sub_MusicVocal(Hindustani)",
+      "name": "Music Vocal (Hindustani)"
+    }
+  ],
+  "dailyDumps": {
+    "2026-07-03": {
+      "delta": "Will try to bypass distractions.",
+      "deltaChecked": true,
+      "leaks": "Sessions distractions",
+      "tags": [
+        "Mild Fatigue",
+        "Late Wakeup",
+        "Extended Breaks",
+        "Slipping Schedule"
+      ],
+      "timeline": "Test for day 1, had routine according to tags but no time to write full",
+      "wins": "Sessions"
+    },
+    "2026-07-04": {
+      "delta": "Hhhbb",
+      "deltaChecked": false,
+      "leaks": "Hb",
+      "timeline": "Fghh",
+      "wins": "Gbg"
+    },
+    "2026-07-07": {
+      "delta": "More focus on current goals.",
+      "deltaChecked": false,
+      "leaks": "Can't fully overcome the continuing distraction.",
+      "tags": [
+        "High Energy",
+        "Mild Fatigue",
+        "Late Wakeup",
+        "Daydreaming",
+        "Skipped PYQs"
+      ],
+      "timeline": "8:00 -8:30 am : waked up and freshen up\n8:30- 9:00 am : fixed code and deployed\n9:00- 11:00 am : workout + deep study session, solutions module homework\n11:00 -12:00 am: chill and lunch \n12:00- 1:30 pm: solutions ncert one shot \n1:30 -2:30 pm: ready and coaching reached \n2:30- 4:00 pm: solutions mistake review+ maths continuity and Differentiability \n4:00- 7:00 pm: coaching lectures\n\n11:00- 12:00 pm: physics Magnetism pyqs numerical.",
+      "wins": "Broke friction and started new.\nHad a nice small comeback"
+    }
+  },
+  "directive": {
+    "cycleKey": "2026-07-11",
+    "locked": true,
+    "message": {
+      "expiresAt": 1783704600000,
+      "text": "DIRECTIVE SECURED: +50 XP",
+      "type": "success"
+    },
+    "tasks": [
+      {
+        "done": false,
+        "id": "dt1",
+        "text": "Solutions module questions round"
+      },
+      {
+        "done": false,
+        "id": "dt2",
+        "text": "Continuity and Differentiability module (grind as much as I can)"
+      },
+      {
+        "done": false,
+        "id": "dt3",
+        "text": "Carboxylic acids+aldehydes+ketones"
+      }
+    ]
+  },
+  "habits": [
+    {
+      "currentStreak": 8,
+      "id": "1783054964096",
+      "lastCompleted": "2026-07-10",
+      "maxStreak": 8,
+      "name": "Nofap {STRICT}"
+    }
+  ],
+  "lifetimeHours": 245.57999999999998,
+  "mockScores": {
+    "adv": [
+      {
+        "date": "2026-06-24",
+        "max1": 180,
+        "max2": 180,
+        "p1": 35,
+        "p2": 28
+      },
+      {
+        "date": "2026-06-26",
+        "max1": 180,
+        "max2": 180,
+        "p1": 48,
+        "p2": 35
+      },
+      {
+        "date": "2026-07-08",
+        "max1": 180,
+        "max2": 0,
+        "p1": 80,
+        "p2": 0
+      }
+    ],
+    "mains": [
+      {
+        "date": "2026-06-24",
+        "max": 300,
+        "score": 117
+      },
+      {
+        "date": "2026-06-24",
+        "max": 300,
+        "score": 195
+      },
+      {
+        "date": "2026-06-24",
+        "max": 300,
+        "score": 195
+      },
+      {
+        "date": "2026-06-24",
+        "max": 300,
+        "score": 195
+      },
+      {
+        "date": "2026-06-24",
+        "max": 300,
+        "score": 195
+      },
+      {
+        "date": "2026-06-24",
+        "max": 300,
+        "score": 195
+      },
+      {
+        "date": "2026-06-24",
+        "max": 300,
+        "score": 195
+      },
+      {
+        "date": "2026-06-24",
+        "max": 300,
+        "score": 195
+      },
+      {
+        "date": "2026-06-24",
+        "max": 300,
+        "score": 195
+      },
+      {
+        "date": "2026-06-24",
+        "max": 300,
+        "score": 195
+      },
+      {
+        "date": "2026-06-24",
+        "max": 300,
+        "score": 195
+      },
+      {
+        "date": "2026-06-24",
+        "max": 300,
+        "score": 195
+      },
+      {
+        "date": "2026-06-24",
+        "max": 300,
+        "score": 195
+      },
+      {
+        "date": "2026-06-24",
+        "max": 300,
+        "score": 195
+      },
+      {
+        "date": "2026-06-24",
+        "max": 300,
+        "score": 195
+      },
+      {
+        "date": "2026-06-24",
+        "max": 300,
+        "score": 195
+      },
+      {
+        "date": "2026-07-08",
+        "max": 300,
+        "score": 127
+      }
+    ]
+  },
+  "shields": 0,
+  "studyLogs": {
+    "2026-05-15": {
+      "c11": 0,
+      "c12": 0,
+      "m11": 0,
+      "m12": 2,
+      "p11": 0,
+      "p12": 1,
+      "test": 0
+    },
+    "2026-05-16": {
+      "board": 0,
+      "c11": 0,
+      "c12": 0,
+      "m11": 0,
+      "m12": 0,
+      "p11": 0,
+      "p12": 4,
+      "test": 0
+    },
+    "2026-05-17": {
+      "board": 0,
+      "c11": 0,
+      "c12": 2,
+      "m11": 0,
+      "m12": 2,
+      "p11": 0,
+      "p12": 1,
+      "test": 0
+    },
+    "2026-05-18": {
+      "board": 0,
+      "c11": 0,
+      "c12": 0,
+      "m11": 0,
+      "m12": 2,
+      "p11": 0,
+      "p12": 1,
+      "test": 0
+    },
+    "2026-05-19": {
+      "board": 0,
+      "c11": 0,
+      "c12": 2,
+      "m11": 0,
+      "m12": 1,
+      "p11": 0,
+      "p12": 2,
+      "test": 0
+    },
+    "2026-05-20": {
+      "board": 0,
+      "c11": 0,
+      "c12": 2,
+      "m11": 0,
+      "m12": 0,
+      "p11": 0,
+      "p12": 1,
+      "test": 0
+    },
+    "2026-05-21": {
+      "board": 0,
+      "c11": 0,
+      "c12": 0,
+      "m11": 0,
+      "m12": 2,
+      "p11": 0,
+      "p12": 3,
+      "test": 0
+    },
+    "2026-05-22": {
+      "board": 0,
+      "c11": 0,
+      "c12": 1,
+      "m11": 0,
+      "m12": 2,
+      "p11": 0,
+      "p12": 2,
+      "test": 0
+    },
+    "2026-05-25": {
+      "board": 0,
+      "c11": 0,
+      "c12": 0,
+      "m11": 0,
+      "m12": 1,
+      "p11": 0,
+      "p12": 0,
+      "test": 0
+    },
+    "2026-05-26": {
+      "board": 0,
+      "c11": 2,
+      "c12": 0,
+      "m11": 0,
+      "m12": 1,
+      "p11": 1,
+      "p12": 0,
+      "test": 0
+    },
+    "2026-05-27": {
+      "board": 0,
+      "c11": 0,
+      "c12": 1,
+      "m11": 1,
+      "m12": 1,
+      "p11": 1,
+      "p12": 2,
+      "test": 0
+    },
+    "2026-05-28": {
+      "board": 0,
+      "c11": 0,
+      "c12": 2,
+      "m11": 2,
+      "m12": 0,
+      "p11": 2,
+      "p12": 1,
+      "test": 0
+    },
+    "2026-05-29": {
+      "board": 0,
+      "c11": 0.9,
+      "c12": 0.3,
+      "m11": 1,
+      "m12": 1,
+      "p11": 0.3,
+      "p12": 0.6,
+      "test": 0
+    },
+    "2026-05-30": {
+      "board": 0,
+      "c11": 1,
+      "c12": 1,
+      "m11": 0,
+      "m12": 3,
+      "p11": 0,
+      "p12": 0,
+      "test": 0
+    },
+    "2026-05-31": {
+      "board": 2,
+      "c11": 0,
+      "c12": 0,
+      "coaching": 0,
+      "m11": 0,
+      "m12": 0,
+      "p11": 0,
+      "p12": 0,
+      "test": 6
+    },
+    "2026-06-01": {
+      "board": 2,
+      "c11": 0,
+      "c12": 0,
+      "coaching": 1.5,
+      "m11": 0,
+      "m12": 2,
+      "p11": 0,
+      "p12": 0,
+      "test": 2
+    },
+    "2026-06-02": {
+      "board": 2,
+      "c11": 0,
+      "c12": 1,
+      "coaching": 3,
+      "m11": 0,
+      "m12": 1,
+      "p11": 0,
+      "p12": 0,
+      "test": 1
+    },
+    "2026-06-03": {
+      "board": 0,
+      "c11": 0,
+      "c12": 1,
+      "coaching": 3,
+      "m11": 0,
+      "m12": 2.67,
+      "p11": 0,
+      "p12": 0,
+      "test": 0
+    },
+    "2026-06-04": {
+      "board": 0,
+      "c11": 0,
+      "c12": 2,
+      "coaching": 3,
+      "m11": 0,
+      "m12": 2,
+      "p11": 0,
+      "p12": 0,
+      "test": 0
+    },
+    "2026-06-05": {
+      "board": 0,
+      "c11": 0,
+      "c12": 3,
+      "coaching": 4.5,
+      "m11": 0,
+      "m12": 1,
+      "p11": 0,
+      "p12": 0.5,
+      "test": 0
+    },
+    "2026-06-06": {
+      "board": 0,
+      "c11": 0,
+      "c12": 3.5,
+      "coaching": 3,
+      "m11": 0,
+      "m12": 0,
+      "p11": 0,
+      "p12": 0,
+      "test": 0
+    },
+    "2026-06-07": {
+      "board": 0,
+      "c11": 0,
+      "c12": 0.5,
+      "coaching": 0,
+      "m11": 0,
+      "m12": 0,
+      "p11": 0,
+      "p12": 4.5,
+      "test": 1.4
+    },
+    "2026-06-08": {
+      "board": 0,
+      "c11": 0,
+      "c12": 1.4,
+      "coaching": 3,
+      "m11": 0,
+      "m12": 1.9,
+      "p11": 0,
+      "p12": 1.75,
+      "test": 0
+    },
+    "2026-06-09": {
+      "board": 0,
+      "c11": 0,
+      "c12": 1.2,
+      "coaching": 3,
+      "m11": 0,
+      "m12": 0.34,
+      "p11": 0,
+      "p12": 1.67,
+      "test": 1.2
+    },
+    "2026-06-10": {
+      "board": 0,
+      "c11": 0,
+      "c12": 0,
+      "coaching": 0,
+      "m11": 0,
+      "m12": 1,
+      "p11": 0,
+      "p12": 0,
+      "test": 3
+    },
+    "2026-06-11": {
+      "board": 0,
+      "c11": 0,
+      "c12": 1,
+      "coaching": 3,
+      "m11": 0,
+      "m12": 1,
+      "p11": 0,
+      "p12": 0,
+      "test": 0
+    },
+    "2026-06-12": {
+      "board": 0,
+      "c11": 0,
+      "c12": 0,
+      "coaching": 3,
+      "m11": 0,
+      "m12": 4.8,
+      "p11": 0,
+      "p12": 1.2,
+      "test": 0
+    },
+    "2026-06-13": {
+      "board": 0,
+      "c11": 0,
+      "c12": 0,
+      "coaching": 3,
+      "m11": 0,
+      "m12": 2.3,
+      "p11": 0,
+      "p12": 0,
+      "test": 0.2
+    },
+    "2026-06-14": {
+      "board": 1,
+      "c11": 0,
+      "c12": 1,
+      "coaching": 0,
+      "m11": 0,
+      "m12": 1,
+      "p11": 0,
+      "p12": 1,
+      "test": 0
+    },
+    "2026-06-15": {
+      "board": 0,
+      "c11": 0,
+      "c12": 0.5,
+      "coaching": 3,
+      "m11": 2,
+      "m12": 0,
+      "p11": 0,
+      "p12": 2.5,
+      "test": 0
+    },
+    "2026-06-16": {
+      "board": 0,
+      "c11": 0,
+      "c12": 2.5,
+      "coaching": 3,
+      "m11": 0,
+      "m12": 2.5,
+      "p11": 0,
+      "p12": 0,
+      "test": 0
+    },
+    "2026-06-17": {
+      "board": 0,
+      "c11": 0,
+      "c12": 2.5,
+      "coaching": 0,
+      "m11": 0,
+      "m12": 2,
+      "p11": 0,
+      "p12": 1.3,
+      "test": 0
+    },
+    "2026-06-18": {
+      "board": 0,
+      "c11": 0,
+      "c12": 0,
+      "coaching": 4.5,
+      "m11": 0,
+      "m12": 1.5,
+      "p11": 0,
+      "p12": 0,
+      "test": 0
+    },
+    "2026-06-19": {
+      "board": 0,
+      "c11": 2.5,
+      "c12": 0,
+      "coaching": 3,
+      "m11": 0,
+      "m12": 0,
+      "p11": 1.5,
+      "p12": 0,
+      "test": 0
+    },
+    "2026-06-20": {
+      "board": 0,
+      "c11": 0,
+      "c12": 1,
+      "coaching": 3,
+      "m11": 1.5,
+      "m12": 0,
+      "p11": 0,
+      "p12": 0,
+      "test": 0
+    },
+    "2026-06-21": {
+      "board": 0,
+      "c11": 1,
+      "c12": 0,
+      "coaching": 0,
+      "m11": 1,
+      "m12": 0,
+      "p11": 0,
+      "p12": 0,
+      "test": 1.5
+    },
+    "2026-06-22": {
+      "board": 0,
+      "c11": 0,
+      "c12": 0,
+      "coaching": 3,
+      "m11": 0,
+      "m12": 0,
+      "p11": 0,
+      "p12": 1.3,
+      "test": 0
+    },
+    "2026-06-23": {
+      "board": 0,
+      "c11": 1.5,
+      "c12": 0.5,
+      "coaching": 3,
+      "m11": 0,
+      "m12": 1,
+      "p11": 0,
+      "p12": 0,
+      "test": 0
+    },
+    "2026-06-24": {
+      "board": 0,
+      "c11": 0,
+      "c12": 1,
+      "coaching": 3,
+      "m11": 0,
+      "m12": 0.75,
+      "p11": 0,
+      "p12": 1,
+      "test": 0
+    },
+    "2026-06-25": {
+      "board": 0,
+      "c11": 0,
+      "c12": 0,
+      "coaching": 4.5,
+      "m11": 0,
+      "m12": 1,
+      "p11": 0,
+      "p12": 2,
+      "test": 2.3
+    },
+    "2026-06-26": {
+      "board": 0,
+      "c11": 0,
+      "c12": 0.5,
+      "coaching": 3,
+      "m11": 1.3,
+      "m12": 0.5,
+      "p11": 1,
+      "p12": 2,
+      "test": 0
+    },
+    "2026-06-27": {
+      "board": 0,
+      "c11": 0,
+      "c12": 1,
+      "coaching": 3,
+      "m11": 2,
+      "m12": 1,
+      "p11": 0.2,
+      "p12": 0.5,
+      "test": 1.1
+    },
+    "2026-06-28": {
+      "board": 0,
+      "c11": 0,
+      "c12": 0.2,
+      "coaching": 0,
+      "m11": 0,
+      "m12": 0,
+      "p11": 0,
+      "p12": 1,
+      "test": 6
+    },
+    "2026-06-29": {
+      "board": 0,
+      "c11": 0,
+      "c12": 0,
+      "coaching": 3,
+      "m11": 0,
+      "m12": 0,
+      "p11": 0,
+      "p12": 1,
+      "test": 0
+    },
+    "2026-06-30": {
+      "board": 0,
+      "c11": 0,
+      "c12": 2,
+      "coaching": 3,
+      "m11": 0,
+      "m12": 0,
+      "p11": 0,
+      "p12": 0,
+      "test": 0
+    },
+    "2026-07-01": {
+      "board": 0,
+      "c11": 0,
+      "c12": 1,
+      "coaching": 3,
+      "m11": 0,
+      "m12": 0,
+      "p11": 0,
+      "p12": 4,
+      "test": 0.5
+    },
+    "2026-07-02": {
+      "board": 0,
+      "c11": 0,
+      "c12": 1,
+      "coaching": 4.5,
+      "m11": 0,
+      "m12": 0,
+      "p11": 0,
+      "p12": 1.2,
+      "test": 0
+    },
+    "2026-07-03": {
+      "board": 0,
+      "c11": 0,
+      "c12": 1.5,
+      "coaching": 3,
+      "m11": 0,
+      "m12": 0,
+      "p11": 0,
+      "p12": 2.2,
+      "test": 0
+    },
+    "2026-07-04": {
+      "board": 0,
+      "c11": 0,
+      "c12": 2,
+      "coaching": 3,
+      "m11": 0,
+      "m12": 1,
+      "p11": 0,
+      "p12": 1,
+      "test": 0
+    },
+    "2026-07-06": {
+      "board": 0,
+      "c11": 0,
+      "c12": 2,
+      "coaching": 3,
+      "m11": 0,
+      "m12": 0.2,
+      "p11": 0,
+      "p12": 0,
+      "test": 0
+    },
+    "2026-07-07": {
+      "board": 1.2,
+      "c11": 0,
+      "c12": 2,
+      "coaching": 3,
+      "m11": 0,
+      "m12": 1,
+      "p11": 0,
+      "p12": 1,
+      "test": 0
+    },
+    "2026-07-08": {
+      "board": 2,
+      "c11": 0,
+      "c12": 0,
+      "coaching": 3,
+      "m11": 0,
+      "m12": 1.1,
+      "p11": 0,
+      "p12": 1,
+      "test": 0
+    },
+    "2026-07-09": {
+      "board": 1,
+      "c11": 0,
+      "c12": 0,
+      "coaching": 0,
+      "m11": 0,
+      "m12": 0,
+      "p11": 0,
+      "p12": 1,
+      "test": 2.2
+    },
+    "2026-07-10": {
+      "board": 0,
+      "c11": 0,
+      "c12": 1.5,
+      "coaching": 3,
+      "m11": 0,
+      "m12": 2,
+      "p11": 0,
+      "p12": 2,
+      "test": 0
+    }
+  },
+  "vault": {
+    "Chemistry": {
+      "units": [
+        {
+          "chapters": [
+            {
+              "id": "vc_1782319578593",
+              "name": "Structure of Atom"
+            },
+            {
+              "id": "vc_1782319590144",
+              "name": "Mole Concept"
+            }
+          ],
+          "id": "vu_1782319556071",
+          "name": "Physical Chemistry"
+        }
+      ]
+    },
+    "Physics": {
+      "units": [
+        {
+          "chapters": [
+            {
+              "id": "vc_1781837864291",
+              "items": [
+                {
+                  "color": "emerald-500",
+                  "done": false,
+                  "id": "vi_1781837951246",
+                  "text": "x(t) → v(t) → a(t).   (Via differentiation)",
+                  "type": "note"
+                },
+                {
+                  "color": "blue-500",
+                  "done": false,
+                  "id": "vi_1781848000176",
+                  "text": "Motion under gravity",
+                  "type": "note"
+                },
+                {
+                  "color": "blue-500",
+                  "done": false,
+                  "id": "vi_1782114343250",
+                  "text": "Relative Motion in 1D",
+                  "type": "note"
+                }
+              ],
+              "name": "Motion in Straight Line"
+            }
+          ],
+          "id": "vu_1781837841394",
+          "name": "Kinematics"
+        },
+        {
+          "chapters": [
+            {
+              "id": "vc_1782100589252",
+              "items": [
+                {
+                  "color": "blue-500",
+                  "done": false,
+                  "id": "vi_1782199596579",
+                  "text": "Electric Field due to various geometrical shapes",
+                  "type": "note"
+                }
+              ],
+              "name": "Electrostatics"
+            },
+            {
+              "id": "vc_1782100603983",
+              "name": "Current Electricity"
+            },
+            {
+              "id": "vc_1782100634705",
+              "name": "Moving Charges and Magnetism"
+            }
+          ],
+          "id": "vu_1782100567080",
+          "name": "ElectroMagnetism"
+        }
+      ]
+    },
+    "chem": {
+      "units": [
+        {
+          "id": "vu_1782317538802",
+          "name": "Physical Chemistry"
+        },
+        {
+          "id": "vu_1782317563544",
+          "name": "Physical Chemistry"
+        }
+      ]
+    }
+  },
+  "warCry": "",
+  "xp": 232
+}
