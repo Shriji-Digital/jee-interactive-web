@@ -237,43 +237,74 @@
     </div>
 
     <!-- SYSTEM SECURE LOGIN OVERLAY -->
-<div id="auth-screen" class="fixed inset-0 z-[90] flex items-center justify-center bg-[#090e17] transition-opacity duration-500">
-    <div class="glass-card w-full max-w-md mx-4 rounded-3xl p-8 border border-slate-700 shadow-[0_0_50px_rgba(16,185,129,0.1)] relative overflow-hidden flex flex-col">
+<div id="auth-screen" class="fixed inset-0 z-[90] flex items-center justify-center bg-[#090e17] transition-opacity duration-500 hidden">
+    <div class="glass-card w-full max-w-md mx-4 rounded-3xl p-8 border border-slate-700 shadow-[0_0_50px_rgba(16,185,129,0.1)] relative overflow-hidden flex flex-col max-h-[90vh] overflow-y-auto custom-scrollbar">
         
-        <!-- Header -->
-        <div class="flex flex-col items-center mb-8">
+        <div class="flex flex-col items-center mb-6">
             <div class="w-16 h-16 bg-[#0f172a] rounded-full flex items-center justify-center border border-slate-800 shadow-[0_0_20px_rgba(16,185,129,0.2)] mb-4">
                 <i data-lucide="lock" class="text-accent" width="28" height="28"></i>
             </div>
             <h1 class="text-2xl font-black text-white uppercase tracking-widest text-center">System <span class="text-accent">Access</span></h1>
-            <p class="text-[10px] text-gray-500 font-bold uppercase tracking-widest mt-2">Identify yourself to enter the Matrix</p>
         </div>
 
-        <!-- Inputs -->
-        <div class="space-y-4 mb-8">
-            <div>
-                <label class="text-[10px] uppercase text-gray-400 font-bold mb-1.5 block">Email Designation</label>
-                <input type="email" id="auth-email" placeholder="beast@jee2027.com" class="w-full glass-input rounded-xl px-4 py-3 text-sm font-medium">
-            </div>
-            <div>
-                <label class="text-[10px] uppercase text-gray-400 font-bold mb-1.5 block">Security Key</label>
-                <input type="password" id="auth-password" placeholder="••••••••" class="w-full glass-input rounded-xl px-4 py-3 text-sm font-medium">
-            </div>
-            <div id="auth-error" class="hidden text-[10px] text-red-500 font-bold uppercase tracking-widest text-center mt-2 border border-red-900/50 bg-red-900/20 py-2 rounded"></div>
+        <div class="flex border-b border-slate-800 mb-6">
+            <button onclick="window.toggleAuthMode('login')" id="tab-btn-login" class="flex-1 py-3 text-xs font-black uppercase tracking-widest text-accent border-b-2 border-accent transition">Login</button>
+            <button onclick="window.toggleAuthMode('register')" id="tab-btn-register" class="flex-1 py-3 text-xs font-black uppercase tracking-widest text-slate-500 border-b-2 border-transparent hover:text-gray-300 transition">Sign Up</button>
         </div>
 
-        <!-- Actions -->
-        <div class="flex flex-col gap-3 mt-auto">
-            <button onclick="window.handleLogin()" id="btn-login" class="w-full bg-accent hover:bg-emerald-400 text-slate-900 font-black uppercase tracking-widest text-xs py-3.5 rounded-xl transition shadow-[0_0_15px_rgba(16,185,129,0.3)] flex items-center justify-center gap-2">
+        <div id="auth-error" class="hidden text-[10px] text-red-500 font-bold uppercase tracking-widest text-center mb-4 border border-red-900/50 bg-red-900/20 py-2 rounded"></div>
+
+        <div id="auth-login-fields" class="space-y-4 mb-6">
+            <div>
+                <label class="text-[10px] uppercase text-gray-400 font-bold mb-1 block">Email</label>
+                <input type="email" id="auth-email" placeholder="beast@jee.com" class="w-full glass-input rounded-xl px-4 py-3 text-sm">
+            </div>
+            <div>
+                <label class="text-[10px] uppercase text-gray-400 font-bold mb-1 block">Security Key</label>
+                <input type="password" id="auth-password" placeholder="••••••••" class="w-full glass-input rounded-xl px-4 py-3 text-sm">
+            </div>
+            <button onclick="window.handleLogin()" id="btn-login" class="w-full mt-4 bg-accent hover:bg-emerald-400 text-slate-900 font-black uppercase tracking-widest text-xs py-3.5 rounded-xl transition shadow-[0_0_15px_rgba(16,185,129,0.3)] flex items-center justify-center gap-2">
                 <i data-lucide="log-in" width="16" height="16"></i> Initialize Uplink
             </button>
-            <button onclick="window.handleRegister()" class="w-full bg-slate-800 hover:bg-slate-700 text-gray-400 hover:text-white font-bold uppercase tracking-widest text-[10px] py-3.5 rounded-xl transition border border-slate-700">
-                Register New Operative
+        </div>
+
+        <div id="auth-register-fields" class="space-y-4 mb-6 hidden">
+            <div>
+                <label class="text-[10px] uppercase text-gray-400 font-bold mb-1 block">Operative Name</label>
+                <input type="text" id="auth-reg-name" placeholder="Priyansh" class="w-full glass-input rounded-xl px-4 py-3 text-sm">
+            </div>
+            <div class="grid grid-cols-2 gap-3">
+                <div>
+                    <label class="text-[10px] uppercase text-gray-400 font-bold mb-1 block">Age</label>
+                    <input type="number" id="auth-reg-age" placeholder="16" class="w-full glass-input rounded-xl px-4 py-3 text-sm">
+                </div>
+                <div>
+                    <label class="text-[10px] uppercase text-gray-400 font-bold mb-1 block">Class</label>
+                    <select id="auth-reg-class" class="w-full glass-input rounded-xl px-4 py-3 text-sm appearance-none cursor-pointer">
+                        <option value="11">Class 11</option>
+                        <option value="12" selected>Class 12</option>
+                        <option value="Dropper">Dropper</option>
+                    </select>
+                </div>
+            </div>
+            <div>
+                <label class="text-[10px] uppercase text-gray-400 font-bold mb-1 block">Target Year</label>
+                <input type="number" id="auth-reg-year" value="2027" class="w-full glass-input rounded-xl px-4 py-3 text-sm">
+            </div>
+            <div>
+                <label class="text-[10px] uppercase text-gray-400 font-bold mb-1 block">Email</label>
+                <input type="email" id="auth-reg-email" class="w-full glass-input rounded-xl px-4 py-3 text-sm">
+            </div>
+            <div>
+                <label class="text-[10px] uppercase text-gray-400 font-bold mb-1 block">Create Password</label>
+                <input type="password" id="auth-reg-password" class="w-full glass-input rounded-xl px-4 py-3 text-sm">
+            </div>
+            <button onclick="window.handleRegister()" id="btn-register" class="w-full mt-4 bg-slate-800 hover:bg-slate-700 text-white font-black uppercase tracking-widest text-xs py-3.5 rounded-xl transition border border-slate-700 flex items-center justify-center gap-2">
+                <i data-lucide="user-plus" width="16" height="16"></i> Register Operative
             </button>
         </div>
     </div>
-</div>
-
+ </div>
     <div
         class="hidden border-slate-500 border-blue-500 border-emerald-500 border-amber-500 border-red-500 border-purple-500 border-pink-500">
     </div>
@@ -281,16 +312,48 @@
     <div class="max-w-7xl mx-auto w-full flex-1 pb-28">
 
         <div id="tab-home" class="tab-content active">
-            <div
-                class="max-w-7xl mx-auto w-full flex justify-between items-end mb-6 pt-2 border-b border-slate-800 pb-4 mt-4">
-                <div>
-                    <h1 class="text-2xl font-black tracking-tight flex items-center gap-2">
-                        <i data-lucide="rocket" class="text-accent" width="24" height="24"></i>
-                        JEE <span class="text-gray-500">2027</span>
-                    </h1>
-                    <p id="system-status" class="text-[9px] text-gray-500 tracking-widest uppercase font-bold mt-1">
-                        System Online</p>
-                </div>
+            <div id="sidebar-overlay" class="fixed inset-0 bg-black/80 z-[80] hidden opacity-0 transition-opacity duration-300" onclick="window.closeSidebar()"></div>
+
+<div id="sidebar-panel" class="fixed top-0 left-0 h-full w-72 bg-[#05080f] border-r border-slate-800 z-[90] transform -translate-x-full transition-transform duration-300 flex flex-col p-6 shadow-[20px_0_50px_rgba(0,0,0,0.5)]">
+    
+    <div class="flex justify-between items-center mb-8 border-b border-slate-800 pb-4">
+        <div class="w-10 h-10 bg-slate-900 rounded-full flex items-center justify-center border border-slate-700">
+            <i data-lucide="user" class="text-accent" width="20" height="20"></i>
+        </div>
+        <button onclick="window.closeSidebar()" class="text-gray-500 hover:text-white transition"><i data-lucide="x" width="20" height="20"></i></button>
+    </div>
+    
+    <div class="mb-8">
+        <h2 id="sidebar-name" class="text-xl font-black text-white uppercase tracking-wider mb-1">OPERATIVE</h2>
+        <p id="sidebar-class" class="text-[10px] text-gray-400 font-bold uppercase tracking-widest">Class -- | Target 2027</p>
+    </div>
+
+    <div class="flex-1 flex flex-col gap-3">
+        <button onclick="window.openHelp()" class="w-full bg-slate-900 hover:bg-slate-800 text-gray-300 py-4 rounded-xl text-xs font-black uppercase tracking-widest transition flex items-center justify-start px-5 gap-3 border border-slate-800">
+            <i data-lucide="book-open" class="text-blue-500" width="16" height="16"></i> System Guide
+        </button>
+    </div>
+
+    <div class="mt-auto pt-6 border-t border-slate-800">
+        <button onclick="window.handleLogout()" class="w-full bg-red-900/10 hover:bg-red-900/30 text-red-500 py-4 rounded-xl text-xs font-black uppercase tracking-widest transition flex items-center justify-center gap-2 border border-red-900/30">
+            <i data-lucide="power" width="16" height="16"></i> Terminate Uplink
+        </button>
+    </div>
+</div>
+
+<div class="max-w-7xl mx-auto w-full flex justify-between items-end mb-6 pt-2 border-b border-slate-800 pb-4 mt-4">
+    <div class="flex gap-4 items-center">
+        <button onclick="window.openSidebar()" class="text-slate-500 hover:text-white transition bg-slate-900 p-2 rounded-lg border border-slate-800 mb-1">
+            <i data-lucide="menu" width="20" height="20"></i>
+        </button>
+        <div>
+            <h1 class="text-2xl font-black tracking-tight flex items-center gap-2">
+                <i data-lucide="rocket" class="text-accent" width="24" height="24"></i>
+                JEE <span id="header-target" class="text-gray-500 transition-colors">2027</span>
+            </h1>
+            <p id="system-status" class="text-[9px] text-gray-500 tracking-widest uppercase font-bold mt-1">System Online</p>
+        </div>
+    </div>
                 <div class="flex gap-3">
                     <div
                         class="glass-card px-3 py-1.5 rounded-lg flex items-center gap-2 border-b-2 border-b-yellow-500">
@@ -302,10 +365,6 @@
                         <div class="font-black text-sm" id="shield-display">1</div>
                     </div>
                 </div>
-            </div>
-            <div class="glass-card px-3 py-1.5 rounded-lg flex items-center gap-2 border-b-2 border-b-danger cursor-pointer hover:bg-slate-800 transition" onclick="window.handleLogout()">
-                <i data-lucide="power" class="text-danger" width="14" height="14"></i>
-                <div class="font-black text-sm text-danger text-[10px] uppercase">Exit</div>
             </div>
             <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
                 <div class="lg:col-span-8 flex flex-col gap-6 lg:border-r lg:border-slate-800 lg:pr-6">
@@ -1088,11 +1147,35 @@ window.handleLogin = function() {
 };
 
 window.handleRegister = function() {
-    const e = document.getElementById('auth-email').value;
-    const p = document.getElementById('auth-password').value;
+    const n = document.getElementById('auth-reg-name').value.trim();
+    const a = document.getElementById('auth-reg-age').value;
+    const c = document.getElementById('auth-reg-class').value;
+    const y = document.getElementById('auth-reg-year').value;
+    const e = document.getElementById('auth-reg-email').value;
+    const p = document.getElementById('auth-reg-password').value;
+
+    if(!n || !y) return window.showAuthError("Name and Target Year are required.");
     if(p.length < 6) return window.showAuthError("Key must be at least 6 characters.");
-    createUserWithEmailAndPassword(auth, e, p).catch(err => {
+
+    document.getElementById('btn-register').innerHTML = `<i data-lucide="loader-2" class="animate-spin" width="16" height="16"></i> Registering...`;
+    lucide.createIcons();
+
+    createUserWithEmailAndPassword(auth, e, p).then((userCredential) => {
+        const user = userCredential.user;
+        // Instantly push the unique profile data to their specific UID folder
+        const profileRef = ref(db, 'userData/' + user.uid + '/profile');
+        set(profileRef, {
+            name: n,
+            age: a,
+            classLevel: c,
+            targetYear: y,
+            joinedDate: new Date().toISOString()
+        });
+        // Note: The onAuthStateChanged observer will auto-hide this screen and log them in
+    }).catch(err => {
         window.showAuthError("Registration Failed: " + err.message);
+        document.getElementById('btn-register').innerHTML = `<i data-lucide="user-plus" width="16" height="16"></i> Register Operative`;
+        lucide.createIcons();
     });
 };
 
@@ -1165,6 +1248,19 @@ onAuthStateChanged(auth, (user) => {
 
             if (data) {
                 state = { ...state, ...data };
+                // DYNAMIC PROFILE INJECTION
+if (data.profile) {
+    const targetY = data.profile.targetYear || "2027";
+    const headerEl = document.getElementById('header-target');
+    if (headerEl) {
+        headerEl.innerText = targetY;
+        headerEl.classList.replace('text-gray-500', 'text-blue-400'); // Optional: change color to show it loaded
+    }
+    const sideName = document.getElementById('sidebar-name');
+    if (sideName) sideName.innerText = data.profile.name || "OPERATIVE";
+    const sideClass = document.getElementById('sidebar-class');
+    if (sideClass) sideClass.innerText = `Class ${data.profile.classLevel || "--"} | Target ${targetY}`;
+        }
                 if (!state.habits) state.habits = [];
                 if (!state.studyLogs) state.studyLogs = {};
                 if (!state.boardData) state.boardData = [];
@@ -1260,6 +1356,49 @@ onAuthStateChanged(auth, (user) => {
         });
 
      };
+
+        // Sidebar Logic
+window.openSidebar = function() {
+    const overlay = document.getElementById('sidebar-overlay');
+    const panel = document.getElementById('sidebar-panel');
+    overlay.classList.remove('hidden');
+    setTimeout(() => {
+        overlay.classList.remove('opacity-0');
+        panel.classList.remove('-translate-x-full');
+    }, 10);
+};
+
+window.closeSidebar = function() {
+    const overlay = document.getElementById('sidebar-overlay');
+    const panel = document.getElementById('sidebar-panel');
+    overlay.classList.add('opacity-0');
+    panel.classList.add('-translate-x-full');
+    setTimeout(() => overlay.classList.add('hidden'), 300);
+};
+
+window.openHelp = function() {
+    alert("System Guide coming soon. Keep grinding."); // Placeholder for future modal
+};
+
+// Auth Tab Logic
+window.toggleAuthMode = function(mode) {
+    const lFields = document.getElementById('auth-login-fields');
+    const rFields = document.getElementById('auth-register-fields');
+    const lBtn = document.getElementById('tab-btn-login');
+    const rBtn = document.getElementById('tab-btn-register');
+    const errBox = document.getElementById('auth-error');
+    errBox.classList.add('hidden'); // clear errors on switch
+
+    if (mode === 'register') {
+        lFields.classList.add('hidden'); rFields.classList.remove('hidden');
+        lBtn.className = "flex-1 py-3 text-xs font-black uppercase tracking-widest text-slate-500 border-b-2 border-transparent hover:text-gray-300 transition";
+        rBtn.className = "flex-1 py-3 text-xs font-black uppercase tracking-widest text-accent border-b-2 border-accent transition";
+    } else {
+        rFields.classList.add('hidden'); lFields.classList.remove('hidden');
+        rBtn.className = "flex-1 py-3 text-xs font-black uppercase tracking-widest text-slate-500 border-b-2 border-transparent hover:text-gray-300 transition";
+        lBtn.className = "flex-1 py-3 text-xs font-black uppercase tracking-widest text-accent border-b-2 border-accent transition";
+    }
+};
 
         function saveData() {
             localStorage.setItem('jee_ghost_backup', JSON.stringify(state));
