@@ -1115,6 +1115,13 @@ onAuthStateChanged(auth, (user) => {
     } else {
         // Logged out: Show auth screen
         document.getElementById('auth-screen').classList.remove('hidden', 'opacity-0', 'pointer-events-none');
+        
+        // 🚨 THE FIX: Force the boot screen to hide so you can actually see the login screen!
+        const bootScreen = document.getElementById('system-boot-screen');
+        if (bootScreen) {
+            bootScreen.classList.add('opacity-0', 'pointer-events-none');
+            setTimeout(() => bootScreen.classList.add('hidden'), 500);
+        }
     }
 });
 
