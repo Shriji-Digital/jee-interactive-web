@@ -1293,10 +1293,86 @@
                 <!-- Scrollable Content Panes -->
                 <div class="flex-1 overflow-y-auto custom-scrollbar p-6 md:p-10 relative z-10">
 
-                    <div id="content-guide-register" class="hidden">
-                        <h1 class="text-3xl font-black text-white uppercase tracking-tight mb-2">Login and Registration</h1>
-                        <p class="text-xs text-gray-500 font-bold uppercase tracking-widest mb-8 border-b border-slate-800 pb-4">Verifications and Email/Password Change</p>
-                        <!-- CONTENT LATER -->
+                    <div id="content-guide-register" class="hidden animate-fade-in">
+    <h1 class="text-3xl font-black text-white uppercase tracking-tight mb-2">Login & Account</h1>
+    <p class="text-xs text-gray-500 font-bold uppercase tracking-widest mb-8 border-b border-slate-800 pb-4">Verifications & Security Protocols</p>
+    
+    <!-- SECTION 1: ACCOUNT CREATION -->
+    <div class="mb-10">
+        <h2 class="text-xl font-black text-white flex items-center gap-2 mb-5">
+            <i data-lucide="user-plus" class="text-accent"></i> 1. Account Creation
+        </h2>
+        
+        <div class="space-y-4 text-sm text-gray-300 font-medium leading-relaxed">
+            <p class="flex gap-4 items-start">
+                <span class="text-accent font-black mt-0.5">(i)</span> 
+                <span>You can create account With the help of an 📧 <strong>Email ID</strong> or a 📱 <strong>Mobile number</strong>.</span>
+            </p>
+            <p class="flex gap-4 items-start">
+                <span class="text-accent font-black mt-0.5">(ii)</span> 
+                <span>You'll need to submit Name, Age, Class and Target Year (Year in which you want to give JEE exam). Once you enter all these along with E-mail+ password or mobile number.</span>
+            </p>
+            <p class="flex gap-4 items-start">
+                <span class="text-accent font-black mt-0.5">(iii)</span> 
+                <span>If Account created using E-mail id, you'll need to add a security key (password) and if you create an account using mobile number then see step (v).</span>
+            </p>
+            <p class="flex gap-4 items-start">
+                <span class="text-accent font-black mt-0.5">(iv)</span> 
+                <span>After account creation you'll get a email for verification of your email id with a link, you'll get verified if you click that link. <br><span class="text-gray-500 text-xs uppercase tracking-widest font-bold mt-1 inline-block"><i data-lucide="info" class="inline mb-0.5" width="12" height="12"></i> Note - Verification e-mails may be in spam folders</span></span>
+            </p>
+            
+            <!-- Mobile Auth Highlight Box -->
+            <div class="bg-blue-900/10 border border-blue-900/50 p-4 rounded-xl my-3 shadow-inner">
+                <p class="flex gap-4 items-start">
+                    <span class="text-blue-400 font-black mt-0.5">(v)</span> 
+                    <span>For mobile number, you need to send an email to <strong class="text-blue-400 select-all tracking-wide">akshitinani@gmail.com</strong> (Developer's email id), with subject as <span class="bg-blue-900/40 text-blue-300 font-mono text-xs px-2 py-1 rounded">Requesting account creation through mobile number</span>, and in body you have to write your mobile number. You'll get a confirmation mail with a 6-digit code and then you can create your account using that mobile number.</span>
+                </p>
+            </div>
+            
+            <p class="flex gap-4 items-start">
+                <span class="text-accent font-black mt-0.5">(vi)</span> 
+                <span>Once account is created using either method, you can enjoy and grind using the features of app. 🚀</span>
+            </p>
+        </div>
+        
+        <!-- SECURE RECOMMENDATION NOTE -->
+        <div class="mt-6 bg-emerald-900/20 border-l-4 border-emerald-500 p-5 rounded-r-xl shadow-inner">
+            <div class="text-emerald-500 text-xs font-black uppercase tracking-widest mb-1.5 flex items-center gap-2">
+                <i data-lucide="shield-check" width="16" height="16"></i> System Recommendation
+            </div>
+            <p class="text-sm text-emerald-100/90 font-medium">NOTE- We recommend Creating account using <strong>E-mail ID</strong> as it's more secure and hectic free.</p>
+        </div>
+    </div>
+
+    <!-- SECTION 2: USER LOGIN -->
+    <div class="mb-10">
+        <h2 class="text-xl font-black text-white flex items-center gap-2 mb-5">
+            <i data-lucide="log-in" class="text-blue-400"></i> 2. User Login
+        </h2>
+        
+        <div class="space-y-4 text-sm text-gray-300 font-medium leading-relaxed">
+            <p class="flex gap-4 items-start">
+                <span class="text-blue-400 font-black mt-0.5">(i)</span> 
+                <span>You'll need either Email or Mobile number for login (whichever opted while creating account).</span>
+            </p>
+            <p class="flex gap-4 items-start">
+                <span class="text-blue-400 font-black mt-0.5">(ii)</span> 
+                <span>For E-mail ID, you need the password to login. 🔑</span>
+            </p>
+            <p class="flex gap-4 items-start">
+                <span class="text-blue-400 font-black mt-0.5">(iii)</span> 
+                <span>For Mobile number you'll need the 6-Digit code (sent via e-mail when creating account) for logging in. 📱</span>
+            </p>
+        </div>
+
+        <!-- DANGER SECURITY NOTE -->
+        <div class="mt-6 bg-red-900/20 border-l-4 border-red-500 p-5 rounded-r-xl shadow-inner">
+            <div class="text-red-500 text-xs font-black uppercase tracking-widest mb-1.5 flex items-center gap-2">
+                <i data-lucide="alert-triangle" width="16" height="16"></i> Critical Security Warning
+            </div>
+            <p class="text-sm text-red-200/90 font-medium leading-relaxed">NOTE - The mobile number method for account creation and Log-in is <strong>Not secured</strong> as developer has the 6-digit code and can access your data, so we recommend you to create account and Log-in using <strong>E-mail/Password method</strong>. 🔒</p>
+        </div>
+    </div>
                     </div>
                     
                     <div id="content-guide-directive" class="hidden">
