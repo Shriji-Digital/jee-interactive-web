@@ -329,8 +329,12 @@
         <h2 class="text-lg font-black text-white uppercase tracking-widest mb-1 text-center">Check Comms</h2>
         <p class="text-[10px] text-gray-400 font-bold uppercase tracking-widest text-center mb-6">A verification link has been sent to your email. You must verify it to break the seal.</p>
         
-        <button onclick="window.checkEmailVerification()" id="btn-check-email" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-black uppercase tracking-widest text-xs py-3.5 rounded-xl transition shadow-[0_0_15px_rgba(59,130,246,0.3)] flex items-center justify-center gap-2 mb-4">
+        <button onclick="window.checkEmailVerification()" id="btn-check-email" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-black uppercase tracking-widest text-xs py-3.5 rounded-xl transition shadow-[0_0_15px_rgba(59,130,246,0.3)] flex items-center justify-center gap-2 mb-3">
             <i data-lucide="refresh-cw" width="16" height="16"></i> I Have Verified
+        </button>
+
+        <button onclick="window.resendVerificationEmail()" id="btn-resend-email" class="w-full bg-slate-800 hover:bg-slate-700 text-gray-300 font-black uppercase tracking-widest text-xs py-3.5 rounded-xl transition border border-slate-700 flex items-center justify-center gap-2 mb-5">
+            <i data-lucide="send" width="16" height="16"></i> Resend Link
         </button>
         
         <button onclick="window.handleLogout()" class="text-[10px] text-gray-500 hover:text-white uppercase font-bold tracking-widest">Log Out</button>
@@ -1429,6 +1433,37 @@ window.checkEmailVerification = function() {
     }
 };
 
+// Email Verification Resender (For Legacy Users & Missed Emails)
+window.resendVerificationEmail = function() {
+    if(auth.currentUser) {
+        const btn = document.getElementById('btn-resend-email');
+        btn.innerHTML = `<i data-lucide="loader-2" class="animate-spin" width="16" height="16"></i> Sending...`;
+        lucide.createIcons();
+
+        import("https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js").then((module) => {
+            module.sendEmailVerification(auth.currentUser).then(() => {
+                alert("Verification link sent! Check your inbox and spam folder.");
+                btn.innerHTML = `<i data-lucide="check" width="16" height="16"></i> Sent`;
+                lucide.createIcons();
+                setTimeout(() => {
+                    btn.innerHTML = `<i data-lucide="send" width="16" height="16"></i> Resend Link`;
+                    lucide.createIcons();
+                }, 3000);
+            }).catch((error) => {
+                // Prevent users from spamming the button and getting blocked by Firebase
+                if(error.code === 'auth/too-many-requests') {
+                    alert("Please wait a few minutes before requesting another email.");
+                } else {
+                    alert("Error: " + error.message);
+                }
+                btn.innerHTML = `<i data-lucide="send" width="16" height="16"></i> Resend Link`;
+                lucide.createIcons();
+            });
+        });
+    }
+};
+
+        
 // The Gatekeeper (Auth State Observer)
 onAuthStateChanged(auth, (user) => {
     if (user) {
