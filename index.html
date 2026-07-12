@@ -1262,22 +1262,22 @@
 
                 <!-- Navigation Tabs -->
                 <div class="flex flex-row md:flex-col overflow-x-auto md:overflow-y-auto custom-scrollbar p-3 md:p-4 gap-2 shrink-0 md:flex-1">
-                    <button id="tab-guide-register" onclick="window.switchHelpTab('guide-register')" class="w-full text-left px-3 md:px-4 py-2 md:py-3 text-[10px] md:text-xs font-bold uppercase tracking-widest transition-all rounded-lg bg-transparent text-gray-500 hover:bg-slate-800/40 border-l-4 border-transparent flex items-center gap-2 shrink-0 whitespace-nowrap">
+                    <button id="tab-guide-register" onclick="window.switchHelpTab('guide-register')" class="w-max md:w-full text-left px-3 md:px-4 py-1.5 md:py-3 text-[10px] md:text-xs font-bold uppercase tracking-widest transition-all rounded-lg bg-transparent text-gray-500 hover:bg-slate-800/40 border-l-[3px] md:border-l-4 border-transparent flex items-center gap-2 shrink-0 whitespace-nowrap">
                         <i data-lucide="user-plus" width="16" height="16" class="shrink-0"></i> Login & Account
                     </button>
-                    <button id="tab-guide-directive" onclick="window.switchHelpTab('guide-directive')" class="w-full text-left px-3 md:px-4 py-2 md:py-3 text-[10px] md:text-xs font-bold uppercase tracking-widest transition-all rounded-lg bg-transparent text-gray-500 hover:bg-slate-800/40 border-l-4 border-transparent flex items-center gap-2 shrink-0 whitespace-nowrap">
+                    <button id="tab-guide-directive" onclick="window.switchHelpTab('guide-directive')" class="w-max md:w-full text-left px-3 md:px-4 py-1.5 md:py-3 text-[10px] md:text-xs font-bold uppercase tracking-widest transition-all rounded-lg bg-transparent text-gray-500 hover:bg-slate-800/40 border-l-[3px] md:border-l-4 border-transparent flex items-center gap-2 shrink-0 whitespace-nowrap">
                         <i data-lucide="crosshair" width="16" height="16" class="shrink-0"></i> The Directive
                     </button>
-                    <button id="tab-guide-mechanics" onclick="window.switchHelpTab('guide-mechanics')" class="w-full text-left px-3 md:px-4 py-2 md:py-3 text-[10px] md:text-xs font-bold uppercase tracking-widest transition-all rounded-lg bg-transparent text-gray-500 hover:bg-slate-800/40 border-l-4 border-transparent flex items-center gap-2 shrink-0 whitespace-nowrap">
+                    <button id="tab-guide-mechanics" onclick="window.switchHelpTab('guide-mechanics')" class="w-max md:w-full text-left px-3 md:px-4 py-1.5 md:py-3 text-[10px] md:text-xs font-bold uppercase tracking-widest transition-all rounded-lg bg-transparent text-gray-500 hover:bg-slate-800/40 border-l-[3px] md:border-l-4 border-transparent flex items-center gap-2 shrink-0 whitespace-nowrap">
                         <i data-lucide="settings" width="16" height="16" class="shrink-0"></i> System Rules
                     </button>
-                    <button id="tab-guide-matrix" onclick="window.switchHelpTab('guide-matrix')" class="w-full text-left px-3 md:px-4 py-2 md:py-3 text-[10px] md:text-xs font-bold uppercase tracking-widest transition-all rounded-lg bg-transparent text-gray-500 hover:bg-slate-800/40 border-l-4 border-transparent flex items-center gap-2 shrink-0 whitespace-nowrap">
+                    <button id="tab-guide-matrix" onclick="window.switchHelpTab('guide-matrix')" class="w-max md:w-full text-left px-3 md:px-4 py-1.5 md:py-3 text-[10px] md:text-xs font-bold uppercase tracking-widest transition-all rounded-lg bg-transparent text-gray-500 hover:bg-slate-800/40 border-l-[3px] md:border-l-4 border-transparent flex items-center gap-2 shrink-0 whitespace-nowrap">
                         <i data-lucide="bar-chart-2" width="16" height="16" class="shrink-0"></i> Matrix & XP
                     </button>
-                    <button id="tab-guide-saves" onclick="window.switchHelpTab('guide-saves')" class="w-full text-left px-3 md:px-4 py-2 md:py-3 text-[10px] md:text-xs font-bold uppercase tracking-widest transition-all rounded-lg bg-transparent text-gray-500 hover:bg-slate-800/40 border-l-4 border-transparent flex items-center gap-2 shrink-0 whitespace-nowrap">
+                    <button id="tab-guide-saves" onclick="window.switchHelpTab('guide-saves')" class="w-max md:w-full text-left px-3 md:px-4 py-1.5 md:py-3 text-[10px] md:text-xs font-bold uppercase tracking-widest transition-all rounded-lg bg-transparent text-gray-500 hover:bg-slate-800/40 border-l-[3px] md:border-l-4 border-transparent flex items-center gap-2 shrink-0 whitespace-nowrap">
                         <i data-lucide="database" width="16" height="16" class="shrink-0"></i> The Saves
                     </button>
-                    <button id="tab-guide-crucible" onclick="window.switchHelpTab('guide-crucible')" class="w-full text-left px-3 md:px-4 py-2 md:py-3 text-[10px] md:text-xs font-bold uppercase tracking-widest transition-all rounded-lg bg-transparent text-gray-500 hover:bg-slate-800/40 border-l-4 border-transparent flex items-center gap-2 shrink-0 whitespace-nowrap">
+                    <button id="tab-guide-crucible" onclick="window.switchHelpTab('guide-crucible')" class="w-max md:w-full text-left px-3 md:px-4 py-1.5 md:py-3 text-[10px] md:text-xs font-bold uppercase tracking-widest transition-all rounded-lg bg-transparent text-gray-500 hover:bg-slate-800/40 border-l-[3px] md:border-l-4 border-transparent flex items-center gap-2 shrink-0 whitespace-nowrap">
                         <i data-lucide="flame" width="16" height="16" class="shrink-0"></i> 200 Hard
                     </button>
                 </div>
@@ -1977,12 +1977,12 @@ window.switchHelpTab = function(tabId) {
         const btn = document.getElementById(`tab-${t}`);
         if (btn) {
             if (t === tabId) {
-                // Active State (Responsive Sizing)
-                btn.className = "w-full text-left px-3 md:px-4 py-2 md:py-3 text-[10px] md:text-xs font-black uppercase tracking-widest transition-all rounded-lg bg-slate-800/80 text-white border-l-4 border-accent shadow-md flex items-center gap-2 shrink-0 whitespace-nowrap";
+                // ACTIVE: w-max on mobile, w-full on desktop. Sleek mobile padding.
+                btn.className = "w-max md:w-full text-left px-3 md:px-4 py-1.5 md:py-3 text-[10px] md:text-xs font-black uppercase tracking-widest transition-all rounded-lg bg-slate-800/80 text-white border-l-[3px] md:border-l-4 border-accent shadow-md flex items-center gap-2 shrink-0 whitespace-nowrap";
                 if(t === 'guide-crucible') btn.classList.replace('border-accent', 'border-red-500');
             } else {
-                // Inactive State (Responsive Sizing)
-                btn.className = "w-full text-left px-3 md:px-4 py-2 md:py-3 text-[10px] md:text-xs font-bold uppercase tracking-widest transition-all rounded-lg bg-transparent text-gray-500 hover:bg-slate-800/40 hover:text-gray-300 border-l-4 border-transparent flex items-center gap-2 shrink-0 whitespace-nowrap";
+                // INACTIVE
+                btn.className = "w-max md:w-full text-left px-3 md:px-4 py-1.5 md:py-3 text-[10px] md:text-xs font-bold uppercase tracking-widest transition-all rounded-lg bg-transparent text-gray-500 hover:bg-slate-800/40 hover:text-gray-300 border-l-[3px] md:border-l-4 border-transparent flex items-center gap-2 shrink-0 whitespace-nowrap";
             }
         }
     });
