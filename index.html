@@ -238,73 +238,105 @@
 
     <!-- SYSTEM SECURE LOGIN OVERLAY -->
 <div id="auth-screen" class="fixed inset-0 z-[90] flex items-center justify-center bg-[#090e17] transition-opacity duration-500 hidden">
-    <div class="glass-card w-full max-w-md mx-4 rounded-3xl p-8 border border-slate-700 shadow-[0_0_50px_rgba(16,185,129,0.1)] relative overflow-hidden flex flex-col max-h-[90vh] overflow-y-auto custom-scrollbar">
+    
+    <div id="auth-main-box" class="glass-card w-full max-w-md mx-4 rounded-3xl p-8 border border-slate-700 shadow-[0_0_50px_rgba(16,185,129,0.1)] relative overflow-hidden flex flex-col max-h-[90vh] overflow-y-auto custom-scrollbar">
         
         <div class="flex flex-col items-center mb-6">
             <div class="w-16 h-16 bg-[#0f172a] rounded-full flex items-center justify-center border border-slate-800 shadow-[0_0_20px_rgba(16,185,129,0.2)] mb-4">
-                <i data-lucide="lock" class="text-accent" width="28" height="28"></i>
+                <i data-lucide="shield-check" class="text-accent" width="28" height="28"></i>
             </div>
             <h1 class="text-2xl font-black text-white uppercase tracking-widest text-center">System <span class="text-accent">Access</span></h1>
         </div>
 
-        <div class="flex border-b border-slate-800 mb-6">
-            <button onclick="window.toggleAuthMode('login')" id="tab-btn-login" class="flex-1 py-3 text-xs font-black uppercase tracking-widest text-accent border-b-2 border-accent transition">Login</button>
-            <button onclick="window.toggleAuthMode('register')" id="tab-btn-register" class="flex-1 py-3 text-xs font-black uppercase tracking-widest text-slate-500 border-b-2 border-transparent hover:text-gray-300 transition">Sign Up</button>
+        <div class="flex border-b border-slate-800 mb-4">
+            <button onclick="window.setAuthMode('login')" id="tab-mode-login" class="flex-1 py-3 text-xs font-black uppercase tracking-widest text-accent border-b-2 border-accent transition">Login</button>
+            <button onclick="window.setAuthMode('register')" id="tab-mode-register" class="flex-1 py-3 text-xs font-black uppercase tracking-widest text-slate-500 border-b-2 border-transparent hover:text-gray-300 transition">Sign Up</button>
+        </div>
+
+        <div class="flex bg-slate-900 rounded-lg p-1 mb-6 border border-slate-800">
+            <button onclick="window.setAuthMethod('email')" id="btn-method-email" class="flex-1 py-2 text-[10px] font-black uppercase tracking-widest bg-slate-800 text-white rounded shadow transition">Email</button>
+            <button onclick="window.setAuthMethod('phone')" id="btn-method-phone" class="flex-1 py-2 text-[10px] font-black uppercase tracking-widest text-gray-500 hover:text-white rounded transition">Phone</button>
         </div>
 
         <div id="auth-error" class="hidden text-[10px] text-red-500 font-bold uppercase tracking-widest text-center mb-4 border border-red-900/50 bg-red-900/20 py-2 rounded"></div>
 
-        <div id="auth-login-fields" class="space-y-4 mb-6">
-            <div>
-                <label class="text-[10px] uppercase text-gray-400 font-bold mb-1 block">Email</label>
-                <input type="email" id="auth-email" placeholder="beast@jee.com" class="w-full glass-input rounded-xl px-4 py-3 text-sm">
-            </div>
-            <div>
-                <label class="text-[10px] uppercase text-gray-400 font-bold mb-1 block">Security Key</label>
-                <input type="password" id="auth-password" placeholder="••••••••" class="w-full glass-input rounded-xl px-4 py-3 text-sm">
-            </div>
-            <button onclick="window.handleLogin()" id="btn-login" class="w-full mt-4 bg-accent hover:bg-emerald-400 text-slate-900 font-black uppercase tracking-widest text-xs py-3.5 rounded-xl transition shadow-[0_0_15px_rgba(16,185,129,0.3)] flex items-center justify-center gap-2">
-                <i data-lucide="log-in" width="16" height="16"></i> Initialize Uplink
-            </button>
-        </div>
-
-        <div id="auth-register-fields" class="space-y-4 mb-6 hidden">
+        <div id="auth-demographics" class="space-y-4 mb-4 hidden border-b border-slate-800 pb-4">
             <div>
                 <label class="text-[10px] uppercase text-gray-400 font-bold mb-1 block">Operative Name</label>
-                <input type="text" id="auth-reg-name" placeholder="Priyansh" class="w-full glass-input rounded-xl px-4 py-3 text-sm">
+                <input type="text" id="auth-reg-name" placeholder="Priyansh" class="w-full glass-input rounded-xl px-4 py-3 text-sm font-bold">
             </div>
-            <div class="grid grid-cols-2 gap-3">
+            <div class="grid grid-cols-3 gap-3">
                 <div>
                     <label class="text-[10px] uppercase text-gray-400 font-bold mb-1 block">Age</label>
-                    <input type="number" id="auth-reg-age" placeholder="16" class="w-full glass-input rounded-xl px-4 py-3 text-sm">
+                    <input type="number" id="auth-reg-age" placeholder="16" class="w-full glass-input rounded-xl px-4 py-3 text-sm font-bold text-center">
                 </div>
                 <div>
                     <label class="text-[10px] uppercase text-gray-400 font-bold mb-1 block">Class</label>
-                    <select id="auth-reg-class" class="w-full glass-input rounded-xl px-4 py-3 text-sm appearance-none cursor-pointer">
-                        <option value="11">Class 11</option>
-                        <option value="12" selected>Class 12</option>
-                        <option value="Dropper">Dropper</option>
+                    <select id="auth-reg-class" class="w-full glass-input rounded-xl px-2 py-3 text-sm appearance-none cursor-pointer font-bold text-center">
+                        <option value="11">11</option>
+                        <option value="12" selected>12</option>
+                        <option value="Drop">Drop</option>
                     </select>
                 </div>
+                <div>
+                    <label class="text-[10px] uppercase text-gray-400 font-bold mb-1 block">Target</label>
+                    <input type="number" id="auth-reg-year" value="2027" class="w-full glass-input rounded-xl px-2 py-3 text-sm font-bold text-center">
+                </div>
             </div>
-            <div>
-                <label class="text-[10px] uppercase text-gray-400 font-bold mb-1 block">Target Year</label>
-                <input type="number" id="auth-reg-year" value="2027" class="w-full glass-input rounded-xl px-4 py-3 text-sm">
-            </div>
-            <div>
-                <label class="text-[10px] uppercase text-gray-400 font-bold mb-1 block">Email</label>
-                <input type="email" id="auth-reg-email" class="w-full glass-input rounded-xl px-4 py-3 text-sm">
-            </div>
-            <div>
-                <label class="text-[10px] uppercase text-gray-400 font-bold mb-1 block">Create Password</label>
-                <input type="password" id="auth-reg-password" class="w-full glass-input rounded-xl px-4 py-3 text-sm">
-            </div>
-            <button onclick="window.handleRegister()" id="btn-register" class="w-full mt-4 bg-slate-800 hover:bg-slate-700 text-white font-black uppercase tracking-widest text-xs py-3.5 rounded-xl transition border border-slate-700 flex items-center justify-center gap-2">
-                <i data-lucide="user-plus" width="16" height="16"></i> Register Operative
-            </button>
         </div>
+
+        <div id="auth-email-fields" class="space-y-4 mb-6">
+            <div>
+                <label class="text-[10px] uppercase text-gray-400 font-bold mb-1 block">System Email</label>
+                <input type="email" id="auth-email" placeholder="beast@jee.com" class="w-full glass-input rounded-xl px-4 py-3 text-sm font-bold">
+            </div>
+            <div>
+                <label class="text-[10px] uppercase text-gray-400 font-bold mb-1 block">Security Key</label>
+                <input type="password" id="auth-password" placeholder="••••••••" class="w-full glass-input rounded-xl px-4 py-3 text-sm font-bold">
+            </div>
+        </div>
+
+        <div id="auth-phone-fields" class="space-y-4 mb-6 hidden">
+            <div>
+                <label class="text-[10px] uppercase text-gray-400 font-bold mb-1 block">Secure Comm Number</label>
+                <input type="tel" id="auth-phone" placeholder="+91 9999999999" class="w-full glass-input rounded-xl px-4 py-3 text-sm font-bold tracking-widest">
+                <p class="text-[8px] text-gray-500 mt-1 uppercase tracking-widest">Include country code (e.g. +91)</p>
+            </div>
+        </div>
+
+        <div id="recaptcha-container"></div>
+
+        <button onclick="window.executeAuthAction()" id="btn-auth-action" class="w-full bg-accent hover:bg-emerald-400 text-slate-900 font-black uppercase tracking-widest text-xs py-3.5 rounded-xl transition shadow-[0_0_15px_rgba(16,185,129,0.3)] flex items-center justify-center gap-2">
+            <i data-lucide="log-in" width="16" height="16"></i> Initialize Uplink
+        </button>
     </div>
- </div>
+
+    <div id="auth-otp-box" class="glass-card w-full max-w-sm mx-4 rounded-3xl p-8 border border-slate-700 shadow-[0_0_50px_rgba(16,185,129,0.1)] hidden flex flex-col items-center">
+        <i data-lucide="smartphone" class="text-accent mb-4" width="32" height="32"></i>
+        <h2 class="text-lg font-black text-white uppercase tracking-widest mb-1 text-center">Verify Signal</h2>
+        <p class="text-[10px] text-gray-400 font-bold uppercase tracking-widest text-center mb-6">Enter the 6-digit code sent to your device</p>
+        
+        <input type="number" id="auth-otp-input" placeholder="000000" class="w-full glass-input rounded-xl px-4 py-4 text-2xl font-black text-center tracking-[0.5em] mb-6">
+        
+        <button onclick="window.verifyOTP()" id="btn-verify-otp" class="w-full bg-accent hover:bg-emerald-400 text-slate-900 font-black uppercase tracking-widest text-xs py-3.5 rounded-xl transition shadow-[0_0_15px_rgba(16,185,129,0.3)] flex items-center justify-center gap-2 mb-3">
+            Confirm Identity
+        </button>
+        <button onclick="window.cancelOTP()" class="text-[10px] text-gray-500 hover:text-white uppercase font-bold tracking-widest">Cancel / Go Back</button>
+    </div>
+
+    <div id="auth-email-verify-box" class="glass-card w-full max-w-sm mx-4 rounded-3xl p-8 border border-slate-700 shadow-[0_0_50px_rgba(59,130,246,0.1)] hidden flex flex-col items-center">
+        <i data-lucide="mail-warning" class="text-blue-400 mb-4" width="32" height="32"></i>
+        <h2 class="text-lg font-black text-white uppercase tracking-widest mb-1 text-center">Check Comms</h2>
+        <p class="text-[10px] text-gray-400 font-bold uppercase tracking-widest text-center mb-6">A verification link has been sent to your email. You must verify it to break the seal.</p>
+        
+        <button onclick="window.checkEmailVerification()" id="btn-check-email" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-black uppercase tracking-widest text-xs py-3.5 rounded-xl transition shadow-[0_0_15px_rgba(59,130,246,0.3)] flex items-center justify-center gap-2 mb-4">
+            <i data-lucide="refresh-cw" width="16" height="16"></i> I Have Verified
+        </button>
+        
+        <button onclick="window.handleLogout()" class="text-[10px] text-gray-500 hover:text-white uppercase font-bold tracking-widest">Log Out</button>
+    </div>
+</div>
+
     <div
         class="hidden border-slate-500 border-blue-500 border-emerald-500 border-amber-500 border-red-500 border-purple-500 border-pink-500">
     </div>
@@ -1215,7 +1247,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
-        import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged, signOut, updateEmail, updatePassword } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+        import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged, signOut, updateEmail, updatePassword, RecaptchaVerifier, signInWithPhoneNumber, sendEmailVerification } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
 const firebaseConfig = {
     apiKey: "AIzaSyD6EwIZ_5LGK3StUnBcKBUYCC3env9IGHI",
@@ -1234,72 +1266,201 @@ const auth = getAuth(app);
 let dbRef; 
 let currentUserUid = null;
 
-        // Auth UI Functions
+        // --- AUTHENTICATION ENGINE (DUAL PATH) ---
+let currentAuthMode = 'login'; // 'login' or 'register'
+let currentAuthMethod = 'email'; // 'email' or 'phone'
+let tempProfileData = null; // Caches profile during OTP phase
+
 window.showAuthError = function(msg) {
     const errBox = document.getElementById('auth-error');
     errBox.innerText = msg;
     errBox.classList.remove('hidden');
 };
 
-window.handleLogin = function() {
-    const e = document.getElementById('auth-email').value;
-    const p = document.getElementById('auth-password').value;
-    document.getElementById('btn-login').innerHTML = `<i data-lucide="loader-2" class="animate-spin" width="16" height="16"></i> Authenticating...`;
-    signInWithEmailAndPassword(auth, e, p).catch(err => {
-        window.showAuthError("Access Denied: Check credentials.");
-        document.getElementById('btn-login').innerHTML = `<i data-lucide="log-in" width="16" height="16"></i> Initialize Uplink`;
-        lucide.createIcons();
-    });
+// UI Toggles
+window.setAuthMode = function(mode) {
+    currentAuthMode = mode;
+    document.getElementById('auth-error').classList.add('hidden');
+    
+    if(mode === 'register') {
+        document.getElementById('auth-demographics').classList.remove('hidden');
+        document.getElementById('tab-mode-register').className = "flex-1 py-3 text-xs font-black uppercase tracking-widest text-accent border-b-2 border-accent transition";
+        document.getElementById('tab-mode-login').className = "flex-1 py-3 text-xs font-black uppercase tracking-widest text-slate-500 border-b-2 border-transparent hover:text-gray-300 transition";
+        document.getElementById('btn-auth-action').innerHTML = `<i data-lucide="user-plus" width="16" height="16"></i> Register Operative`;
+    } else {
+        document.getElementById('auth-demographics').classList.add('hidden');
+        document.getElementById('tab-mode-login').className = "flex-1 py-3 text-xs font-black uppercase tracking-widest text-accent border-b-2 border-accent transition";
+        document.getElementById('tab-mode-register').className = "flex-1 py-3 text-xs font-black uppercase tracking-widest text-slate-500 border-b-2 border-transparent hover:text-gray-300 transition";
+        document.getElementById('btn-auth-action').innerHTML = `<i data-lucide="log-in" width="16" height="16"></i> Initialize Uplink`;
+    }
+    lucide.createIcons();
 };
 
-window.handleRegister = function() {
-    const n = document.getElementById('auth-reg-name').value.trim();
-    const a = document.getElementById('auth-reg-age').value;
-    const c = document.getElementById('auth-reg-class').value;
-    const y = document.getElementById('auth-reg-year').value;
-    const e = document.getElementById('auth-reg-email').value;
-    const p = document.getElementById('auth-reg-password').value;
+window.setAuthMethod = function(method) {
+    currentAuthMethod = method;
+    document.getElementById('auth-error').classList.add('hidden');
+    
+    if(method === 'email') {
+        document.getElementById('auth-email-fields').classList.remove('hidden');
+        document.getElementById('auth-phone-fields').classList.add('hidden');
+        document.getElementById('btn-method-email').className = "flex-1 py-2 text-[10px] font-black uppercase tracking-widest bg-slate-800 text-white rounded shadow transition";
+        document.getElementById('btn-method-phone').className = "flex-1 py-2 text-[10px] font-black uppercase tracking-widest text-gray-500 hover:text-white rounded transition";
+    } else {
+        document.getElementById('auth-phone-fields').classList.remove('hidden');
+        document.getElementById('auth-email-fields').classList.add('hidden');
+        document.getElementById('btn-method-phone').className = "flex-1 py-2 text-[10px] font-black uppercase tracking-widest bg-slate-800 text-white rounded shadow transition";
+        document.getElementById('btn-method-email').className = "flex-1 py-2 text-[10px] font-black uppercase tracking-widest text-gray-500 hover:text-white rounded transition";
+    }
+};
 
-    if(!n || !y) return window.showAuthError("Name and Target Year are required.");
-    if(p.length < 6) return window.showAuthError("Key must be at least 6 characters.");
+// Main Action Router
+window.executeAuthAction = function() {
+    document.getElementById('auth-error').classList.add('hidden');
+    
+    // Cache demographics if registering
+    if (currentAuthMode === 'register') {
+        tempProfileData = {
+            name: document.getElementById('auth-reg-name').value.trim(),
+            age: document.getElementById('auth-reg-age').value,
+            classLevel: document.getElementById('auth-reg-class').value,
+            targetYear: document.getElementById('auth-reg-year').value
+        };
+        if(!tempProfileData.name || !tempProfileData.targetYear) return showAuthError("Name and Target Year are required.");
+    } else {
+        tempProfileData = null; // Clear if logging in
+    }
 
-    document.getElementById('btn-register').innerHTML = `<i data-lucide="loader-2" class="animate-spin" width="16" height="16"></i> Registering...`;
+    const btn = document.getElementById('btn-auth-action');
+    btn.innerHTML = `<i data-lucide="loader-2" class="animate-spin" width="16" height="16"></i> Processing...`;
     lucide.createIcons();
 
-    createUserWithEmailAndPassword(auth, e, p).then((userCredential) => {
-        const user = userCredential.user;
-        // Instantly push the unique profile data to their specific UID folder
-        const profileRef = ref(db, 'userData/' + user.uid + '/profile');
-        set(profileRef, {
-            name: n,
-            age: a,
-            classLevel: c,
-            targetYear: y,
-            joinedDate: new Date().toISOString()
+    if (currentAuthMethod === 'email') {
+        const e = document.getElementById('auth-email').value;
+        const p = document.getElementById('auth-password').value;
+        if(currentAuthMode === 'login') {
+            signInWithEmailAndPassword(auth, e, p).catch(err => {
+                showAuthError("Access Denied: " + err.message);
+                btn.innerHTML = `<i data-lucide="log-in" width="16" height="16"></i> Initialize Uplink`;
+                lucide.createIcons();
+            });
+        } else {
+            if(p.length < 6) {
+                showAuthError("Key must be at least 6 characters.");
+                btn.innerHTML = `<i data-lucide="user-plus" width="16" height="16"></i> Register Operative`;
+                return lucide.createIcons();
+            }
+            createUserWithEmailAndPassword(auth, e, p).then((cred) => {
+                set(ref(db, 'userData/' + cred.user.uid + '/profile'), tempProfileData).then(() => {
+                    sendEmailVerification(cred.user);
+                });
+            }).catch(err => {
+                showAuthError("Registration Failed: " + err.message);
+                btn.innerHTML = `<i data-lucide="user-plus" width="16" height="16"></i> Register Operative`;
+                lucide.createIcons();
+            });
+        }
+    } else if (currentAuthMethod === 'phone') {
+        const phone = document.getElementById('auth-phone').value.trim();
+        if(!phone.startsWith('+')) return showAuthError("Include country code (e.g., +91).");
+        
+        // Init reCAPTCHA if not ready
+        if (!window.recaptchaVerifier) {
+            window.recaptchaVerifier = new RecaptchaVerifier(auth, 'recaptcha-container', { 'size': 'invisible' });
+        }
+
+        signInWithPhoneNumber(auth, phone, window.recaptchaVerifier).then((confirmationResult) => {
+            window.confirmationResult = confirmationResult;
+            document.getElementById('auth-main-box').classList.add('hidden');
+            document.getElementById('auth-otp-box').classList.remove('hidden');
+            document.getElementById('auth-otp-box').classList.add('flex');
+            btn.innerHTML = `Process Complete`;
+        }).catch((err) => {
+            showAuthError("SMS Failed: " + err.message);
+            btn.innerHTML = `Try Again`;
+            // Reset recaptcha if failed
+            if(window.recaptchaVerifier) { window.recaptchaVerifier.clear(); window.recaptchaVerifier = null; }
         });
-        // Note: The onAuthStateChanged observer will auto-hide this screen and log them in
-    }).catch(err => {
-        window.showAuthError("Registration Failed: " + err.message);
-        document.getElementById('btn-register').innerHTML = `<i data-lucide="user-plus" width="16" height="16"></i> Register Operative`;
-        lucide.createIcons();
+    }
+};
+
+// OTP Verification
+window.verifyOTP = function() {
+    const code = document.getElementById('auth-otp-input').value.trim();
+    if(code.length !== 6) return alert("Enter the 6-digit code.");
+    
+    const btn = document.getElementById('btn-verify-otp');
+    btn.innerHTML = `<i data-lucide="loader-2" class="animate-spin" width="16" height="16"></i> Verifying...`;
+    lucide.createIcons();
+
+    window.confirmationResult.confirm(code).then((result) => {
+        // If they registered, push the cached demographics to the DB
+        if(tempProfileData) {
+            set(ref(db, 'userData/' + result.user.uid + '/profile'), tempProfileData);
+            tempProfileData = null;
+        }
+        // onAuthStateChanged will handle the rest
+    }).catch((err) => {
+        alert("Invalid Code.");
+        btn.innerHTML = `Confirm Identity`;
     });
 };
 
-// Auth State Observer
+window.cancelOTP = function() {
+    document.getElementById('auth-otp-box').classList.add('hidden');
+    document.getElementById('auth-otp-box').classList.remove('flex');
+    document.getElementById('auth-main-box').classList.remove('hidden');
+    document.getElementById('btn-auth-action').innerHTML = `Retry Uplink`;
+};
+
+// Email Verification Checker
+window.checkEmailVerification = function() {
+    if(auth.currentUser) {
+        auth.currentUser.reload().then(() => {
+            if(auth.currentUser.emailVerified) {
+                document.getElementById('auth-email-verify-box').classList.add('hidden');
+                document.getElementById('auth-email-verify-box').classList.remove('flex');
+                document.getElementById('auth-screen').classList.add('hidden');
+                dbRef = ref(db, 'userData/' + auth.currentUser.uid);
+                startDatabaseSync();
+            } else {
+                alert("Email not verified yet. Check your inbox/spam.");
+            }
+        });
+    }
+};
+
+// The Gatekeeper (Auth State Observer)
 onAuthStateChanged(auth, (user) => {
     if (user) {
-        // User logged in: Hide auth screen, setup dynamic DB ref, start sync
-        document.getElementById('auth-screen').classList.add('opacity-0', 'pointer-events-none');
-        setTimeout(() => document.getElementById('auth-screen').classList.add('hidden'), 500);
+        // Check if user logged in via Email/Password
+        const isEmailAuth = user.providerData.some(p => p.providerId === 'password');
         
-        currentUserUid = user.uid;
-        dbRef = ref(db, 'userData/' + currentUserUid);
-        startDatabaseSync(); // Call the main data fetcher
+        if (isEmailAuth && !user.emailVerified) {
+            // Block entry. Show Verification UI.
+            document.getElementById('auth-screen').classList.remove('hidden', 'opacity-0', 'pointer-events-none');
+            document.getElementById('auth-main-box').classList.add('hidden');
+            document.getElementById('auth-email-verify-box').classList.remove('hidden');
+            document.getElementById('auth-email-verify-box').classList.add('flex');
+            
+            // Hide boot screen if it's there
+            const bootScreen = document.getElementById('system-boot-screen');
+            if (bootScreen) bootScreen.classList.add('hidden');
+        } else {
+            // Authorized. Enter the Matrix.
+            document.getElementById('auth-screen').classList.add('hidden');
+            currentUserUid = user.uid;
+            dbRef = ref(db, 'userData/' + currentUserUid);
+            startDatabaseSync();
+        }
     } else {
-        // Logged out: Show auth screen
+        // Not logged in. Reset UI.
         document.getElementById('auth-screen').classList.remove('hidden', 'opacity-0', 'pointer-events-none');
+        document.getElementById('auth-main-box').classList.remove('hidden');
+        document.getElementById('auth-otp-box').classList.add('hidden');
+        document.getElementById('auth-otp-box').classList.remove('flex');
+        document.getElementById('auth-email-verify-box').classList.add('hidden');
+        document.getElementById('auth-email-verify-box').classList.remove('flex');
         
-        // 🚨 THE FIX: Force the boot screen to hide so you can actually see the login screen!
         const bootScreen = document.getElementById('system-boot-screen');
         if (bootScreen) {
             bootScreen.classList.add('opacity-0', 'pointer-events-none');
