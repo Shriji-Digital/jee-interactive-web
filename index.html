@@ -1241,6 +1241,100 @@
         </div>
     </div>
 
+    <!-- SYSTEM GUIDE / FIELD MANUAL MODAL -->
+    <div id="system-guide-modal" class="fixed inset-0 bg-black/90 backdrop-blur-md z-[120] hidden items-center justify-center p-4 transition-opacity duration-300 opacity-0">
+        
+        <!-- Modal Container -->
+        <div id="system-guide-content" class="bg-[#090e17] w-full max-w-5xl h-[85vh] md:h-[80vh] rounded-3xl border border-slate-700 shadow-[0_0_50px_rgba(0,0,0,0.8)] flex flex-col md:flex-row overflow-hidden transform scale-95 transition-transform duration-300">
+            
+            <!-- MASTER MENU (Sidebar on Desktop, Top Nav on Mobile) -->
+            <div class="w-full md:w-72 bg-[#0f172a] border-b md:border-b-0 md:border-r border-slate-800 flex flex-col shrink-0">
+                <!-- Header -->
+                <div class="p-5 border-b border-slate-800 flex justify-between items-center bg-slate-900/50 shrink-0">
+                    <h2 class="text-lg font-black text-white uppercase tracking-widest flex items-center gap-2">
+                        <i data-lucide="book-open" class="text-blue-500" width="20" height="20"></i> Field Manual
+                    </h2>
+                    <!-- Close button for Mobile (visible only on small screens) -->
+                    <button onclick="window.closeHelp()" class="md:hidden text-gray-500 hover:text-white transition p-1">
+                        <i data-lucide="x" width="20" height="20"></i>
+                    </button>
+                </div>
+
+                <!-- Navigation Tabs -->
+                <div class="flex flex-row md:flex-col overflow-x-auto md:overflow-y-auto custom-scrollbar p-3 md:p-4 gap-2 shrink-0 md:flex-1">
+                    <button id="tab-guide-register" onclick="window.switchHelpTab('guide-directive')" class="w-full text-left px-4 py-3 text-xs md:text-sm font-bold uppercase tracking-widest transition-all rounded-lg bg-transparent text-gray-500 hover:bg-slate-800/40 border-l-4 border-transparent flex items-center gap-3 shrink-0 whitespace-nowrap">
+                        <i data-lucide="user-plus" width="16" height="16"></i> Login and Account Creation
+                    </button>
+                    <button id="tab-guide-directive" onclick="window.switchHelpTab('guide-directive')" class="w-full text-left px-4 py-3 text-xs md:text-sm font-bold uppercase tracking-widest transition-all rounded-lg bg-transparent text-gray-500 hover:bg-slate-800/40 border-l-4 border-transparent flex items-center gap-3 shrink-0 whitespace-nowrap">
+                        <i data-lucide="crosshair" width="16" height="16"></i> The Directive
+                    </button>
+                    <button id="tab-guide-mechanics" onclick="window.switchHelpTab('guide-mechanics')" class="w-full text-left px-4 py-3 text-xs md:text-sm font-bold uppercase tracking-widest transition-all rounded-lg bg-transparent text-gray-500 hover:bg-slate-800/40 border-l-4 border-transparent flex items-center gap-3 shrink-0 whitespace-nowrap">
+                        <i data-lucide="settings" width="16" height="16"></i> System Rules
+                    </button>
+                    <button id="tab-guide-matrix" onclick="window.switchHelpTab('guide-matrix')" class="w-full text-left px-4 py-3 text-xs md:text-sm font-bold uppercase tracking-widest transition-all rounded-lg bg-transparent text-gray-500 hover:bg-slate-800/40 border-l-4 border-transparent flex items-center gap-3 shrink-0 whitespace-nowrap">
+                        <i data-lucide="bar-chart-2" width="16" height="16"></i> Matrix & XP
+                    </button>
+                    <button id="tab-guide-saves" onclick="window.switchHelpTab('guide-saves')" class="w-full text-left px-4 py-3 text-xs md:text-sm font-bold uppercase tracking-widest transition-all rounded-lg bg-transparent text-gray-500 hover:bg-slate-800/40 border-l-4 border-transparent flex items-center gap-3 shrink-0 whitespace-nowrap">
+                        <i data-lucide="database" width="16" height="16"></i> The Saves
+                    </button>
+                    <button id="tab-guide-crucible" onclick="window.switchHelpTab('guide-crucible')" class="w-full text-left px-4 py-3 text-xs md:text-sm font-bold uppercase tracking-widest transition-all rounded-lg bg-transparent text-gray-500 hover:bg-slate-800/40 border-l-4 border-transparent flex items-center gap-3 shrink-0 whitespace-nowrap">
+                        <i data-lucide="flame" width="16" height="16"></i> 200 Hard
+                    </button>
+                    
+                </div>
+            </div>
+
+            <!-- DETAIL VIEW (Content Area) -->
+            <div class="flex-1 bg-[#05080f] relative overflow-hidden flex flex-col">
+                <!-- Close Button (Desktop) -->
+                <button onclick="window.closeHelp()" class="hidden md:flex absolute top-6 right-6 text-gray-500 hover:text-white transition z-20 bg-slate-900/50 p-2 rounded-lg border border-slate-800">
+                    <i data-lucide="x" width="20" height="20"></i>
+                </button>
+
+                <!-- Scrollable Content Panes -->
+                <div class="flex-1 overflow-y-auto custom-scrollbar p-6 md:p-10 relative z-10">
+
+                    <div id="content-guide-register" class="hidden">
+                        <h1 class="text-3xl font-black text-white uppercase tracking-tight mb-2">Login and Registration</h1>
+                        <p class="text-xs text-gray-500 font-bold uppercase tracking-widest mb-8 border-b border-slate-800 pb-4">Verifications and Email/Password Change</p>
+                        <!-- CONTENT LATER -->
+                    </div>
+                    
+                    <div id="content-guide-directive" class="hidden">
+                        <h1 class="text-3xl font-black text-white uppercase tracking-tight mb-2">The Directive</h1>
+                        <p class="text-xs text-gray-500 font-bold uppercase tracking-widest mb-8 border-b border-slate-800 pb-4">Home Base Protocols</p>
+                        <!-- CONTENT LATER -->
+                    </div>
+
+                    <div id="content-guide-mechanics" class="hidden">
+                        <h1 class="text-3xl font-black text-white uppercase tracking-tight mb-2">System Rules</h1>
+                        <p class="text-xs text-gray-500 font-bold uppercase tracking-widest mb-8 border-b border-slate-800 pb-4">Shields, Time Machine & XP</p>
+                        <!-- CONTENT LATER -->
+                    </div>
+
+                    <div id="content-guide-matrix" class="hidden">
+                        <h1 class="text-3xl font-black text-white uppercase tracking-tight mb-2">Matrix & XP</h1>
+                        <p class="text-xs text-gray-500 font-bold uppercase tracking-widest mb-8 border-b border-slate-800 pb-4">Trinity Balance & Rank Scaling</p>
+                        <!-- CONTENT LATER -->
+                    </div>
+
+                    <div id="content-guide-saves" class="hidden">
+                        <h1 class="text-3xl font-black text-white uppercase tracking-tight mb-2">Saves</h1>
+                        <p class="text-xs text-gray-500 font-bold uppercase tracking-widest mb-8 border-b border-slate-800 pb-4">Notes, Math Engine & Dumps</p>
+                        <!-- CONTENT LATER -->
+                    </div>
+
+                    <div id="content-guide-crucible" class="hidden">
+                        <h1 class="text-3xl font-black text-red-500 uppercase tracking-tight mb-2">200 Hard Crucible</h1>
+                        <p class="text-xs text-gray-500 font-bold uppercase tracking-widest mb-8 border-b border-slate-800 pb-4">Iron Oaths & Relapse Tax</p>
+                        <!-- CONTENT LATER -->
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
@@ -1832,8 +1926,70 @@ window.handleLogout = function() {
     }
 };
 
+// --- SYSTEM GUIDE (FIELD MANUAL) LOGIC ---
 window.openHelp = function() {
-    alert("System Guide coming soon. Keep grinding."); // Placeholder for future modal
+    window.closeSidebar(); // Ensure sidebar gets out of the way
+    
+    const modal = document.getElementById('system-guide-modal');
+    const content = document.getElementById('system-guide-content');
+    
+    // Reset to first tab automatically
+    window.switchHelpTab('guide-register'); 
+    
+    modal.classList.remove('hidden');
+    modal.classList.add('flex');
+    
+    setTimeout(() => {
+        modal.classList.remove('opacity-0');
+        content.classList.remove('scale-95');
+    }, 10);
+};
+
+window.closeHelp = function() {
+    const modal = document.getElementById('system-guide-modal');
+    const content = document.getElementById('system-guide-content');
+    
+    modal.classList.add('opacity-0');
+    content.classList.add('scale-95');
+    
+    setTimeout(() => {
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+    }, 300);
+};
+
+window.switchHelpTab = function(tabId) {
+    const tabs = ['guide-register', 'guide-directive', 'guide-mechanics', 'guide-matrix', 'guide-saves', 'guide-crucible'];
+    
+    tabs.forEach(t => {
+        // Handle Content Pane Toggling
+        const contentPane = document.getElementById(`content-${t}`);
+        if (contentPane) {
+            if (t === tabId) {
+                contentPane.classList.remove('hidden');
+                contentPane.classList.add('block', 'animate-fade-in'); // Soft fade in
+            } else {
+                contentPane.classList.add('hidden');
+                contentPane.classList.remove('block', 'animate-fade-in');
+            }
+        }
+        
+        // Handle Button Styling Toggling
+        const btn = document.getElementById(`tab-${t}`);
+        if (btn) {
+            if (t === tabId) {
+                // Active State
+                btn.className = "w-full text-left px-4 py-3 text-xs md:text-sm font-black uppercase tracking-widest transition-all rounded-lg bg-slate-800/80 text-white border-l-4 border-accent shadow-md flex items-center gap-3 shrink-0 whitespace-nowrap";
+                if(t === 'guide-crucible') btn.classList.replace('border-accent', 'border-red-500'); // Special red border for Crucible
+            } else {
+                // Inactive State
+                btn.className = "w-full text-left px-4 py-3 text-xs md:text-sm font-bold uppercase tracking-widest transition-all rounded-lg bg-transparent text-gray-500 hover:bg-slate-800/40 hover:text-gray-300 border-l-4 border-transparent flex items-center gap-3 shrink-0 whitespace-nowrap";
+            }
+        }
+    });
+    
+    // Re-initialize icons just in case
+    lucide.createIcons();
 };
 
 // Auth Tab Logic
