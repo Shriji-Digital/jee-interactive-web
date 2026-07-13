@@ -232,9 +232,17 @@
             </div>
         </div>
         
+        <!-- Locked Middle Content -->
         <div class="flex-1 p-6 flex flex-col gap-3 overflow-y-auto custom-scrollbar">
-            <button onclick="window.openHelp()" class="w-full bg-slate-900 hover:bg-slate-800 text-gray-300 py-4 rounded-xl text-xs font-black uppercase tracking-widest transition flex items-center justify-start px-5 gap-3 border border-slate-800">
+            <button onclick="window.openHelp()" class="w-full bg-slate-900 hover:bg-slate-800 text-gray-300 py-4 rounded-xl text-xs font-black uppercase tracking-widest transition flex items-center justify-start px-5 gap-3 border border-slate-800 shrink-0">
                 <i data-lucide="book-open" class="text-blue-500" width="16" height="16"></i> System Guide
+            </button>
+            
+            <button onclick="window.openGracePeriod()" class="w-full bg-transparent hover:bg-slate-900/50 text-gray-400 py-3 rounded-xl text-xs font-black uppercase tracking-widest transition flex flex-col items-start px-5 border border-transparent hover:border-slate-800 shrink-0">
+                <div class="flex items-center gap-3">
+                    <i data-lucide="history" class="text-slate-500" width="16" height="16"></i> Grace Period
+                </div>
+                <span id="sidebar-grace-status" class="text-[9px] text-gray-500 font-bold tracking-widest mt-1 ml-7 uppercase">offline</span>
             </button>
         </div>
 
@@ -612,8 +620,12 @@
 
     </div>
     <div class="fixed bottom-24 right-4 md:right-8 z-40 flex flex-col items-end gap-3 pointer-events-none">
-        <div
-            class="pointer-events-auto flex items-center gap-2 bg-[#090e17]/80 backdrop-blur-md px-3 py-1.5 rounded-full border border-slate-800 text-[9px] uppercase tracking-widest font-bold">
+        <!-- GRACE PERIOD FLOATING ALERT -->
+        <div id="grace-period-alert" class="pointer-events-auto hidden bg-slate-900/80 backdrop-blur-md px-4 py-2 rounded-xl border border-slate-700 shadow-lg flex items-center gap-3 transition-all hover:bg-slate-800 cursor-pointer" onclick="window.openGracePeriod()">
+            <i data-lucide="history" class="text-gray-400" width="14" height="14"></i>
+            <span class="text-[9px] text-gray-300 font-bold uppercase tracking-widest">Yesterday's missing checks are open to lock in</span>
+        </div>
+        <div class="pointer-events-auto flex items-center gap-2 bg-[#090e17]/80 backdrop-blur-md px-3 py-1.5 rounded-full border border-slate-800 text-[9px] uppercase tracking-widest font-bold">
             <span id="db-status" class="flex items-center gap-1"><i data-lucide="loader-2" class="animate-spin"
                     width="10" height="10"></i> Syncing...</span>
         </div>
@@ -1474,6 +1486,26 @@
         </div>
     </div>
 
+    <!-- GRACE PERIOD (RECOVERY) MODAL -->
+    <div id="grace-period-modal" class="fixed inset-0 bg-black/90 backdrop-blur-md z-[115] hidden items-center justify-center p-4 transition-opacity duration-300 opacity-0">
+        <div id="grace-period-content" class="bg-[#090e17] w-full max-w-md rounded-3xl border border-slate-700 shadow-2xl flex flex-col overflow-hidden transform scale-95 transition-transform duration-300">
+            <div class="p-5 border-b border-slate-800 flex justify-between items-center bg-slate-900/50 shrink-0">
+                <h2 class="text-sm font-black text-white uppercase tracking-widest flex items-center gap-2">
+                    <i data-lucide="history" class="text-gray-400" width="16" height="16"></i> Recovery Log
+                </h2>
+                <button onclick="window.closeGracePeriod()" class="text-gray-500 hover:text-white transition p-1"><i data-lucide="x" width="18" height="18"></i></button>
+            </div>
+            <div class="flex border-b border-slate-800 shrink-0">
+                <button id="tab-grace-directive" onclick="window.switchGraceTab('directive')" class="flex-1 py-3 text-[10px] font-black uppercase tracking-widest text-white border-b-2 border-accent transition bg-slate-800/30">Directive</button>
+                <button id="tab-grace-crucible" onclick="window.switchGraceTab('crucible')" class="flex-1 py-3 text-[10px] font-black uppercase tracking-widest text-slate-500 border-b-2 border-transparent hover:text-gray-300 transition">Crucible</button>
+            </div>
+            <div class="p-6 overflow-y-auto custom-scrollbar max-h-[60vh]">
+                <div id="grace-directive-container" class="hidden"></div>
+                <div id="grace-crucible-container" class="hidden"></div>
+            </div>
+        </div>
+    </div>
+
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
@@ -1827,11 +1859,23 @@ if (data.profile) {
                     databaseChanged = true;
                 } else if (state.directive.cycleKey < currentCycle) {
                     let msgText = ""; let msgType = ""; let xpChange = 0;
+                    
+                    // SAVE ARCHIVE FOR GRACE PERIOD
+                    state.pastDirective = JSON.parse(JSON.stringify(state.directive));
+                    
                     if (state.directive.locked) {
                         const allDone = state.directive.tasks.length === 3 && state.directive.tasks.every(t => t.done);
-                        if (allDone) { xpChange = 50; msgText = "DIRECTIVE SECURED: +50 XP"; msgType = "success"; }
-                        else { xpChange = -100; msgText = "DIRECTIVE BREACHED (Incomplete): -100 XP"; msgType = "danger"; }
-                    } else { xpChange = -50; msgText = "DIRECTIVE MISSED (Not Locked): -50 XP"; msgType = "warning"; }
+                        if (allDone) { 
+                            xpChange = 50; msgText = "DIRECTIVE SECURED: +50 XP"; msgType = "success"; 
+                            state.pastDirective.autoFailed = false;
+                        } else { 
+                            xpChange = -100; msgText = "DIRECTIVE BREACHED (Incomplete): -100 XP"; msgType = "danger"; 
+                            state.pastDirective.autoFailed = true; // Strict Mode Eligible
+                        }
+                    } else { 
+                        xpChange = -50; msgText = "DIRECTIVE MISSED (Not Locked): -50 XP"; msgType = "warning"; 
+                        state.pastDirective.autoFailed = false; // Strict Mode Ineligible
+                    }
 
                     state.xp = Math.max(0, state.xp + xpChange);
                     const [y, m, d] = state.directive.cycleKey.split('-');
@@ -1847,9 +1891,10 @@ if (data.profile) {
                         if (dateKey < todayStr) {
                             const log = state.crucible.logs[dateKey];
                             if (!log.locked) {
+                                state.xp = Math.max(0, state.xp - 100); // Apply penalty for missing check
                                 log.locked = true;
-                                log.passed = log.o1 && log.o2 && log.o3 && log.o4 && log.o5;
-                                if (log.passed) state.xp += 200; // Award delayed XP
+                                log.passed = false;
+                                log.autoFailed = true; // Mark eligible for recovery
                                 databaseChanged = true;
                             }
                         }
@@ -2211,6 +2256,133 @@ window.toggleAuthMode = function(mode) {
                 btnYes.className = "bg-slate-800 text-gray-500 hover:text-white px-3 py-1.5 rounded text-xs font-black border border-slate-700 transition";
             }
         };
+
+        // --- YESTERDAY'S GRACE PERIOD ENGINE ---
+window.isRecovering = false; // System flag for War Room illusion
+
+window.updateGracePeriodStatus = function() {
+    const now = getISTDateObj();
+    const hour = now.getHours();
+    const isTimeValid = hour >= 0 && hour < 11;
+    
+    let pending = false;
+    if (state.pastDirective && state.pastDirective.autoFailed && !state.pastDirective.recovered) pending = true;
+    
+    const yLog = state.crucible?.logs?.[getYesterdayStr()];
+    if (yLog && yLog.autoFailed && !yLog.recovered) pending = true;
+
+    const sidebarText = document.getElementById('sidebar-grace-status');
+    const alertBox = document.getElementById('grace-period-alert');
+
+    if (!isTimeValid) {
+        if(sidebarText) sidebarText.innerText = "offline";
+        if(alertBox) alertBox.classList.add('hidden');
+    } else if (!pending) {
+        if(sidebarText) sidebarText.innerText = "nothing to recover";
+        if(alertBox) alertBox.classList.add('hidden');
+    } else {
+        if(sidebarText) sidebarText.innerText = "grace period active";
+        if(alertBox) alertBox.classList.remove('hidden');
+    }
+};
+
+window.openGracePeriod = function() {
+    window.closeSidebar();
+    const modal = document.getElementById('grace-period-modal'), content = document.getElementById('grace-period-content');
+    window.switchGraceTab('directive');
+    modal.classList.remove('hidden'); modal.classList.add('flex');
+    setTimeout(() => { modal.classList.remove('opacity-0'); content.classList.remove('scale-95'); }, 10);
+};
+
+window.closeGracePeriod = function() {
+    const modal = document.getElementById('grace-period-modal'), content = document.getElementById('grace-period-content');
+    modal.classList.add('opacity-0'); content.classList.add('scale-95');
+    setTimeout(() => { modal.classList.add('hidden'); modal.classList.remove('flex'); }, 300);
+};
+
+window.switchGraceTab = function(tab) {
+    document.getElementById('tab-grace-directive').className = tab === 'directive' ? "flex-1 py-3 text-[10px] font-black uppercase tracking-widest text-white border-b-2 border-accent transition bg-slate-800/30" : "flex-1 py-3 text-[10px] font-black uppercase tracking-widest text-slate-500 border-b-2 border-transparent hover:text-gray-300 transition";
+    document.getElementById('tab-grace-crucible').className = tab === 'crucible' ? "flex-1 py-3 text-[10px] font-black uppercase tracking-widest text-white border-b-2 border-accent transition bg-slate-800/30" : "flex-1 py-3 text-[10px] font-black uppercase tracking-widest text-slate-500 border-b-2 border-transparent hover:text-gray-300 transition";
+    
+    document.getElementById('grace-directive-container').className = tab === 'directive' ? "block" : "hidden";
+    document.getElementById('grace-crucible-container').className = tab === 'crucible' ? "block" : "hidden";
+    
+    if (tab === 'directive') window.renderGraceDirective();
+    if (tab === 'crucible') window.renderGraceCrucible();
+};
+
+window.renderGraceDirective = function() {
+    const container = document.getElementById('grace-directive-container');
+    if (!state.pastDirective || !state.pastDirective.autoFailed || state.pastDirective.recovered) {
+        container.innerHTML = `<div class="text-xs text-gray-500 text-center py-8 uppercase tracking-widest font-bold">No recoverable data found.</div>`;
+        return;
+    }
+    let html = `<div class="bg-[#0f172a] p-4 rounded-xl border border-slate-800 mb-6 shadow-inner">`;
+    state.pastDirective.tasks.forEach(t => {
+        html += `<div class="flex items-start gap-3 py-3 border-b border-slate-800/50 last:border-0"><label class="flex items-center gap-3 cursor-pointer cyber-checkbox pt-0.5"><input type="checkbox" ${t.done ? 'checked' : ''} onchange="window.toggleGraceDirectiveTask('${t.id}')"><div class="box"></div></label><span class="text-sm font-medium ${t.done ? 'text-slate-500 line-through' : 'text-gray-200'}">${t.text}</span></div>`;
+    });
+    html += `</div><button onclick="window.lockGraceDirective()" class="w-full bg-slate-800 hover:bg-emerald-900/40 text-emerald-500 border border-slate-700 hover:border-emerald-500/50 font-black py-3.5 rounded-xl uppercase tracking-widest transition">Lock Yesterday's Tasks</button>`;
+    container.innerHTML = html; lucide.createIcons();
+};
+
+window.toggleGraceDirectiveTask = function(taskId) {
+    if (!state.pastDirective) return;
+    const t = state.pastDirective.tasks.find(x => x.id === taskId);
+    if (t) { t.done = !t.done; window.renderGraceDirective(); }
+};
+
+window.lockGraceDirective = function() {
+    if (!state.pastDirective) return;
+    const allDone = state.pastDirective.tasks.length === 3 && state.pastDirective.tasks.every(t => t.done);
+    if (!allDone) return alert("Complete all tasks to secure the recovery.");
+    
+    state.xp += 150; // Refund 100 + Reward 50
+    state.pastDirective.recovered = true;
+    saveData(); window.updateGracePeriodStatus(); window.renderGraceDirective();
+};
+
+window.renderGraceCrucible = function() {
+    const container = document.getElementById('grace-crucible-container');
+    const yLog = state.crucible?.logs?.[getYesterdayStr()];
+    if (!yLog || !yLog.autoFailed || yLog.recovered) {
+        container.innerHTML = `<div class="text-xs text-gray-500 text-center py-8 uppercase tracking-widest font-bold">No recoverable data found.</div>`;
+        return;
+    }
+    let html = `<div class="flex flex-col gap-4 mb-6">`;
+    const oaths = [
+        { id: 'o1', text: '12:00 AM to 7:00 AM strict sleep cycle' }, { id: 'o2', text: 'Minimum 6 hours total sleep' },
+        { id: 'o3', text: 'Zero digital distractions in study blocks' }, { id: 'o4', text: 'Physical exercise (Heart rate elevated)' },
+        { id: 'o5', text: '70+ PYQs explicitly solved & reviewed' }, { id: 'o6', text: 'Hard grind to get seat in IIT Bombay' }
+    ];
+    oaths.forEach(o => {
+        html += `<label class="flex items-center gap-3 cursor-pointer group"><input type="checkbox" class="w-5 h-5 rounded bg-slate-900 border-slate-700 text-red-500 focus:ring-red-500" ${yLog[o.id] ? 'checked' : ''} onchange="window.toggleGraceCrucibleOath('${o.id}')"><span class="text-sm font-bold text-gray-400 group-hover:text-gray-200 transition">${o.text}</span></label>`;
+    });
+    html += `</div><button onclick="window.lockGraceCrucible()" class="w-full bg-slate-800 hover:bg-red-900/40 text-red-500 border border-slate-700 hover:border-red-500/50 font-black py-3.5 rounded-xl uppercase tracking-widest transition">Lock Yesterday's Crucible</button>`;
+    container.innerHTML = html; lucide.createIcons();
+};
+
+window.toggleGraceCrucibleOath = function(oathId) {
+    const yLog = state.crucible.logs[getYesterdayStr()];
+    if (yLog) yLog[oathId] = !yLog[oathId];
+};
+
+window.lockGraceCrucible = function() {
+    const yLog = state.crucible.logs[getYesterdayStr()];
+    if (!yLog) return;
+    const passed = yLog.o1 && yLog.o2 && yLog.o3 && yLog.o4 && yLog.o5;
+    if (!passed) return alert("All Iron Oaths must be secured to pass recovery.");
+    
+    window.isRecovering = true; // Route War Room to Yesterday
+    window.closeGracePeriod();
+    
+    const questions = ["Where did your focus break yesterday?", "What concept exposed your weakness yesterday?", "Did you leave any effort on the table yesterday?", "What was your biggest distraction yesterday?"];
+    document.getElementById('war-room-q').innerText = questions[Math.floor(Math.random() * questions.length)];
+    document.getElementById('war-room-input').value = '';
+    
+    const overlay = document.getElementById('war-room-overlay'), content = document.getElementById('war-room-content');
+    overlay.classList.remove('hidden');
+    setTimeout(() => { overlay.classList.remove('opacity-0'); content.classList.remove('scale-95'); document.getElementById('war-room-input').focus(); }, 10);
+};
 
         window.openLogModal = function () {
             const log = state.studyLogs[getTodayStr()] || {};
@@ -3631,27 +3803,35 @@ window.closeMobileCanvas = function() {
 
         window.sealCrucibleDay = function() {
             const debrief = document.getElementById('war-room-input').value.trim();
-            const todayStr = getTodayStr();
+            const targetDateStr = window.isRecovering ? getYesterdayStr() : getTodayStr(); // Illusion Routing
             
-            // BUGFIX: If memory for today is completely blank (e.g., locking a failed day), initialize it first.
-            if (!state.crucible.logs[todayStr]) {
-                state.crucible.logs[todayStr] = { o1:false, o2:false, o3:false, o4:false, o5:false, locked: false, passed: false };
+            if (!state.crucible.logs[targetDateStr]) {
+                state.crucible.logs[targetDateStr] = { o1:false, o2:false, o3:false, o4:false, o5:false, locked: false, passed: false };
             }
             
-            const log = state.crucible.logs[todayStr];
+            const log = state.crucible.logs[targetDateStr];
             
-            log.debrief = debrief || "No debrief recorded."; // Save the journal entry
+            log.debrief = debrief || "No debrief recorded."; 
             log.locked = true;
             log.passed = log.o1 && log.o2 && log.o3 && log.o4 && log.o5;
             
             if (log.passed) {
-                state.xp += 25; // Phase 1 Calibrated Grind
+                if (window.isRecovering) {
+                    state.xp += 150; // Grace Period: Refund + Reward
+                    log.recovered = true;
+                } else {
+                    state.xp += 25; // Standard Daily Reward
+                }
                 if (typeof confetti === 'function') confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
             }
             
             saveData();
             window.closeWarRoom();
-            setTimeout(() => window.renderCrucible(), 300);
+            window.isRecovering = false; // Reset flag instantly
+            setTimeout(() => {
+                if (window.renderCrucible) window.renderCrucible();
+                if (window.updateGracePeriodStatus) window.updateGracePeriodStatus();
+            }, 300);
         };
 
         window.buyShield = function() {
@@ -3724,6 +3904,7 @@ window.closeMobileCanvas = function() {
             checkLevelUp(); renderDirective(); renderHeatmap(); analyzeDiagnostics(); renderHabits(); renderLogsVault(); renderBoards();
             if (window.renderCrucible) window.renderCrucible();
             if (window.renderMatrixData) window.renderMatrixData();
+            window.updateGracePeriodStatus();
             lucide.createIcons();
         }
 
@@ -3743,6 +3924,7 @@ window.closeMobileCanvas = function() {
         
         // --- AUTOMATED BACKGROUND ENGINE ---
         // 1. The 60-Second Master Check (Handles Alerts, Data Audits, and Midnight Rollover)
+        // 1. The 60-Second Master Check (Handles Alerts, Data Audits, and Midnight Rollover)
         setInterval(() => { 
             if (document.getElementById('db-status').innerText.includes("Uplink Secured")) { updateGlobalUI(); }
             
@@ -3752,11 +3934,23 @@ window.closeMobileCanvas = function() {
             const currentCycle = getDirectiveCycle();
             if (state.directive && state.directive.cycleKey < currentCycle) {
                 let msgText = ""; let msgType = ""; let xpChange = 0;
+                
+                // SAVE ARCHIVE FOR GRACE PERIOD
+                state.pastDirective = JSON.parse(JSON.stringify(state.directive));
+
                 if (state.directive.locked) {
                     const allDone = state.directive.tasks.length === 3 && state.directive.tasks.every(t => t.done);
-                    if (allDone) { xpChange = 50; msgText = "DIRECTIVE SECURED: +50 XP"; msgType = "success"; }
-                    else { xpChange = -100; msgText = "DIRECTIVE BREACHED (Incomplete): -100 XP"; msgType = "danger"; }
-                } else { xpChange = -50; msgText = "DIRECTIVE MISSED (Not Locked): -50 XP"; msgType = "warning"; }
+                    if (allDone) { 
+                        xpChange = 50; msgText = "DIRECTIVE SECURED: +50 XP"; msgType = "success"; 
+                        state.pastDirective.autoFailed = false;
+                    } else { 
+                        xpChange = -100; msgText = "DIRECTIVE BREACHED (Incomplete): -100 XP"; msgType = "danger"; 
+                        state.pastDirective.autoFailed = true; // Strict Mode Eligible
+                    }
+                } else { 
+                    xpChange = -50; msgText = "DIRECTIVE MISSED (Not Locked): -50 XP"; msgType = "warning"; 
+                    state.pastDirective.autoFailed = false; // Strict Mode Ineligible
+                }
 
                 state.xp = Math.max(0, state.xp + xpChange);
                 const [y, m, d] = state.directive.cycleKey.split('-');
@@ -3773,15 +3967,16 @@ window.closeMobileCanvas = function() {
                     if (dateKey < todayStr) {
                         const log = state.crucible.logs[dateKey];
                         if (!log.locked) {
+                            state.xp = Math.max(0, state.xp - 100); // Apply penalty for missing check
                             log.locked = true;
-                            log.passed = log.o1 && log.o2 && log.o3 && log.o4 && log.o5;
-                            if (log.passed) state.xp += 25; 
+                            log.passed = false;
+                            log.autoFailed = true; // Mark eligible for recovery
                             crucibleChanged = true;
                         }
                     }
                 });
                 if (crucibleChanged) saveData();
-            }
+         }
 
             // SMART ALERTS
             if (hours === 23 && minutes === 0) { 
