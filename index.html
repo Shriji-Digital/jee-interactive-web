@@ -3171,6 +3171,12 @@ window.closeMobileCanvas = function() {
             if (!isTimeWindowValid()) { alert("STRICT DISCIPLINE PROTOCOL: Secure streaks only between 11:00 PM and Midnight (IST)."); return; }
             const habit = state.habits.find(h => h.id === id); const today = getTodayStr();
             if (habit.lastCompleted === today) return;
+            
+            // 🚨 BUGFIX: BLOCK THE GHOST STREAK LOOPHOLE
+            const diffDays = getDaysDiffIST(habit.lastCompleted);
+            if (diffDays === 2 && habit.currentStreak > 0) return alert("PROTOCOL BREACH: You missed yesterday. You must Rescue the streak first.");
+            if (diffDays >= 3 && habit.currentStreak > 0) return alert("STREAK DEAD: You missed multiple days. The system requires a hard reset.");
+
             habit.currentStreak++; habit.lastCompleted = today;
             if (habit.currentStreak > habit.maxStreak) habit.maxStreak = habit.currentStreak;
             state.xp += 25;
@@ -3182,10 +3188,15 @@ window.closeMobileCanvas = function() {
         };
 
         window.rescueHabit = function(id) {
+            const habit = state.habits.find(h => h.id === id);
+            
+            // 🚨 BUGFIX: PREVENT EXPLOITING RESCUE FOR DEAD STREAKS
+            const diffDays = getDaysDiffIST(habit.lastCompleted);
+            if (diffDays !== 2) return alert("Rescue Missions can only bridge a 1-day gap (Yesterday).");
+
             if (state.xp < 100) return alert("You need 100 Rank XP to initiate a Rescue Mission.");
             if (confirm("Initiate Rescue Mission? Cost: -100 XP. This bridges the gap for yesterday.")) {
                 state.xp -= 100;
-                const habit = state.habits.find(h => h.id === id);
                 habit.currentStreak++; habit.lastCompleted = getYesterdayStr();
                 if (habit.currentStreak > habit.maxStreak) habit.maxStreak = habit.currentStreak;
                 saveData();
@@ -3211,7 +3222,11 @@ window.closeMobileCanvas = function() {
             const container = document.getElementById('habits-container'); container.innerHTML = '';
             const today = getTodayStr(), isValidTime = isTimeWindowValid();
             state.habits.forEach(habit => {
-                const diffDays = getDaysDiffIST(habit.lastCompleted), isDoneToday = (habit.lastCompleted === today), isEndangered = (diffDays === 2 && habit.currentStreak > 0);
+                const diffDays = getDaysDiffIST(habit.lastCompleted);
+                const isDoneToday = (habit.lastCompleted === today);
+                const isEndangered = (diffDays === 2 && habit.currentStreak > 0);
+                const isDead = (diffDays >= 3 && habit.currentStreak > 0); // 🚨 NEW DEATH STATE
+
                 let icColor = "text-slate-600", icGlow = "", icType = "flame";
                 if (habit.currentStreak > 0) icColor = "text-yellow-500"; if (habit.currentStreak >= 7) icColor = "text-orange-500";
                 if (habit.currentStreak >= 14) { icColor = "text-danger"; icType = "zap"; }
@@ -3220,6 +3235,7 @@ window.closeMobileCanvas = function() {
 
                 let mainBtn = "";
                 if (isDoneToday) mainBtn = `<button class="col-span-2 bg-slate-800 text-slate-500 cursor-not-allowed font-black py-2.5 rounded-lg flex justify-center items-center gap-2" disabled><i data-lucide="check-circle" width="16" height="16"></i> Secured</button>`;
+                else if (isDead) mainBtn = `<button onclick="window.resetHabit('${habit.id}')" class="col-span-2 bg-red-900/20 border border-red-500/50 text-red-500 hover:bg-red-600 hover:text-white font-black py-2.5 rounded-lg transition flex justify-center items-center gap-2 text-sm shadow-[0_0_15px_rgba(220,38,38,0.2)]"><i data-lucide="skull" width="16" height="16"></i> DEAD (Reset Required)</button>`;
                 else if (isEndangered) mainBtn = `<button onclick="window.rescueHabit('${habit.id}')" class="col-span-2 bg-amber-500/10 border border-amber-500/50 text-amber-500 hover:bg-amber-500 hover:text-slate-900 shadow-[0_0_15px_rgba(245,158,11,0.2)] font-black py-2.5 rounded-lg transition flex justify-center items-center gap-2 text-sm"><i data-lucide="life-buoy" width="16" height="16"></i> Rescue (-100 XP)</button>`;
                 else if (!isValidTime) mainBtn = `<button onclick="window.markDone('${habit.id}')" class="col-span-2 bg-slate-800/80 border border-slate-700 text-gray-400 hover:bg-slate-700 font-black py-2.5 rounded-lg transition flex justify-center items-center gap-2 text-sm"><i data-lucide="lock" width="16" height="16"></i> 11 PM Unlock</button>`;
                 else mainBtn = `<button onclick="window.markDone('${habit.id}')" class="col-span-2 bg-accent hover:bg-emerald-400 text-slate-900 shadow-[0_0_15px_rgba(16,185,129,0.2)] font-black py-2.5 rounded-lg transition flex justify-center items-center gap-2 text-sm"><i data-lucide="check" width="16" height="16"></i> Done</button>`;
@@ -3977,6 +3993,27 @@ window.closeMobileCanvas = function() {
                 });
                 if (crucibleChanged) saveData();
          }
+
+            // --- LIVE HABITS DECAY AUTO-AUDIT ---
+            let habitsChanged = false;
+            state.habits.forEach(habit => {
+                if (habit.lastCompleted && habit.currentStreak > 0) {
+                    const diffDays = getDaysDiffIST(habit.lastCompleted);
+                    if (diffDays >= 3) {
+                        if (state.shields > 0) { 
+                            state.shields--; 
+                            habit.lastCompleted = getYesterdayStr(); 
+                        } else { 
+                            habit.currentStreak = 0; 
+                            habit.lastCompleted = null; 
+                            state.recoveryUntil = Date.now() + 86400000; 
+                            state.xp = Math.max(0, state.xp - 250); 
+                        }
+                        habitsChanged = true;
+                    }
+                }
+            });
+            if (habitsChanged) saveData();
 
             // SMART ALERTS
             if (hours === 23 && minutes === 0) { 
