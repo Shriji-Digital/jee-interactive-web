@@ -210,6 +210,9 @@
 
 <body id="app-body" class="min-h-screen p-4 md:p-6 lg:p-8 flex flex-col">
 
+    <!-- RELAPSE TAX MONOCHROME OVERLAY (Fixes CSS Filter Bug) -->
+    <div id="recovery-overlay" class="fixed inset-0 z-[9998] pointer-events-none hidden opacity-0 transition-opacity duration-1000" style="backdrop-filter: grayscale(100%) brightness(0.7) contrast(1.2); -webkit-backdrop-filter: grayscale(100%) brightness(0.7) contrast(1.2);"></div>
+    
     <div id="sidebar-overlay" class="fixed inset-0 bg-black/80 z-[990] hidden opacity-0 transition-opacity duration-300" onclick="window.closeSidebar()"></div>
 
     <div id="sidebar-panel" class="fixed inset-y-0 left-0 h-[100dvh] max-h-screen w-72 bg-[#05080f] border-r border-slate-800 z-[1000] transform -translate-x-full opacity-0 hidden transition-all duration-300 flex flex-col shadow-[20px_0_50px_rgba(0,0,0,0.8)] overflow-hidden">
@@ -3911,10 +3914,26 @@ window.closeMobileCanvas = function() {
         }
 
         function updateGlobalUI() {
-            const body = document.getElementById('app-body');
             const statusTxt = document.getElementById('system-status');
-            if (state.recoveryUntil && Date.now() < state.recoveryUntil) { body.classList.add('recovery-mode'); statusTxt.classList.remove('text-accent'); statusTxt.classList.add('text-danger'); }
-            else { body.classList.remove('recovery-mode'); statusTxt.classList.remove('text-danger'); statusTxt.classList.add('text-accent'); if (state.recoveryUntil) { state.recoveryUntil = null; saveData(); } }
+            const recOverlay = document.getElementById('recovery-overlay');
+            
+            // Toggle the new Backdrop Filter Overlay instead of the body class
+            if (state.recoveryUntil && Date.now() < state.recoveryUntil) { 
+                if (recOverlay) {
+                    recOverlay.classList.remove('hidden');
+                    setTimeout(() => recOverlay.classList.remove('opacity-0'), 10);
+                }
+                statusTxt.classList.remove('text-accent'); 
+                statusTxt.classList.add('text-danger'); 
+            } else { 
+                if (recOverlay) {
+                    recOverlay.classList.add('opacity-0');
+                    setTimeout(() => recOverlay.classList.add('hidden'), 1000);
+                }
+                statusTxt.classList.remove('text-danger'); 
+                statusTxt.classList.add('text-accent'); 
+                if (state.recoveryUntil) { state.recoveryUntil = null; saveData(); } 
+            }
 
             document.getElementById('xp-display').innerText = state.xp; document.getElementById('shield-display').innerText = state.shields;
             checkLevelUp(); renderDirective(); renderHeatmap(); analyzeDiagnostics(); renderHabits(); renderLogsVault(); renderBoards();
