@@ -3144,6 +3144,26 @@ window.closeMobileCanvas = function() {
             } else {
                 interceptBox.classList.add('hidden');
                 check.checked = true; // safe default
+            }
+
+            // THE MISSING CODE: OPEN THE MODAL & CLOSE THE FUNCTION
+            window.validateDumpForm();
+            const modal = document.getElementById('dump-modal-overlay'), content = document.getElementById('dump-modal-content');
+            modal.classList.remove('hidden'); 
+            setTimeout(() => { modal.classList.remove('opacity-0'); content.classList.remove('scale-95'); }, 10);
+        };
+            
+            const interceptBox = document.getElementById('dump-intercept-box');
+            const check = document.getElementById('dump-delta-check');
+            
+            if (dateStr === getTodayStr() && lastLog && lastLog.delta && !lastLog.deltaChecked) {
+                interceptBox.classList.remove('hidden');
+                document.getElementById('dump-intercept-text').innerText = lastLog.delta;
+                interceptBox.setAttribute('data-target-date', lastLoggedDumpDate); // Save memory of which day we are paying for
+                check.checked = false;
+            } else {
+                interceptBox.classList.add('hidden');
+                check.checked = true; // safe default
         }
 
         window.renderDumpTags = function() {
