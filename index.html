@@ -414,12 +414,16 @@
                         <i data-lucide="star" class="text-yellow-400 fill-yellow-400" width="14" height="14"></i>
                         <div class="font-black text-sm" id="xp-display">0</div>
                     </div>
-                    <div class="glass-card px-3 py-1.5 rounded-lg flex items-center gap-2 border-b-2 border-b-iit">
-                        <i data-lucide="shield" class="text-iit fill-iit/20" width="14" height="14"></i>
-                        <div class="font-black text-sm" id="shield-display">1</div>
-                    </div>
-                </div>
-            </div>
+                    <!-- Interactive Shield Armory -->
+                    <button onclick="window.buyShield()" class="glass-card px-3 py-1.5 rounded-lg flex items-center gap-1.5 border-b-2 border-b-iit hover:bg-slate-800/80 transition group" title="Exchange 300 XP for 1 Shield">
+                        <i data-lucide="shield" class="text-iit fill-iit/20 group-hover:fill-iit/40 transition" width="14" height="14"></i>
+                        <div class="font-black text-sm pr-1" id="shield-display">1</div>
+                        <div class="w-0 overflow-hidden group-hover:w-3 transition-all duration-300 flex items-center justify-center">
+                            <i data-lucide="plus" class="text-iit" width="12" height="12"></i>
+                        </div>
+                    </button>
+                 </div>
+    
             <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
                 <div class="lg:col-span-8 flex flex-col gap-6 lg:border-r lg:border-slate-800 lg:pr-6">
 
@@ -1804,7 +1808,10 @@ onAuthStateChanged(auth, (user) => {
         function formatDateStr(d) { return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`; }
         function getTodayStr() { return formatDateStr(getISTDateObj()); }
         function getYesterdayStr() { const d = getISTDateObj(); d.setDate(d.getDate() - 1); return formatDateStr(d); }
-        function isTimeWindowValid() { return getISTDateObj().getHours() === 23; }
+        function isTimeWindowValid() { 
+            const h = getISTDateObj().getHours(); 
+            return h >= 21 && h <= 23; 
+        }
         function formatDisplayDate(dateStr) { return new Date(dateStr).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }); }
         function getDaysDiffIST(pastDateStr) {
             if (!pastDateStr) return 0;
@@ -1887,22 +1894,39 @@ if (data.profile) {
                     databaseChanged = true;
                 }
 
-                // --- CRUCIBLE AUTO-AUDIT (MORNING JUDGMENT) ---
-                if (state.crucible && state.crucible.active && state.crucible.logs) {
+                // --- CRUCIBLE AUTO-AUDIT (MORNING JUDGMENT & GHOST LOG FIX) ---
+                if (state.crucible && state.crucible.active) {
                     const todayStr = getTodayStr();
-                    Object.keys(state.crucible.logs).forEach(dateKey => {
-                        if (dateKey < todayStr) {
-                            const log = state.crucible.logs[dateKey];
-                            if (!log.locked) {
-                                state.xp = Math.max(0, state.xp - 100); // Apply penalty for missing check
-                                log.locked = true;
-                                log.passed = false;
-                                log.autoFailed = true; // Mark eligible for recovery
-                                databaseChanged = true;
-                            }
+                    const yesterdayStr = getYesterdayStr();
+                    let crucibleChanged = false;
+                    
+                    if (!state.crucible.logs) state.crucible.logs = {};
+                    
+                    const startParts = state.crucible.startDate.split('-');
+                    const currentDayNum = getDaysDiffIST(state.crucible.startDate) + 1;
+
+                    // Loop from Day 1 to Yesterday. If a log is completely missing (Ghost Log) or unlocked, fail it.
+                    for (let i = 1; i < currentDayNum; i++) {
+                        const d = new Date(startParts[0], startParts[1] - 1, startParts[2]);
+                        d.setDate(d.getDate() + (i - 1));
+                        const dayStr = formatDateStr(d);
+                        
+                        const log = state.crucible.logs[dayStr];
+                        
+                        if (!log || !log.locked) {
+                            state.xp = Math.max(0, state.xp - 100); // Apply penalty for missing check
+                            state.crucible.logs[dayStr] = {
+                                o1: false, o2: false, o3: false, o4: false, o5: false,
+                                ...(log || {}), // Keep any checks they might have clicked but forgot to lock
+                                locked: true,
+                                passed: false,
+                                autoFailed: (dayStr === yesterdayStr) // ONLY yesterday gets the grace period
+                            };
+                            crucibleChanged = true;
                         }
-                    });
-                }
+                    }
+                    if (crucibleChanged) saveData();
+                 }
 
                 state.habits.forEach(habit => {
                     if (habit.lastCompleted && habit.currentStreak > 0) {
@@ -3096,25 +3120,31 @@ window.closeMobileCanvas = function() {
             document.getElementById('dump-leaks').value = dump.leaks || "";
             document.getElementById('dump-delta').value = dump.delta || "";
             
-            // DELTA INTERCEPT LOGIC
-            const yesterday = getYesterdayStr();
-            const yLog = state.dailyDumps[yesterday];
+            // DELTA INTERCEPT LOGIC (Finds most recent dump, even if days were skipped)
+            const dumpDates = Object.keys(state.dailyDumps || {}).sort((a, b) => new Date(b) - new Date(a));
+            let lastLoggedDumpDate = null;
+            let lastLog = null;
+            
+            for (let d of dumpDates) {
+                if (d < dateStr && state.dailyDumps[d].delta) {
+                    lastLoggedDumpDate = d;
+                    lastLog = state.dailyDumps[d];
+                    break;
+                }
+            }
+            
             const interceptBox = document.getElementById('dump-intercept-box');
             const check = document.getElementById('dump-delta-check');
             
-            if (dateStr === getTodayStr() && yLog && yLog.delta && !yLog.deltaChecked) {
+            if (dateStr === getTodayStr() && lastLog && lastLog.delta && !lastLog.deltaChecked) {
                 interceptBox.classList.remove('hidden');
-                document.getElementById('dump-intercept-text').innerText = yLog.delta;
+                document.getElementById('dump-intercept-text').innerText = lastLog.delta;
+                interceptBox.setAttribute('data-target-date', lastLoggedDumpDate); // Save memory of which day we are paying for
                 check.checked = false;
             } else {
                 interceptBox.classList.add('hidden');
                 check.checked = true; // safe default
-            }
-
-            window.validateDumpForm();
-            const modal = document.getElementById('dump-modal-overlay'), content = document.getElementById('dump-modal-content');
-            modal.classList.remove('hidden'); setTimeout(() => { modal.classList.remove('opacity-0'); content.classList.remove('scale-95'); }, 10);
-        };
+        }
 
         window.renderDumpTags = function() {
             const render = (theme, arr, containerId, activeClass, inactiveClass) => {
@@ -3144,7 +3174,10 @@ window.closeMobileCanvas = function() {
             const delta = document.getElementById('dump-delta').value.trim();
             
             const box = document.getElementById('dump-intercept-box'), check = document.getElementById('dump-delta-check');
-            if (!box.classList.contains('hidden') && check.checked) state.dailyDumps[getYesterdayStr()].deltaChecked = true;
+            if (!box.classList.contains('hidden') && check.checked) {
+                const targetDate = box.getAttribute('data-target-date');
+                if (targetDate && state.dailyDumps[targetDate]) state.dailyDumps[targetDate].deltaChecked = true;
+            }
 
             if (activeDumpTags.length > 0 || timeline || wins || leaks || delta) {
                 state.dailyDumps[dateStr] = { tags: activeDumpTags, timeline, wins, leaks, delta, deltaChecked: state.dailyDumps[dateStr] ? state.dailyDumps[dateStr].deltaChecked : false };
@@ -3171,7 +3204,7 @@ window.closeMobileCanvas = function() {
         };
 
         window.markDone = function(id) {
-            if (!isTimeWindowValid()) { alert("STRICT DISCIPLINE PROTOCOL: Secure streaks only between 11:00 PM and Midnight (IST)."); return; }
+            if (!isTimeWindowValid()) { alert("STRICT DISCIPLINE PROTOCOL: Secure streaks only between 9:00 PM and Midnight (IST)."); return; }
             const habit = state.habits.find(h => h.id === id); const today = getTodayStr();
             if (habit.lastCompleted === today) return;
             
@@ -3240,7 +3273,7 @@ window.closeMobileCanvas = function() {
                 if (isDoneToday) mainBtn = `<button class="col-span-2 bg-slate-800 text-slate-500 cursor-not-allowed font-black py-2.5 rounded-lg flex justify-center items-center gap-2" disabled><i data-lucide="check-circle" width="16" height="16"></i> Secured</button>`;
                 else if (isDead) mainBtn = `<button onclick="window.resetHabit('${habit.id}')" class="col-span-2 bg-red-900/20 border border-red-500/50 text-red-500 hover:bg-red-600 hover:text-white font-black py-2.5 rounded-lg transition flex justify-center items-center gap-2 text-sm shadow-[0_0_15px_rgba(220,38,38,0.2)]"><i data-lucide="skull" width="16" height="16"></i> DEAD (Reset Required)</button>`;
                 else if (isEndangered) mainBtn = `<button onclick="window.rescueHabit('${habit.id}')" class="col-span-2 bg-amber-500/10 border border-amber-500/50 text-amber-500 hover:bg-amber-500 hover:text-slate-900 shadow-[0_0_15px_rgba(245,158,11,0.2)] font-black py-2.5 rounded-lg transition flex justify-center items-center gap-2 text-sm"><i data-lucide="life-buoy" width="16" height="16"></i> Rescue (-100 XP)</button>`;
-                else if (!isValidTime) mainBtn = `<button onclick="window.markDone('${habit.id}')" class="col-span-2 bg-slate-800/80 border border-slate-700 text-gray-400 hover:bg-slate-700 font-black py-2.5 rounded-lg transition flex justify-center items-center gap-2 text-sm"><i data-lucide="lock" width="16" height="16"></i> 11 PM Unlock</button>`;
+                else if (!isValidTime) mainBtn = `<button onclick="window.markDone('${habit.id}')" class="col-span-2 bg-slate-800/80 border border-slate-700 text-gray-400 hover:bg-slate-700 font-black py-2.5 rounded-lg transition flex justify-center items-center gap-2 text-sm"><i data-lucide="lock" width="16" height="16"></i> 9 PM Unlock</button>`;
                 else mainBtn = `<button onclick="window.markDone('${habit.id}')" class="col-span-2 bg-accent hover:bg-emerald-400 text-slate-900 shadow-[0_0_15px_rgba(16,185,129,0.2)] font-black py-2.5 rounded-lg transition flex justify-center items-center gap-2 text-sm"><i data-lucide="check" width="16" height="16"></i> Done</button>`;
 
                 container.innerHTML += `<div class="glass-card rounded-2xl p-5 flex flex-col relative transition-all duration-300 ${isDoneToday ? 'border-emerald-500/30 bg-emerald-900/10' : ''}"><button onclick="window.deleteHabit('${habit.id}')" class="absolute top-4 right-4 text-slate-600 hover:text-danger transition"><i data-lucide="x" width="16" height="16"></i></button><div class="flex items-center gap-3 mb-4"><div class="${icColor} ${icGlow}"><i data-lucide="${icType}" width="28" height="28"></i></div><div><h3 class="font-bold text-sm leading-tight w-[80%]">${habit.name}</h3><p class="text-[9px] text-gray-500 mt-0.5 uppercase font-bold tracking-wider">Max: ${habit.maxStreak}</p></div></div><div class="flex justify-between items-end mb-5"><div><div class="text-4xl font-black text-white tracking-tighter">${habit.currentStreak}</div><div class="text-[9px] uppercase tracking-widest text-gray-500 font-bold">Days Active</div></div>${isDoneToday ? `<span class="bg-emerald-500/20 text-emerald-400 text-[10px] font-bold px-2 py-1 rounded flex items-center gap-1"><i data-lucide="check" width="12" height="12"></i> SECURED</span>` : `<span class="bg-slate-800 text-gray-500 border border-slate-700 text-[10px] font-bold px-2 py-1 rounded flex items-center gap-1"><i data-lucide="clock" width="12" height="12"></i> PENDING</span>`}</div><div class="grid grid-cols-3 gap-2 mt-auto">${mainBtn}<button onclick="window.resetHabit('${habit.id}')" class="col-span-1 bg-slate-800/50 hover:bg-danger hover:text-white text-gray-500 font-bold py-2.5 rounded-lg transition flex justify-center items-center"><i data-lucide="rotate-ccw" width="16" height="16"></i></button></div></div>`;
@@ -3854,10 +3887,10 @@ window.closeMobileCanvas = function() {
         };
 
         window.buyShield = function() {
-            if (state.xp >= 1000) { 
-                if (confirm("Exchange 1000 Rank XP for 1 Shield?")) { state.xp -= 1000; state.shields++; saveData(); } 
+            if (state.xp >= 300) { 
+                if (confirm("Exchange 300 Rank XP for 1 Shield?")) { state.xp -= 300; state.shields++; saveData(); } 
             } else {
-                alert(`Insufficient Rank XP. You only have ${state.xp} XP.`);
+                alert(`Insufficient Rank XP. You only have ${state.xp} XP (300 XP Required).`);
             }
         };
 
@@ -3994,24 +4027,39 @@ window.closeMobileCanvas = function() {
                 saveData(); renderDirective();
             }
 
-            // CRUCIBLE MORNING AUTO-AUDIT
-            if (state.crucible && state.crucible.active && state.crucible.logs) {
+            // --- CRUCIBLE AUTO-AUDIT (MORNING JUDGMENT & GHOST LOG FIX) ---
+            if (state.crucible && state.crucible.active) {
                 const todayStr = getTodayStr();
+                const yesterdayStr = getYesterdayStr();
                 let crucibleChanged = false;
-                Object.keys(state.crucible.logs).forEach(dateKey => {
-                    if (dateKey < todayStr) {
-                        const log = state.crucible.logs[dateKey];
-                        if (!log.locked) {
-                            state.xp = Math.max(0, state.xp - 100); // Apply penalty for missing check
-                            log.locked = true;
-                            log.passed = false;
-                            log.autoFailed = true; // Mark eligible for recovery
-                            crucibleChanged = true;
-                        }
+                
+                if (!state.crucible.logs) state.crucible.logs = {};
+                
+                const startParts = state.crucible.startDate.split('-');
+                const currentDayNum = getDaysDiffIST(state.crucible.startDate) + 1;
+
+                // Loop from Day 1 to Yesterday. If a log is completely missing (Ghost Log) or unlocked, fail it.
+                for (let i = 1; i < currentDayNum; i++) {
+                    const d = new Date(startParts[0], startParts[1] - 1, startParts[2]);
+                    d.setDate(d.getDate() + (i - 1));
+                    const dayStr = formatDateStr(d);
+                    
+                    const log = state.crucible.logs[dayStr];
+                    
+                    if (!log || !log.locked) {
+                        state.xp = Math.max(0, state.xp - 100); // Apply penalty for missing check
+                        state.crucible.logs[dayStr] = {
+                            o1: false, o2: false, o3: false, o4: false, o5: false,
+                            ...(log || {}), // Keep any checks they might have clicked but forgot to lock
+                            locked: true,
+                            passed: false,
+                            autoFailed: (dayStr === yesterdayStr) // ONLY yesterday gets the grace period
+                        };
+                        crucibleChanged = true;
                     }
-                });
+                }
                 if (crucibleChanged) saveData();
-         }
+            }
 
             // --- LIVE HABITS DECAY AUTO-AUDIT ---
             let habitsChanged = false;
