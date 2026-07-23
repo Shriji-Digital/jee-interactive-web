@@ -328,6 +328,23 @@
                     <input type="number" id="auth-reg-year" value="2027" class="w-full glass-input rounded-xl px-2 py-3 text-sm font-bold text-center">
                 </div>
             </div>
+            <div class="grid grid-cols-2 gap-3 mt-2">
+                <div>
+                    <label class="text-[10px] uppercase text-gray-400 font-bold mb-1 block">5th Subject</label>
+                    <select id="auth-reg-optional" onchange="window.toggleCustomOpt('auth-reg')" class="w-full glass-input rounded-xl px-2 py-3 text-sm appearance-none cursor-pointer font-bold text-center">
+                        <option value="Computer Science">Computer Science</option>
+                        <option value="Physical Education">Physical Education</option>
+                        <option value="Fine Arts">Fine Arts</option>
+                        <option value="Music">Music</option>
+                        <option value="Psychology">Psychology</option>
+                        <option value="Custom">Custom...</option>
+                    </select>
+                </div>
+                <div id="auth-reg-custom-box" class="hidden">
+                    <label class="text-[10px] uppercase text-accent font-bold mb-1 block">Specify Custom</label>
+                    <input type="text" id="auth-reg-custom" placeholder="e.g. Economics" class="w-full glass-input rounded-xl px-3 py-3 text-sm font-bold">
+                </div>
+            </div>
         </div>
 
         <div id="auth-email-fields" class="space-y-4 mb-6">
@@ -336,7 +353,7 @@
                 <input type="email" id="auth-email" placeholder="beast@jee.com" class="w-full glass-input rounded-xl px-4 py-3 text-sm font-bold">
             </div>
             <div>
-                <label class="text-[10px] uppercase text-gray-400 font-bold mb-1 block">Set Password</label>
+                <label class="text-[10px] uppercase text-gray-400 font-bold mb-1 block">Enter Password</label>
                 <input type="password" id="auth-password" placeholder="••••••••" class="w-full glass-input rounded-xl px-4 py-3 text-sm font-bold">
             </div>
         </div>
@@ -808,6 +825,23 @@
                     <input type="number" id="edit-year" class="w-full glass-input rounded-xl px-2 py-3 text-sm font-bold text-center">
                 </div>
             </div>
+            <div class="grid grid-cols-2 gap-3 mt-2">
+                <div>
+                    <label class="text-[10px] uppercase text-gray-400 font-bold mb-1 block">5th Subject</label>
+                    <select id="edit-optional" onchange="window.toggleCustomOpt('edit')" class="w-full glass-input rounded-xl px-2 py-3 text-sm appearance-none cursor-pointer font-bold text-center">
+                        <option value="Computer Science">Computer Science</option>
+                        <option value="Physical Education">Physical Education</option>
+                        <option value="Fine Arts">Fine Arts</option>
+                        <option value="Music">Music</option>
+                        <option value="Psychology">Psychology</option>
+                        <option value="Custom">Custom...</option>
+                    </select>
+                </div>
+                <div id="edit-custom-box" class="hidden">
+                    <label class="text-[10px] uppercase text-accent font-bold mb-1 block">Specify Custom</label>
+                    <input type="text" id="edit-custom" placeholder="e.g. Economics" class="w-full glass-input rounded-xl px-3 py-3 text-sm font-bold">
+                </div>
+            </div>
 
             <!-- Firebase Auth Data -->
             <div class="pt-4 border-t border-slate-800">
@@ -887,9 +921,8 @@
                         class="w-full glass-input rounded p-2 text-sm mt-1">
                 </div>
                 <div>
-                    <h3
-                        class="text-[11px] text-yellow-500 font-bold mb-2 uppercase tracking-widest flex items-center gap-1">
-                        <i data-lucide="book-open" width="12" height="12"></i> Boards
+                    <h3 class="text-[11px] text-yellow-500 font-bold mb-2 uppercase tracking-widest flex items-center gap-1">
+                        <i data-lucide="book-open" width="12" height="12"></i> <span id="lbl-log-boards">Boards</span>
                     </h3>
                     <input type="number" id="h-board" step="0.1" min="0" placeholder="Hrs"
                         class="w-full glass-input rounded p-2 text-sm mt-1">
@@ -1548,6 +1581,14 @@ window.showAuthError = function(msg) {
 };
 
 // UI Toggles
+
+window.toggleCustomOpt = function(prefix) {
+    const sel = document.getElementById(`${prefix}-optional`);
+    const box = document.getElementById(`${prefix}-custom-box`);
+    if (sel.value === 'Custom') box.classList.remove('hidden');
+    else box.classList.add('hidden');
+};
+        
 window.setAuthMode = function(mode) {
     currentAuthMode = mode;
     document.getElementById('auth-error').classList.add('hidden');
@@ -1589,13 +1630,18 @@ window.executeAuthAction = function() {
     
     // Cache demographics if registering
     if (currentAuthMode === 'register') {
+        let optSub = document.getElementById('auth-reg-optional').value;
+        if(optSub === 'Custom') optSub = document.getElementById('auth-reg-custom').value.trim();
+
         tempProfileData = {
             name: document.getElementById('auth-reg-name').value.trim(),
             age: document.getElementById('auth-reg-age').value,
             classLevel: document.getElementById('auth-reg-class').value,
-            targetYear: document.getElementById('auth-reg-year').value
+            targetYear: document.getElementById('auth-reg-year').value,
+            optionalSubject: optSub || "Computer Science"
         };
         if(!tempProfileData.name || !tempProfileData.targetYear) return showAuthError("Name and Target Year are required.");
+        if(!optSub) return showAuthError("Please specify your 5th subject.");
     } else {
         tempProfileData = null; // Clear if logging in
     }
@@ -1793,7 +1839,6 @@ onAuthStateChanged(auth, (user) => {
     }
 });
 
-        const DEFAULT_SUBJECTS = ['English', 'Physics', 'Maths', 'Chemistry', 'Music Vocal (Hindustani)'];
         const SUBJECT_TASKS = {
             'English': ['Chapter Reading', 'Understanding true meaning and proper knowledge', 'Remember keywords for answer writing', 'Read and try to learn specific answer types'],
             'Physics': ['Read NCERT', 'Watch one shot lecture with notes (if required)', 'Solve NCERT questions and memorise derivations', 'Board PYQs'],
@@ -1852,7 +1897,23 @@ if (data.profile) {
                 if (!state.studyLogs) state.studyLogs = {};
                 if (!state.boardData) state.boardData = [];
 
-                DEFAULT_SUBJECTS.forEach(name => {
+                if (!state.habits) state.habits = [];
+                if (!state.studyLogs) state.studyLogs = {};
+                if (!state.boardData) state.boardData = [];
+
+                // --- OPTIONAL SUBJECT INJECTION ENGINE ---
+                const optSubject = (data.profile && data.profile.optionalSubject) ? data.profile.optionalSubject : "Computer Science";
+                const DYNAMIC_SUBJECTS = ['English', 'Physics', 'Maths', 'Chemistry', optSubject];
+                
+                // Backwards Compatibility: Destroy the old hardcoded Music subject if present
+                const oldMusicIdx = state.boardData.findIndex(b => b.name === 'Music Vocal (Hindustani)');
+                if (oldMusicIdx !== -1 && optSubject !== 'Music Vocal (Hindustani)') {
+                    state.boardData[oldMusicIdx].name = optSubject;
+                    state.boardData[oldMusicIdx].id = 'sub_' + optSubject.replace(/[^a-zA-Z0-9]/g, '');
+                    databaseChanged = true;
+                }
+
+                DYNAMIC_SUBJECTS.forEach(name => {
                     if (!state.boardData.find(b => b.name === name)) {
                         state.boardData.push({ id: 'sub_' + name.replace(/[^a-zA-Z0-9]/g, ''), name: name, chapters: [] });
                         databaseChanged = true;
@@ -2048,6 +2109,18 @@ window.openEditProfile = function() {
     document.getElementById('edit-email').value = auth.currentUser ? auth.currentUser.email : "";
     document.getElementById('edit-password').value = ""; // Keep security tight, leave blank
 
+    const optSub = p.optionalSubject || "Computer Science";
+    const sel = document.getElementById('edit-optional');
+    const customBox = document.getElementById('edit-custom-box');
+    const customInput = document.getElementById('edit-custom');
+    
+    const standardOpts = ["Computer Science", "Physical Education", "Fine Arts", "Music", "Psychology"];
+    if(standardOpts.includes(optSub)) {
+        sel.value = optSub; customBox.classList.add('hidden'); customInput.value = "";
+    } else {
+        sel.value = 'Custom'; customBox.classList.remove('hidden'); customInput.value = optSub;
+    }
+
     const modal = document.getElementById('edit-profile-modal');
     const content = document.getElementById('edit-profile-content');
     
@@ -2074,11 +2147,14 @@ window.saveProfile = function() {
     const a = document.getElementById('edit-age').value;
     const c = document.getElementById('edit-class').value;
     const y = document.getElementById('edit-year').value;
+    let optSub = document.getElementById('edit-optional').value;
+    if(optSub === 'Custom') optSub = document.getElementById('edit-custom').value.trim();
+
     const email = document.getElementById('edit-email').value.trim();
     const pass = document.getElementById('edit-password').value;
     const btn = document.getElementById('btn-save-profile');
 
-    if(!n || !y || !email) return alert("Name, System Email, and Target Year are strictly required.");
+    if(!n || !y || !email || !optSub) return alert("Name, Target Year, Email, and 5th Subject are required.");
 
     btn.innerHTML = `<i data-lucide="loader-2" class="animate-spin" width="16" height="16"></i> Saving...`;
     lucide.createIcons();
@@ -2103,19 +2179,31 @@ window.saveProfile = function() {
     Promise.all(authPromises).then(() => {
         // Auth Updates Secured. Now save to Realtime Database.
         if(!state.profile) state.profile = {};
+        const oldSubject = state.profile.optionalSubject;
+
         state.profile.name = n;
         state.profile.age = a;
         state.profile.classLevel = c;
         state.profile.targetYear = y;
+        state.profile.optionalSubject = optSub;
+
+        // Dynamic Boards Tab Subject Renaming Engine
+        if (oldSubject && oldSubject !== optSub && state.boardData) {
+            const boardIdx = state.boardData.findIndex(b => b.name === oldSubject);
+            if (boardIdx !== -1) {
+                state.boardData[boardIdx].name = optSub;
+                state.boardData[boardIdx].id = 'sub_' + optSub.replace(/[^a-zA-Z0-9]/g, '');
+            }
+        }
 
         set(ref(db, 'userData/' + currentUserUid + '/profile'), state.profile).then(() => {
             btn.innerHTML = `<i data-lucide="save" width="16" height="16"></i> Apply Changes`;
             lucide.createIcons();
             window.closeEditProfile();
+            if(window.renderBoards) window.renderBoards();
         });
 
     }).catch((error) => {
-        // Trap the specific security error for outdated logins
         if(error.code === 'auth/requires-recent-login') {
             alert("SECURITY LOCK: You must log out and log back in before changing sensitive data (Email/Password).");
         } else {
@@ -2418,6 +2506,11 @@ window.lockGraceCrucible = function() {
             if (document.getElementById('h-coaching')) document.getElementById('h-coaching').value = log['coaching'] || '0';
             if ((log.coaching || 0) > 0) window.setCoaching(true, false); else window.setCoaching(false, false);
 
+            // Dynamically rename the Boards label to include their Optional subject
+            const optSub = state.profile?.optionalSubject || "Boards";
+            const lbl = document.getElementById('lbl-log-boards');
+            if(lbl) lbl.innerText = "Brd + " + (optSub.length > 8 ? optSub.substring(0,6)+'..' : optSub);
+            
             const modal = document.getElementById('study-modal');
             modal.classList.remove('hidden');
             setTimeout(() => { modal.classList.remove('opacity-0'); document.getElementById('study-modal-content').classList.remove('scale-95'); }, 10);
@@ -3904,9 +3997,12 @@ window.closeMobileCanvas = function() {
 
         window.clearData = function() {
             if(confirm("WARNING: Complete system wipe. Proceed?")) {
-                state = { xp: 0, shields: 1, habits: [], studyLogs: {}, boardData: [], warCry: "", recoveryUntil: null, lifetimeHours: 0, vault: {} };
-                state.boardData = DEFAULT_SUBJECTS.map(name => ({ id: 'sub_' + name.replace(/\s+/g, ''), name: name, chapters: [] }));
+                const optSubject = state.profile?.optionalSubject || "Computer Science";
+                const DYNAMIC_SUBJECTS = ['English', 'Physics', 'Maths', 'Chemistry', optSubject];
+                state = { profile: state.profile, xp: 0, shields: 1, habits: [], studyLogs: {}, boardData: [], warCry: "", recoveryUntil: null, lifetimeHours: 0, vault: {} };
+                state.boardData = DYNAMIC_SUBJECTS.map(name => ({ id: 'sub_' + name.replace(/[^a-zA-Z0-9]/g, ''), name: name, chapters: [] }));
                 saveData();
+                window.location.reload();
             }
         };
 
